@@ -1,4 +1,4 @@
-# FinTrack Pro
+# portapp
 
 Gestor personal de carteras de activos financieros. Prototipo interactivo construido con Claude.
 
@@ -66,7 +66,7 @@ Gestor personal de carteras de activos financieros. Prototipo interactivo constr
 ## Estructura del proyecto
 
 ```
-fintrack-pro/
+portapp/
 ├── src/
 │   ├── screens/         # Pantallas principales de la app
 │   ├── components/      # Componentes reutilizables

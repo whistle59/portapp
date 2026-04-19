@@ -1,4 +1,4 @@
-# FinTrack Pro — Especificación de requisitos
+# portapp — Especificación de requisitos
 
 ## Visión general
 Gestor personal multicartera de activos financieros. Orientado a inversores particulares

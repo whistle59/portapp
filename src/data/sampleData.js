@@ -1,5 +1,5 @@
 /**
- * FinTrack Pro — estructuras de datos y datos de ejemplo
+ * portapp — estructuras de datos y datos de ejemplo
  * Usar como referencia para el esquema de base de datos en producción
  */
 
