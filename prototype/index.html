@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>portapp — prototipo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f4;
+    --bg-tertiary: #eeede8;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6b6b6b;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --accent: #185FA5;
+    --accent-light: #E6F1FB;
+    --accent-text: #0C447C;
+    --pos: #0F6E56;
+    --neg: #993C1D;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1c1c1e;
+      --bg-secondary: #2c2c2e;
+      --bg-tertiary: #3a3a3c;
+      --text-primary: #f2f2f7;
+      --text-secondary: #aeaeb2;
+      --border: rgba(255,255,255,0.12);
+      --border-md: rgba(255,255,255,0.22);
+      --accent-light: #0c2d4a;
+      --accent-text: #85B7EB;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: var(--text-primary); background: var(--bg-tertiary); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 0; }
+  .device { width: 100%; max-width: 390px; min-height: 100vh; background: var(--bg-primary); display: flex; flex-direction:column; position: relative; overflow: hidden; }
+  @media (min-width: 500px) { body { padding: 24px 0; } .device { min-height: auto; height: 780px; border-radius: 40px; box-shadow: 0 24px 64px rgba(0,0,0,0.18); overflow: hidden; } }
+
+  /* AUTH SCREENS */
+  .auth-screen { display: none; flex-direction: column; padding: 36px 24px 24px; flex: 1; overflow-y: auto; }
+  .auth-screen.active { display: flex; }
+  .logo { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+  .logo svg { width: 26px; height: 26px; }
+  .auth-title { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .auth-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.5; }
+
+  /* APP SHELL */
+  .app-shell { display: none; flex-direction: column; flex: 1; overflow: hidden; }
+  .app-shell.active { display: flex; }
+  .topbar { display: flex; align-items: center; gap: 8px; padding: 12px 14px 0; background: var(--bg-primary); flex-shrink: 0; }
+  .port-sel { display: flex; align-items: center; gap: 6px; background: var(--bg-secondary); border: 0.5px solid var(--border-md); border-radius: 8px; padding: 7px 10px; cursor: pointer; flex: 1; }
+  .port-sel span { font-size: 13px; font-weight: 500; flex: 1; }
+  .port-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .topbar-btn { background: none; border: 0.5px solid var(--border-md); border-radius: 8px; padding: 7px 10px; font-size: 12px; cursor: pointer; color: var(--text-secondary); white-space: nowrap; }
+  .screens-wrap { flex: 1; overflow-y: auto; overflow-x: hidden; }
+  .screen { display: none; padding: 14px 14px 90px; }
+  .screen.active { display: block; }
+  .nav-bar { display: flex; border-top: 0.5px solid var(--border); background: var(--bg-primary); padding: 6px 0 env(safe-area-inset-bottom, 6px); flex-shrink: 0; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 4px 0; border: none; background: none; }
+  .nav-label { font-size: 9px; color: var(--text-secondary); }
+  .nav-item.active .nav-label { color: var(--accent); font-weight: 600; }
+  .nav-item.active svg * { stroke: var(--accent) !important; }
+
+  /* COMPONENTS */
+  .screen-title { font-size: 18px; font-weight: 600; margin-bottom: 14px; margin-top: 10px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-bottom: 14px; }
+  .metric { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 12px; }
+  .metric-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; }
+  .metric-value { font-size: 19px; font-weight: 600; }
+  .metric-sub { font-size: 11px; margin-top: 2px; }
+  .pos { color: var(--pos); } .neg { color: var(--neg); }
+  .card { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 13px; margin-bottom: 11px; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .card-title { font-size: 13px; font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+  .b-blue { background: #E6F1FB; color: #0C447C; }
+  .b-teal { background: #E1F5EE; color: #085041; }
+  .b-amber { background: #FAEEDA; color: #633806; }
+  .b-purple { background: #EEEDFE; color: #3C3489; }
+  .b-coral { background: #FAECE7; color: #712B13; }
+  .b-gray { background: #F1EFE8; color: #444441; }
+  .b-green { background: #EAF3DE; color: #27500A; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; padding: 6px 7px; font-size: 10px; font-weight: 600; color: var(--text-secondary); border-bottom: 0.5px solid var(--border); text-transform: uppercase; letter-spacing: .04em; }
+  td { padding: 8px 7px; border-bottom: 0.5px solid var(--border); color: var(--text-primary); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .row-link { cursor: pointer; }
+  .row-link:hover td { background: var(--bg-secondary); }
+  input, select, textarea { width: 100%; padding: 9px 11px; border: 0.5px solid var(--border-md); border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary); font-size: 13px; outline: none; font-family: inherit; }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(24,95,165,.1); }
+  .form-group { margin-bottom: 10px; }
+  .form-group label { display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .btn { padding: 10px 16px; border: 0.5px solid var(--border-md); border-radius: var(--radius-md); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 4px; font-family: inherit; }
+  .btn:hover { background: var(--bg-tertiary); }
+  .btn-primary { background: var(--accent); color: #E6F1FB; border-color: var(--accent); }
+  .btn-primary:hover { background: #0C447C; }
+  .btn-sm { padding: 4px 9px; font-size: 11px; width: auto; }
+  .btn-ghost { background: none; border: none; color: var(--accent); font-size: 13px; cursor: pointer; padding: 4px 0; font-family: inherit; }
+  .btn-icon { background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 3px 6px; border-radius: 4px; font-size: 15px; }
+  .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { font-size: 12px; color: var(--text-secondary); }
+  .detail-val { font-size: 12px; font-weight: 500; text-align: right; }
+  .two-col { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 11px; }
+  .tag { display: inline-flex; padding: 3px 9px; border-radius: 4px; font-size: 11px; background: var(--bg-secondary); color: var(--text-secondary); border: 0.5px solid var(--border); cursor: pointer; }
+  .tag.selected { background: var(--accent-light); color: var(--accent-text); border-color: #B5D4F4; }
+  .progress-bar { height: 5px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  .section-label { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; }
+  .note-box { background: var(--bg-secondary); padding: 9px 11px; font-size: 12px; color: var(--text-secondary); border-left: 2px solid #B5D4F4; margin-bottom: 6px; }
+  .note-add { font-size: 12px; color: var(--accent); cursor: pointer; padding: 3px 0; display: inline-block; background: none; border: none; font-family: inherit; }
+  .quick-nav { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+  .qn-btn { padding: 4px 9px; border: 0.5px solid var(--border-md); border-radius: 6px; background: none; font-size: 11px; color: var(--text-secondary); cursor: pointer; font-family: inherit; }
+  .qn-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .breadcrumb { display: flex; align-items: center; gap: 5px; margin-bottom: 13px; font-size: 12px; color: var(--text-secondary); }
+  .breadcrumb .bc-link { cursor: pointer; color: var(--accent); background: none; border: none; font-size: 12px; font-family: inherit; padding: 0; }
+  .modal-overlay { display: none; position: absolute; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: flex-end; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg-primary); border-radius: 16px 16px 0 0; padding: 20px; width: 100%; max-height: 85%; overflow-y: auto; }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .modal-title { font-size: 15px; font-weight: 600; }
+  .port-card { border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 13px; margin-bottom: 9px; cursor: pointer; background: var(--bg-primary); }
+  .port-card:hover { background: var(--bg-secondary); }
+  .port-card.active-card { border: 1.5px solid var(--accent); }
+
+  /* OTP */
+  .otp-row { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
+  .otp-input { width: 44px; height: 52px; text-align: center; font-size: 20px; font-weight: 600; border: 0.5px solid var(--border-md); border-radius: var(--radius-md); padding: 0; background: var(--bg-primary); color: var(--text-primary); font-family: inherit; }
+  .otp-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(24,95,165,.1); outline: none; }
+  .timer-txt { font-size: 12px; color: var(--text-secondary); text-align: center; margin-bottom: 16px; }
+  .timer-txt span { color: var(--accent); font-weight: 600; }
+  .error-box { background: #FCEBEB; border: 0.5px solid #F7C1C1; border-radius: var(--radius-md); padding: 10px 12px; font-size: 13px; color: #791F1F; margin-bottom: 14px; display: none; }
+  .success-box { background: #E1F5EE; border: 0.5px solid #9FE1CB; border-radius: var(--radius-md); padding: 10px 12px; font-size: 13px; color: #085041; margin-bottom: 14px; display: none; }
+  .sec-badge { display: flex; align-items: center; gap: 8px; background: var(--bg-secondary); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; color: var(--text-secondary); margin-top: 20px; }
+  .method-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .method-btn { flex: 1; padding: 10px; border: 0.5px solid var(--border-md); border-radius: var(--radius-md); background: var(--bg-primary); font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-secondary); text-align: center; font-family: inherit; }
+  .method-btn.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent-text); }
+  .check-circle { width: 68px; height: 68px; border-radius: 50%; background: #E1F5EE; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+  .block-circle { width: 68px; height: 68px; border-radius: 50%; background: #FCEBEB; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+  .divider-or { display: flex; align-items: center; gap: 10px; margin: 18px 0; color: var(--text-secondary); font-size: 12px; }
+  .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+  .sso-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+</style>
+</head>
+<body>
+<div class="device">
+
+<!-- ═══════════════════════════════════════════════════════════ AUTH ══ -->
+
+<!-- LOGIN -->
+<div class="auth-screen active" id="as-login">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="10" width="4" height="10" rx="1" fill="white"/><rect x="10" y="6" width="4" height="14" rx="1" fill="white"/><rect x="17" y="2" width="4" height="18" rx="1" fill="white"/></svg>
+  </div>
+  <div class="auth-title">Bienvenido</div>
+  <div class="auth-sub">Accede a tu gestor de carteras financieras</div>
+  <div id="login-err" class="error-box">Credenciales incorrectas.</div>
+  <div class="form-group"><label>Email</label><input type="email" id="l-email" value="usuario@portapp.com"></div>
+  <div class="form-group"><label>Contraseña</label><input type="password" id="l-pass" value="demo1234"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;color:var(--text-secondary)"><input type="checkbox" style="width:auto;margin:0"> Recordarme</label>
+    <button class="btn-ghost" onclick="showAuth('as-forgot')">¿Olvidaste la contraseña?</button>
+  </div>
+  <button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+  <div class="divider-or">o continúa con</div>
+  <div class="sso-grid">
+    <button class="btn" style="display:flex;align-items:center;justify-content:center;gap:6px">
+      <svg width="15" height="15" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Google
+    </button>
+    <button class="btn" style="display:flex;align-items:center;justify-content:center;gap:6px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04zm-3.23-18c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      Apple
+    </button>
+  </div>
+  <div class="sec-badge">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 3.5v4C2 11 5 13.5 8 15c3-1.5 6-4 6-7.5v-4L8 1z" stroke="#1D9E75" stroke-width="1.2"/><path d="M5 8l2 2 4-4" stroke="#1D9E75" stroke-width="1.2" stroke-linecap="round"/></svg>
+    Conexión cifrada · Datos protegidos
+  </div>
+</div>
+
+<!-- 2FA METHOD -->
+<div class="auth-screen" id="as-2fa-method">
+  <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;margin-top:10px">Paso 2 de 2</div>
+  <div class="auth-title">Verificación</div>
+  <div class="auth-sub">Confirmamos tu identidad con un segundo factor.</div>
+  <div class="section-label" style="margin-bottom:8px">Enviar código a</div>
+  <div class="method-row">
+    <div class="method-btn active" id="mb-email" onclick="selectMethod('email')">✉ Email</div>
+    <div class="method-btn" id="mb-sms" onclick="selectMethod('sms')">📱 SMS</div>
+  </div>
+  <div id="method-dest" style="font-size:13px;color:var(--text-secondary);margin-bottom:24px">Se enviará a <strong>us***@portapp.com</strong></div>
+  <button class="btn btn-primary" onclick="sendCode()">Enviar código</button>
+  <button class="btn-ghost" style="display:block;text-align:center;margin-top:12px" onclick="showAuth('as-login')">Volver al login</button>
+  <div class="sec-badge"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 3.5v4C2 11 5 13.5 8 15c3-1.5 6-4 6-7.5v-4L8 1z" stroke="#1D9E75" stroke-width="1.2"/><path d="M5 8l2 2 4-4" stroke="#1D9E75" stroke-width="1.2" stroke-linecap="round"/></svg>Código válido 10 min · Un solo uso</div>
+</div>
+
+<!-- OTP -->
+<div class="auth-screen" id="as-otp">
+  <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;margin-top:10px">Paso 2 de 2</div>
+  <div class="auth-title">Introduce el código</div>
+  <div id="otp-sub" class="auth-sub">Código enviado a <strong>us***@portapp.com</strong></div>
+  <div id="otp-err" class="error-box"></div>
+  <div id="otp-ok" class="success-box">Código correcto. Accediendo...</div>
+  <div class="otp-row">
+    <input class="otp-input" type="text" maxlength="1" id="o0" oninput="otpMove(0)">
+    <input class="otp-input" type="text" maxlength="1" id="o1" oninput="otpMove(1)">
+    <input class="otp-input" type="text" maxlength="1" id="o2" oninput="otpMove(2)">
+    <input class="otp-input" type="text" maxlength="1" id="o3" oninput="otpMove(3)">
+    <input class="otp-input" type="text" maxlength="1" id="o4" oninput="otpMove(4)">
+    <input class="otp-input" type="text" maxlength="1" id="o5" oninput="otpMove(5)">
+  </div>
+  <div class="timer-txt">Expira en <span id="t-val">9:47</span></div>
+  <button class="btn btn-primary" onclick="verifyOtp()">Verificar</button>
+  <div style="text-align:center;margin-top:12px"><button class="btn-ghost" onclick="resendCode()">Reenviar código</button></div>
+  <div style="text-align:center;margin-top:6px"><button class="btn-ghost" style="color:var(--text-secondary)" onclick="showAuth('as-2fa-method')">Cambiar método</button></div>
+  <div class="sec-badge" style="margin-top:20px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 3.5v4C2 11 5 13.5 8 15c3-1.5 6-4 6-7.5v-4L8 1z" stroke="#1D9E75" stroke-width="1.2"/><path d="M5 8l2 2 4-4" stroke="#1D9E75" stroke-width="1.2" stroke-linecap="round"/></svg>Máx. 3 intentos · Bloqueo automático</div>
+</div>
+
+<!-- BLOCKED -->
+<div class="auth-screen" id="as-blocked">
+  <div style="text-align:center;padding-top:50px">
+    <div class="block-circle"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#A32D2D" stroke-width="1.5"/><path d="M12 8v4M12 16h.01" stroke="#A32D2D" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+    <div class="auth-title" style="margin-bottom:8px">Cuenta bloqueada</div>
+    <div class="auth-sub" style="margin-bottom:24px">Superaste los intentos permitidos. Acceso bloqueado temporalmente.</div>
+    <div style="background:#FCEBEB;border-radius:var(--radius-md);padding:14px;margin-bottom:20px">
+      <div style="font-size:11px;color:#791F1F;margin-bottom:4px">Tiempo de espera</div>
+      <div style="font-size:30px;font-weight:700;color:#A32D2D" id="block-t">14:59</div>
+    </div>
+    <button class="btn" onclick="showAuth('as-forgot')" style="margin-bottom:8px">Recuperar acceso por email</button>
+    <button class="btn-ghost" style="display:block;width:100%;text-align:center" onclick="resetAuth()">Volver al inicio</button>
+  </div>
+</div>
+
+<!-- FORGOT -->
+<div class="auth-screen" id="as-forgot">
+  <button class="btn-ghost" style="margin-bottom:20px" onclick="showAuth('as-login')">← Volver</button>
+  <div class="auth-title">Recuperar acceso</div>
+  <div class="auth-sub">Te enviaremos un enlace para restablecer tu contraseña.</div>
+  <div class="form-group"><label>Email</label><input type="email" placeholder="tu@email.com"></div>
+  <button class="btn btn-primary" onclick="showAuth('as-forgot-sent')">Enviar enlace</button>
+</div>
+
+<!-- FORGOT SENT -->
+<div class="auth-screen" id="as-forgot-sent">
+  <div style="text-align:center;padding-top:60px">
+    <div class="check-circle"><svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="auth-title" style="margin-bottom:8px">Email enviado</div>
+    <div class="auth-sub">Revisa tu bandeja de entrada y sigue las instrucciones.</div>
+    <button class="btn btn-primary" style="margin-top:28px" onclick="showAuth('as-login')">Volver al login</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ APP ══ -->
+<div class="app-shell" id="app-shell">
+  <div class="topbar">
+    <div class="port-sel" onclick="openModal('m-portfolios')">
+      <div class="port-dot" id="active-dot" style="background:#185FA5"></div>
+      <span id="active-name">Cartera Principal</span>
+      <span style="font-size:10px;color:var(--text-secondary)">▾</span>
+    </div>
+    <button class="topbar-btn" onclick="goTo('s-global')">Global</button>
+    <button class="topbar-btn" onclick="openModal('m-op')">+ Op.</button>
+  </div>
+
+  <div class="screens-wrap">
+    <!-- GLOBAL -->
+    <div class="screen active" id="s-global">
+      <div class="screen-title">Todas las carteras</div>
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-label">Valor total</div><div class="metric-value">€62.340</div><div class="metric-sub pos">+10,4%</div></div>
+        <div class="metric"><div class="metric-label">Efectivo global</div><div class="metric-value">€7.420</div></div>
+        <div class="metric"><div class="metric-label">Total invertido</div><div class="metric-value">€56.450</div></div>
+        <div class="metric"><div class="metric-label">Rent. media</div><div class="metric-value pos">+9,1%</div></div>
+      </div>
+      <div class="section-label">Carteras activas</div>
+      <div id="lista-carteras"></div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Distribución global por grupo</div>
+        <div id="leg-global" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px"></div>
+        <div style="position:relative;height:170px"><canvas id="cGlobal" role="img" aria-label="Distribución global por grupo"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Exposición por divisa (global)</div>
+        <div id="exp-div-global"></div>
+      </div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="screen" id="s-resumen">
+      <div class="quick-nav" id="qn-resumen"></div>
+      <div class="screen-title" id="res-title">Resumen</div>
+      <div class="metric-grid" id="res-metrics"></div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:9px">Por grupo</div>
+        <div id="leg-resumen" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px"></div>
+        <div style="position:relative;height:170px"><canvas id="cResumen" role="img" aria-label="Distribución por grupo"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Actividad reciente</span><button class="btn btn-sm" onclick="goTo('s-ops')">Ver todas</button></div>
+        <div id="actividad"></div>
+      </div>
+    </div>
+
+    <!-- CARTERA -->
+    <div class="screen" id="s-cartera">
+      <div class="quick-nav" id="qn-cartera"></div>
+      <div class="screen-title">Cartera</div>
+      <div class="chip-row">
+        <span class="tag selected" onclick="filterCt(this,'todos')">Todos</span>
+        <span class="tag" onclick="filterCt(this,'Acción')">Acciones</span>
+        <span class="tag" onclick="filterCt(this,'ETF')">ETFs</span>
+        <span class="tag" onclick="filterCt(this,'Cripto')">Cripto</span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden"><div style="overflow-x:auto">
+        <table><thead><tr><th>Activo</th><th>Grupo</th><th>Valor</th><th>P/L</th></tr></thead>
+        <tbody id="tb-cartera"></tbody></table>
+      </div></div>
+      <div style="margin-top:12px"><div class="section-label">Por región</div><div id="exp-region"></div></div>
+      <div style="margin-top:11px"><div class="section-label">Por divisa</div><div id="exp-divisa"></div></div>
+    </div>
+
+    <!-- EFECTIVO -->
+    <div class="screen" id="s-efectivo">
+      <div class="quick-nav" id="qn-efectivo"></div>
+      <div class="screen-title">Efectivo</div>
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-label">Saldo total</div><div class="metric-value">€4.250</div></div>
+        <div class="metric"><div class="metric-label">Este mes</div><div class="metric-value pos">+€342</div><div class="metric-sub" style="color:var(--text-secondary)">ingresos netos</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Por broker</span></div>
+        <div class="detail-row"><span class="detail-key">Interactive Brokers</span><span class="detail-val">€2.800 <span class="badge b-blue">USD</span></span></div>
+        <div class="detail-row"><span class="detail-key">DEGIRO</span><span class="detail-val">€950 <span class="badge b-teal">EUR</span></span></div>
+        <div class="detail-row"><span class="detail-key">Coinbase</span><span class="detail-val">€500 <span class="badge b-amber">USD</span></span></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Movimientos</span><button class="btn btn-sm" onclick="openModal('m-efectivo')">+ Nuevo</button></div>
+        <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Importe</th></tr></thead>
+        <tbody id="tb-efectivo"></tbody></table>
+      </div>
+    </div>
+
+    <!-- OPERACIONES + DETALLE -->
+    <div class="screen" id="s-ops">
+      <div id="panel-ops">
+        <div class="quick-nav" id="qn-ops"></div>
+        <div class="screen-title">Operaciones</div>
+        <div class="chip-row">
+          <span class="tag selected">Todas</span><span class="tag">Compras</span><span class="tag">Ventas</span><span class="tag">Rendimientos</span>
+        </div>
+        <button class="btn btn-primary" style="margin-bottom:11px" onclick="openModal('m-op')">+ Registrar operación</button>
+        <div class="card" style="padding:0;overflow:hidden"><div style="overflow-x:auto">
+          <table><thead><tr><th>Fecha</th><th>Activo</th><th>Tipo</th><th>Total</th></tr></thead>
+          <tbody id="tb-ops"></tbody></table>
+        </div></div>
+      </div>
+      <div id="panel-detalle" style="display:none">
+        <div class="breadcrumb">
+          <button class="bc-link" onclick="backOps()">Operaciones</button>
+          <span>/</span><span id="d-titulo" style="font-weight:500;color:var(--text-primary)">Activo</span>
+        </div>
+        <div class="metric-grid">
+          <div class="metric"><div class="metric-label">Valor actual</div><div class="metric-value" id="d-valor"></div></div>
+          <div class="metric"><div class="metric-label">P/L total</div><div class="metric-value" id="d-pl"></div></div>
+          <div class="metric"><div class="metric-label">Precio medio</div><div class="metric-value" id="d-pm"></div></div>
+          <div class="metric"><div class="metric-label">Cotización</div><div class="metric-value" id="d-cot"></div></div>
+        </div>
+        <div class="card"><div class="card-title" style="margin-bottom:9px">Ficha del activo</div><div id="ficha"></div></div>
+        <div class="card"><div class="card-title" style="margin-bottom:9px">Historial</div>
+          <table><thead><tr><th>Fecha</th><th>Op.</th><th>Qty</th><th>Precio</th><th>Com.</th></tr></thead>
+          <tbody id="d-hist"></tbody></table>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:7px">Anotaciones</div>
+          <div id="d-notas"></div>
+          <button class="note-add" onclick="openModal('m-nota')">+ Añadir nota</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROYECCIÓN -->
+    <div class="screen" id="s-proyeccion">
+      <div class="quick-nav" id="qn-proyeccion"></div>
+      <div class="screen-title">Proyección DCA</div>
+      <div class="card">
+        <div class="two-col">
+          <div class="form-group"><label>Aportación (€)</label><input type="number" id="dca-amt" value="300" step="50"></div>
+          <div class="form-group"><label>Frecuencia</label><select id="dca-freq"><option>Mensual</option><option>Quincenal</option><option>Semanal</option></select></div>
+        </div>
+        <div class="two-col">
+          <div class="form-group"><label>Revalorización (%)</label><input type="number" id="dca-rate" value="8" step="0.5"></div>
+          <div class="form-group"><label>Horizonte (años)</label><input type="number" id="dca-years" value="10" min="1" max="40"></div>
+        </div>
+        <button class="btn btn-primary" onclick="calcProy()">Calcular</button>
+      </div>
+      <div class="card" id="card-proy" style="display:none">
+        <div class="metric-grid" id="proy-metrics"></div>
+        <div style="position:relative;height:190px;margin-top:11px"><canvas id="cProy" role="img" aria-label="Proyección de cartera"></canvas></div>
+        <div id="tabla-proy" style="margin-top:11px;overflow-x:auto"></div>
+      </div>
+    </div>
+
+    <!-- ÍNDICES -->
+    <div class="screen" id="s-indices">
+      <div class="quick-nav" id="qn-indices"></div>
+      <div class="screen-title">Índices seguidos</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:11px">Datos simulados · en v1 se actualizan online</div>
+      <div id="lista-indices"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="screen" id="s-settings">
+      <div class="screen-title">Ajustes</div>
+      <div class="section-label" style="margin-bottom:7px">Divisas activas</div>
+      <div class="chip-row"><span class="tag selected">EUR</span><span class="tag selected">USD</span><span class="tag">GBP</span><span class="tag">CHF</span><span class="tag">+ Añadir</span></div>
+      <div class="section-label" style="margin-bottom:7px">Brokers conectados</div>
+      <div class="card" style="margin-bottom:11px">
+        <div class="detail-row"><span class="detail-key">Interactive Brokers</span><span class="badge b-teal">Activo</span></div>
+        <div class="detail-row"><span class="detail-key">DEGIRO</span><span class="badge b-teal">Activo</span></div>
+        <div class="detail-row"><span class="detail-key">Coinbase</span><span class="badge b-amber">Manual</span></div>
+        <div class="detail-row"><span class="detail-key">ProRealTime</span><span class="badge b-gray">Pendiente</span></div>
+      </div>
+      <button class="btn" style="margin-bottom:11px">+ Conectar broker / plataforma</button>
+      <div class="section-label" style="margin-bottom:7px">Grupos de activos</div>
+      <div class="chip-row"><span class="tag selected">Core</span><span class="tag selected">Cripto</span><span class="tag selected">AI/Tech</span><span class="tag selected">Renta fija</span><span class="tag selected">Legacy</span><span class="tag selected">Core ampliado</span><span class="tag">+ Nuevo</span></div>
+      <div class="section-label" style="margin-top:11px;margin-bottom:7px">Interfaz</div>
+      <div class="card">
+        <div class="detail-row"><span class="detail-key">Modo oscuro</span><input type="checkbox" style="width:auto"></div>
+        <div class="detail-row"><span class="detail-key">Decimales</span><select style="width:70px;padding:4px"><option>2</option><option>4</option><option>6</option></select></div>
+        <div class="detail-row"><span class="detail-key">Formato fecha</span><select style="width:115px;padding:4px"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select></div>
+      </div>
+      <div class="section-label" style="margin-top:11px;margin-bottom:7px">Datos</div>
+      <div class="card">
+        <div class="detail-row"><span class="detail-key">Exportar Excel</span><button class="btn btn-sm">Exportar</button></div>
+        <div class="detail-row"><span class="detail-key">Exportar CSV</span><button class="btn btn-sm">Exportar</button></div>
+        <div class="detail-row"><span class="detail-key">Importar</span><button class="btn btn-sm">Importar</button></div>
+        <div class="detail-row"><span class="detail-key">Backup</span><button class="btn btn-sm">Backup</button></div>
+      </div>
+      <div class="section-label" style="margin-top:11px;margin-bottom:7px">Sesión</div>
+      <button class="btn" onclick="resetAuth()" style="color:var(--neg);border-color:var(--neg)">Cerrar sesión</button>
+    </div>
+  </div><!-- /screens-wrap -->
+
+  <!-- NAV BAR -->
+  <div class="nav-bar">
+    <button class="nav-item active" id="nav-global" onclick="goTo('s-global',this)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="9" width="4" height="7" rx="1" stroke="var(--text-secondary)" stroke-width="1.3"/><rect x="7" y="5" width="4" height="11" rx="1" stroke="var(--text-secondary)" stroke-width="1.3"/><rect x="13" y="1" width="4" height="15" rx="1" stroke="var(--text-secondary)" stroke-width="1.3"/></svg>
+      <span class="nav-label">Global</span>
+    </button>
+    <button class="nav-item" id="nav-resumen" onclick="goTo('s-resumen',this)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="var(--text-secondary)" stroke-width="1.3"/><path d="M9 4v5l3 2" stroke="var(--text-secondary)" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="nav-label">Resumen</span>
+    </button>
+    <button class="nav-item" id="nav-cartera" onclick="goTo('s-cartera',this)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="6" width="16" height="10" rx="2" stroke="var(--text-secondary)" stroke-width="1.3"/><path d="M5 6V4a2 2 0 014 0v2" stroke="var(--text-secondary)" stroke-width="1.3"/></svg>
+      <span class="nav-label">Cartera</span>
+    </button>
+    <button class="nav-item" id="nav-efectivo" onclick="goTo('s-efectivo',this)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="4" width="16" height="10" rx="2" stroke="var(--text-secondary)" stroke-width="1.3"/><path d="M1 7h16" stroke="var(--text-secondary)" stroke-width="1.3"/><circle cx="5" cy="11" r="1" fill="var(--text-secondary)"/></svg>
+      <span class="nav-label">Efectivo</span>
+    </button>
+    <button class="nav-item" id="nav-ops" onclick="goTo('s-ops',this)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5h12M3 9h8M3 13h10" stroke="var(--text-secondary)" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="nav-label">Ops.</span>
+    </button>
+    <button class="nav-item" id="nav-proyeccion" onclick="goTo('s-proyeccion',this)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="1,14 6,8 10,11 17,3" stroke="var(--text-secondary)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="nav-label">Proy.</span>
+    </button>
+    <button class="nav-item" id="nav-indices" onclick="goTo('s-indices',this)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="var(--text-secondary)" stroke-width="1.3"/><line x1="9" y1="2" x2="9" y2="16" stroke="var(--text-secondary)" stroke-width="1.3"/><line x1="2" y1="9" x2="16" y2="9" stroke="var(--text-secondary)" stroke-width="1.3"/></svg>
+      <span class="nav-label">Índices</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="goTo('s-settings',this)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke="var(--text-secondary)" stroke-width="1.3"/><path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.2 3.2l1.4 1.4M13.4 13.4l1.4 1.4M3.2 14.8l1.4-1.4M13.4 4.6l1.4-1.4" stroke="var(--text-secondary)" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span class="nav-label">Ajustes</span>
+    </button>
+  </div>
+</div><!-- /app-shell -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="m-portfolios">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Mis carteras</span><button class="btn-icon" onclick="closeModal('m-portfolios')">✕</button></div>
+    <div id="port-list"></div>
+    <button class="btn" style="margin-top:8px" onclick="openModal('m-nueva-cartera');closeModal('m-portfolios')">+ Nueva cartera</button>
+    <button class="btn" style="margin-top:6px" onclick="goTo('s-global');closeModal('m-portfolios')">Ver vista global</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-nueva-cartera">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Nueva cartera</span><button class="btn-icon" onclick="closeModal('m-nueva-cartera')">✕</button></div>
+    <div class="form-group"><label>Nombre</label><input type="text" id="nc-nom" placeholder="Ej: Pensión 2040"></div>
+    <div class="form-group"><label>Descripción</label><input type="text" id="nc-desc" placeholder="Objetivo de esta cartera"></div>
+    <div class="form-group"><label>Divisa base</label><select id="nc-div"><option>EUR</option><option>USD</option><option>GBP</option></select></div>
+    <div class="form-group"><label>Color</label><select id="nc-col"><option value="#185FA5">Azul</option><option value="#1D9E75">Verde</option><option value="#BA7517">Ámbar</option><option value="#7F77DD">Morado</option><option value="#D85A30">Coral</option></select></div>
+    <button class="btn btn-primary" onclick="addCartera()">Crear cartera</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-op">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Nueva operación</span><button class="btn-icon" onclick="closeModal('m-op')">✕</button></div>
+    <div class="form-group"><label>Cartera</label><select id="op-cart"></select></div>
+    <div class="two-col">
+      <div class="form-group"><label>Fecha</label><input type="date" id="op-date"></div>
+      <div class="form-group"><label>Ticker</label><input type="text" id="op-tick" placeholder="AAPL"></div>
+    </div>
+    <div class="two-col">
+      <div class="form-group"><label>Tipo activo</label><select id="op-tipo"><option>Acción</option><option>ETF</option><option>Cripto</option><option>Bono</option><option>Fondo</option></select></div>
+      <div class="form-group"><label>Operación</label><select id="op-op"><option>Compra</option><option>Venta</option><option>Dividendo</option><option>Staking</option><option>Interés</option><option>Saveback</option></select></div>
+    </div>
+    <div class="form-group"><label>Broker</label><input type="text" id="op-broker" placeholder="Interactive Brokers"></div>
+    <div class="two-col">
+      <div class="form-group"><label>Cantidad</label><input type="number" id="op-qty" step="any"></div>
+      <div class="form-group"><label>Precio (€)</label><input type="number" id="op-price" step="any"></div>
+    </div>
+    <div class="two-col">
+      <div class="form-group"><label>Comisión (€)</label><input type="number" id="op-fee" value="0" step="any"></div>
+      <div class="form-group"><label>Divisa</label><select id="op-div"><option>EUR</option><option>USD</option><option>GBP</option><option>CHF</option></select></div>
+    </div>
+    <div class="form-group"><label>Grupo</label><select id="op-grupo"><option>Core</option><option>Cripto</option><option>AI/Tech</option><option>Renta fija</option><option>Legacy</option><option>Core ampliado</option></select></div>
+    <div class="form-group"><label>Nota</label><textarea id="op-nota" rows="2" placeholder="Observación opcional..."></textarea></div>
+    <button class="btn btn-primary" onclick="addOp()">Guardar operación</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-efectivo">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Movimiento de efectivo</span><button class="btn-icon" onclick="closeModal('m-efectivo')">✕</button></div>
+    <div class="form-group"><label>Cartera</label><select id="ef-cart"></select></div>
+    <div class="form-group"><label>Fecha</label><input type="date"></div>
+    <div class="form-group"><label>Tipo</label><select><option>Transferencia entrada</option><option>Bizum entrada</option><option>Dividendo</option><option>Interés cuenta</option><option>Staking</option><option>Saveback</option><option>Compra activo</option><option>Transferencia salida</option><option>Comisión</option><option>Otro</option></select></div>
+    <div class="form-group"><label>Broker</label><select><option>Interactive Brokers</option><option>DEGIRO</option><option>Coinbase</option></select></div>
+    <div class="two-col">
+      <div class="form-group"><label>Importe (€)</label><input type="number" step="any"></div>
+      <div class="form-group"><label>Divisa</label><select><option>EUR</option><option>USD</option><option>GBP</option></select></div>
+    </div>
+    <div class="form-group"><label>Nota</label><textarea rows="2"></textarea></div>
+    <button class="btn btn-primary" onclick="closeModal('m-efectivo')">Guardar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-nota">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Nueva anotación</span><button class="btn-icon" onclick="closeModal('m-nota')">✕</button></div>
+    <div class="form-group"><label>Anotación</label><textarea id="nota-txt" rows="3" placeholder="Escribe tu nota..."></textarea></div>
+    <div class="form-group"><label>Nivel</label><select><option>Activo</option><option>Broker</option><option>Grupo</option><option>Cartera</option><option>Global</option></select></div>
+    <button class="btn btn-primary" onclick="saveNota()">Guardar nota</button>
+  </div>
+</div>
+
+</div><!-- /device -->
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const COLORS=['#378ADD','#1D9E75','#BA7517','#7F77DD','#D85A30','#D4537E','#639922','#E24B4A'];
+const GC={'Core':'b-blue','Cripto':'b-amber','AI/Tech':'b-purple','Renta fija':'b-teal','Legacy':'b-gray','Core ampliado':'b-green'};
+
+let carteras=[
+  {id:'c1',nombre:'Cartera Principal',desc:'Inversión a largo plazo',divisa:'EUR',color:'#185FA5'},
+  {id:'c2',nombre:'Pensión 2045',desc:'DCA mensual índices globales',divisa:'EUR',color:'#1D9E75'},
+  {id:'c3',nombre:'Especulativa',desc:'Cripto y tech de alto riesgo',divisa:'USD',color:'#BA7517'},
+];
+let activeId='c1';
+
+const activos=[
+  {ticker:'AAPL',nombre:'Apple Inc.',isin:'US0378331005',tipo:'Acción',broker:'Interactive Brokers',grupo:'AI/Tech',divisa:'USD',mercado:'NASDAQ',qty:10,pm:170,cot:185,cartera:'c1',indice:'-',region:{USA:100},exposDiv:{USD:100}},
+  {ticker:'VWCE',nombre:'Vanguard FTSE All-World',isin:'IE00BK5BQT80',tipo:'ETF',broker:'DEGIRO',grupo:'Core',divisa:'EUR',mercado:'XETRA',qty:20,pm:105,cot:112,cartera:'c1',indice:'FTSE All-World',region:{USA:61,Europa:15,Asia:20,Otros:4},exposDiv:{USD:63,EUR:15,JPY:6,Otros:16}},
+  {ticker:'BTC',nombre:'Bitcoin',isin:'-',tipo:'Cripto',broker:'Coinbase',grupo:'Cripto',divisa:'USD',mercado:'Crypto',qty:0.5,pm:58000,cot:62000,cartera:'c3',indice:'-',region:{Global:100},exposDiv:{USD:100}},
+  {ticker:'MSFT',nombre:'Microsoft Corp.',isin:'US5949181045',tipo:'Acción',broker:'Interactive Brokers',grupo:'AI/Tech',divisa:'USD',mercado:'NASDAQ',qty:5,pm:420,cot:440,cartera:'c1',indice:'-',region:{USA:100},exposDiv:{USD:100}},
+  {ticker:'NVDA',nombre:'NVIDIA Corp.',isin:'US67066G1040',tipo:'Acción',broker:'DEGIRO',grupo:'AI/Tech',divisa:'USD',mercado:'NASDAQ',qty:8,pm:135,cot:128,cartera:'c3',indice:'-',region:{USA:100},exposDiv:{USD:100}},
+  {ticker:'IWDA',nombre:'iShares Core MSCI World',isin:'IE00B4L5Y983',tipo:'ETF',broker:'DEGIRO',grupo:'Core',divisa:'EUR',mercado:'XETRA',qty:30,pm:85,cot:94,cartera:'c2',indice:'MSCI World',region:{USA:68,Europa:16,Asia:14,Otros:2},exposDiv:{USD:70,EUR:14,JPY:5,Otros:11}},
+];
+
+let ops=[
+  {id:1,fecha:'2024-03-10',ticker:'AAPL',tipo:'Acción',broker:'IB',op:'Compra',qty:10,precio:170,fee:2,divisa:'USD',grupo:'AI/Tech',nota:'Primera posición en Apple',cartera:'c1'},
+  {id:2,fecha:'2024-05-22',ticker:'BTC',tipo:'Cripto',broker:'Coinbase',op:'Compra',qty:0.5,precio:58000,fee:15,divisa:'USD',grupo:'Cripto',nota:'',cartera:'c3'},
+  {id:3,fecha:'2024-07-01',ticker:'MSFT',tipo:'Acción',broker:'IB',op:'Compra',qty:5,precio:420,fee:2,divisa:'USD',grupo:'AI/Tech',nota:'',cartera:'c1'},
+  {id:4,fecha:'2024-09-15',ticker:'VWCE',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:20,precio:105,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c1'},
+  {id:5,fecha:'2025-01-08',ticker:'NVDA',tipo:'Acción',broker:'DEGIRO',op:'Compra',qty:8,precio:135,fee:1,divisa:'USD',grupo:'AI/Tech',nota:'',cartera:'c3'},
+  {id:6,fecha:'2025-02-01',ticker:'IWDA',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:30,precio:85,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c2'},
+];
+
+const efectivo=[
+  {fecha:'2024-01-05',tipo:'Transferencia entrada',broker:'IB',importe:5000,divisa:'EUR',cartera:'c1'},
+  {fecha:'2024-03-01',tipo:'Bizum',broker:'DEGIRO',importe:300,divisa:'EUR',cartera:'c1'},
+  {fecha:'2024-04-15',tipo:'Dividendo',broker:'IB',importe:18.4,divisa:'USD',cartera:'c1'},
+  {fecha:'2024-04-12',tipo:'Saveback',broker:'DEGIRO',importe:4.2,divisa:'EUR',cartera:'c1'},
+  {fecha:'2024-05-01',tipo:'Staking',broker:'Coinbase',importe:12,divisa:'USD',cartera:'c3'},
+];
+
+const indices=[
+  {nombre:'FTSE All-World',ticker:'VWCE',ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},
+  {nombre:'S&P 500',ticker:'SPY',ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'},
+  {nombre:'MSCI World',ticker:'IWDA',ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados globales'},
+  {nombre:'NASDAQ 100',ticker:'QQQ',ytd:'+11,3%',y1:'+17,8%',pe:'28,5x',div:'0,6%',n:'100',desc:'100 mayores no financieras NASDAQ'},
+];
+
+let notas=['Tesis de inversión: largo plazo DCA sobre índices globales.'];
+let nextId=10;
+let chGlobal=null,chResumen=null,chProy=null;
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+const DEMO_CODE='123456';
+let intentos=3,timerSec=587,blockSec=899;
+let timerInt=null,blockInt=null,selMethod='email';
+
+function showAuth(id){
+  document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(id);if(el)el.classList.add('active');
+}
+function doLogin(){
+  const p=document.getElementById('l-pass').value;
+  const e=document.getElementById('login-err');
+  if(p.length<6){e.style.display='block';return;}
+  e.style.display='none';
+  showAuth('as-2fa-method');
+}
+function selectMethod(m){
+  selMethod=m;
+  document.getElementById('mb-email').classList.toggle('active',m==='email');
+  document.getElementById('mb-sms').classList.toggle('active',m==='sms');
+  document.getElementById('method-dest').innerHTML=m==='email'?'Se enviará a <strong>us***@portapp.com</strong>':'Se enviará a <strong>+34 *** *** 421</strong>';
+}
+function sendCode(){
+  document.getElementById('otp-sub').innerHTML=selMethod==='email'?'Código enviado a <strong>us***@portapp.com</strong>':'Código enviado por SMS a <strong>+34 *** *** 421</strong>';
+  for(let i=0;i<6;i++)document.getElementById('o'+i).value='';
+  document.getElementById('otp-err').style.display='none';
+  document.getElementById('otp-ok').style.display='none';
+  intentos=3;timerSec=587;
+  clearInterval(timerInt);
+  timerInt=setInterval(()=>{timerSec--;if(timerSec<=0){clearInterval(timerInt);document.getElementById('t-val').textContent='Expirado';return;}const m=Math.floor(timerSec/60),s=timerSec%60;document.getElementById('t-val').textContent=m+':'+(s<10?'0':'')+s;},1000);
+  showAuth('as-otp');
+  setTimeout(()=>document.getElementById('o0').focus(),100);
+}
+function otpMove(i){if(document.getElementById('o'+i).value&&i<5)document.getElementById('o'+(i+1)).focus();}
+function getOtp(){return[0,1,2,3,4,5].map(i=>document.getElementById('o'+i).value).join('');}
+function verifyOtp(){
+  const code=getOtp();
+  const err=document.getElementById('otp-err'),ok=document.getElementById('otp-ok');
+  if(code.length<6){err.style.display='block';err.textContent='Introduce los 6 dígitos.';return;}
+  if(code===DEMO_CODE){
+    err.style.display='none';ok.style.display='block';
+    clearInterval(timerInt);
+    setTimeout(()=>{launchApp();},900);
+  } else {
+    intentos--;
+    if(intentos<=0){
+      clearInterval(timerInt);blockSec=899;
+      clearInterval(blockInt);
+      blockInt=setInterval(()=>{blockSec--;if(blockSec<=0){clearInterval(blockInt);document.getElementById('block-t').textContent='Desbloqueado';return;}const m=Math.floor(blockSec/60),s=blockSec%60;document.getElementById('block-t').textContent=m+':'+(s<10?'0':'')+s;},1000);
+      showAuth('as-blocked');
+    } else {
+      err.style.display='block';err.innerHTML='Código incorrecto. Quedan <strong>'+intentos+'</strong> intento'+(intentos===1?'':'s')+'.';
+      for(let i=0;i<6;i++)document.getElementById('o'+i).value='';
+      document.getElementById('o0').focus();
+    }
+  }
+}
+function resendCode(){timerSec=587;intentos=3;for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('otp-err').style.display='none';document.getElementById('o0').focus();}
+function resetAuth(){clearInterval(timerInt);clearInterval(blockInt);document.getElementById('app-shell').classList.remove('active');document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));document.getElementById('as-login').classList.add('active');}
+function launchApp(){
+  document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('app-shell').classList.add('active');
+  goTo('s-global',document.getElementById('nav-global'));
+}
+
+// OTP keyboard
+document.querySelectorAll('.otp-input').forEach((inp,i)=>{
+  inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&i>0)document.getElementById('o'+(i-1)).focus();if(e.key==='Enter')verifyOtp();});
+  inp.addEventListener('paste',e=>{const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');if(p.length>=6)for(let j=0;j<6;j++)document.getElementById('o'+j).value=p[j]||'';e.preventDefault();});
+});
+
+// ─── APP NAV ──────────────────────────────────────────────────────────────────
+const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-settings'];
+const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-settings':'Ajustes'};
+const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
+
+function goTo(sid,btn){
+  SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));
+  document.getElementById(sid).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');
+  closeAllModals();renderQN(sid);
+  const sw=document.querySelector('.screens-wrap');if(sw)sw.scrollTop=0;
+  if(sid==='s-global')setTimeout(renderGlobal,80);
+  if(sid==='s-resumen'){renderResumen();setTimeout(renderChartResumen,80);}
+  if(sid==='s-cartera')renderCartera();
+  if(sid==='s-efectivo')renderEfectivo();
+  if(sid==='s-ops')renderOps();
+  if(sid==='s-indices')renderIndices();
+}
+
+function renderQN(cur){
+  ['resumen','cartera','efectivo','ops','proyeccion','indices'].forEach(k=>{
+    const el=document.getElementById('qn-'+k);if(!el)return;
+    el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings').map(([id,label])=>`<button class="qn-btn" onclick="goTo('${id}')">${label}</button>`).join('');
+  });
+}
+
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='m-portfolios')renderPortList();
+  if(id==='m-op'||id==='m-efectivo')fillCartSel();
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeAllModals(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));}
+function fillCartSel(){['op-cart','ef-cart'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=carteras.map(c=>`<option value="${c.id}"${c.id===activeId?' selected':''}>${c.nombre}</option>`).join('');});}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+const fe=n=>'€'+Math.round(n).toLocaleString('es-ES');
+const fp=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
+const cAct=cid=>activos.filter(a=>a.cartera===cid);
+const cVal=cid=>cAct(cid).reduce((s,a)=>s+a.qty*a.cot,0);
+const cInv=cid=>cAct(cid).reduce((s,a)=>s+a.qty*a.pm,0);
+
+// ─── GLOBAL ───────────────────────────────────────────────────────────────────
+function renderGlobal(){
+  document.getElementById('lista-carteras').innerHTML=carteras.map(c=>{
+    const v=cVal(c.id),i=cInv(c.id),p=i>0?(v-i)/i*100:0;
+    return `<div class="port-card" onclick="selectCartera('${c.id}')">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${c.color}"></div>
+        <span style="font-weight:600;font-size:13px;flex:1">${c.nombre}</span>
+        <span style="font-size:13px;font-weight:600">${fe(v)}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px">${c.desc}</div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:11px;color:var(--text-secondary)">Invertido: ${fe(i)}</span>
+        <span style="font-size:12px" class="${p>=0?'pos':'neg'}">${fp(p)}</span>
+      </div>
+      <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:${Math.min(100,Math.abs(p)*3+40)}%;background:${c.color}"></div></div>
+    </div>`;
+  }).join('');
+  const grpV={};activos.forEach(a=>{grpV[a.grupo]=(grpV[a.grupo]||0)+a.qty*a.cot;});
+  const labs=Object.keys(grpV),dat=Object.values(grpV),tot=dat.reduce((s,v)=>s+v,0);
+  document.getElementById('leg-global').innerHTML=labs.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary)"><div style="width:9px;height:9px;border-radius:2px;background:${COLORS[i%COLORS.length]}"></div>${l} ${tot>0?(dat[i]/tot*100).toFixed(0)+'%':''}</div>`).join('');
+  if(chGlobal)chGlobal.destroy();
+  chGlobal=new Chart(document.getElementById('cGlobal'),{type:'doughnut',data:{labels:labs,datasets:[{data:dat,backgroundColor:COLORS.slice(0,labs.length),borderWidth:2,borderColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});
+  const dT={};let td=0;activos.forEach(a=>{const v=a.qty*a.cot;td+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});
+  document.getElementById('exp-div-global').innerHTML=Object.entries(dT).map(([d,v])=>{const p=td>0?v/td*100:0;return `<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>${d}</span><span>${p.toFixed(1)}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:#378ADD"></div></div></div>`;}).join('');
+}
+
+// ─── PORTFOLIO MODAL ──────────────────────────────────────────────────────────
+function renderPortList(){
+  document.getElementById('port-list').innerHTML=carteras.map(c=>{
+    const v=cVal(c.id),i=cInv(c.id),p=i>0?(v-i)/i*100:0;
+    return `<div class="port-card${c.id===activeId?' active-card':''}" onclick="selectCartera('${c.id}')">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${c.color}"></div>
+        <span style="font-weight:600;font-size:13px;flex:1">${c.nombre}</span>
+        ${c.id===activeId?'<span class="badge b-blue">Activa</span>':''}
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px">${c.desc}</div>
+      <div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:600">${fe(v)}</span><span class="${p>=0?'pos':'neg'}">${fp(p)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function selectCartera(cid){
+  activeId=cid;
+  const c=carteras.find(x=>x.id===cid);
+  document.getElementById('active-name').textContent=c.nombre;
+  document.getElementById('active-dot').style.background=c.color;
+  closeAllModals();goTo('s-resumen');
+}
+
+function addCartera(){
+  const nom=document.getElementById('nc-nom').value.trim();if(!nom)return;
+  carteras.push({id:'c'+Date.now(),nombre:nom,desc:document.getElementById('nc-desc').value||'',divisa:document.getElementById('nc-div').value,color:document.getElementById('nc-col').value});
+  closeModal('m-nueva-cartera');
+}
+
+// ─── RESUMEN ──────────────────────────────────────────────────────────────────
+function renderResumen(){
+  const c=carteras.find(x=>x.id===activeId);
+  document.getElementById('res-title').textContent='Resumen · '+c.nombre;
+  const v=cVal(activeId),i=cInv(activeId),g=v-i,p=i>0?g/i*100:0;
+  document.getElementById('res-metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">Valor cartera</div><div class="metric-value">${fe(v)}</div><div class="metric-sub ${g>=0?'pos':'neg'}">${fp(p)}</div></div>
+    <div class="metric"><div class="metric-label">Total invertido</div><div class="metric-value">${fe(i)}</div></div>
+    <div class="metric"><div class="metric-label">Ganancia / pérdida</div><div class="metric-value ${g>=0?'pos':'neg'}">${fe(g)}</div></div>
+    <div class="metric"><div class="metric-label">Activos</div><div class="metric-value">${cAct(activeId).length}</div></div>`;
+  document.getElementById('actividad').innerHTML=ops.filter(o=>o.cartera===activeId).slice(0,4).map(o=>`<div class="detail-row"><span class="detail-key">${o.fecha.slice(5)} · ${o.op} ${o.ticker}</span><span class="detail-val ${o.op==='Compra'?'neg':'pos'}">${o.op==='Compra'?'-':'+'}{v}</span></div>`.replace('{v}',fe(o.qty*o.precio))).join('')||'<div style="font-size:12px;color:var(--text-secondary);padding:8px 0">Sin operaciones recientes</div>';
+}
+function renderChartResumen(){
+  const grpV={};cAct(activeId).forEach(a=>{grpV[a.grupo]=(grpV[a.grupo]||0)+a.qty*a.cot;});
+  const labs=Object.keys(grpV),dat=Object.values(grpV),tot=dat.reduce((s,v)=>s+v,0);
+  document.getElementById('leg-resumen').innerHTML=labs.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-secondary)"><div style="width:9px;height:9px;border-radius:2px;background:${COLORS[i%COLORS.length]}"></div>${l} ${tot>0?(dat[i]/tot*100).toFixed(0)+'%':''}</div>`).join('');
+  if(chResumen)chResumen.destroy();
+  chResumen=new Chart(document.getElementById('cResumen'),{type:'doughnut',data:{labels:labs,datasets:[{data:dat,backgroundColor:COLORS.slice(0,labs.length),borderWidth:2,borderColor:'transparent'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});
+}
+
+// ─── CARTERA ──────────────────────────────────────────────────────────────────
+function renderCartera(){
+  const act=cAct(activeId);
+  document.getElementById('tb-cartera').innerHTML=act.map(a=>{const v=a.qty*a.cot,i=a.qty*a.pm,p=(v-i)/i*100;return `<tr class="row-link" onclick="showDetalle('${a.ticker}')"><td><strong>${a.ticker}</strong><br><span style="color:var(--text-secondary);font-size:10px">${a.broker}</span></td><td><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></td><td>${fe(v)}</td><td class="${p>=0?'pos':'neg'}">${fp(p)}</td></tr>`;}).join('');
+  const rT={};let rt=0;act.forEach(a=>{const v=a.qty*a.cot;rt+=v;Object.entries(a.region).forEach(([r,p])=>{rT[r]=(rT[r]||0)+v*p/100;});});
+  document.getElementById('exp-region').innerHTML=Object.entries(rT).map(([r,v])=>{const p=rt>0?v/rt*100:0;return `<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>${r}</span><span>${p.toFixed(1)}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:#378ADD"></div></div></div>`;}).join('');
+  const dT={};let dt=0;act.forEach(a=>{const v=a.qty*a.cot;dt+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});
+  document.getElementById('exp-divisa').innerHTML=Object.entries(dT).map(([d,v])=>{const p=dt>0?v/dt*100:0;return `<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px"><span>${d}</span><span>${p.toFixed(1)}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${p}%;background:#1D9E75"></div></div></div>`;}).join('');
+}
+function filterCt(el){document.querySelectorAll('#s-cartera .chip-row .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');}
+
+// ─── DETALLE ──────────────────────────────────────────────────────────────────
+function showDetalle(ticker){
+  const a=activos.find(x=>x.ticker===ticker);if(!a)return;
+  document.getElementById('panel-ops').style.display='none';
+  document.getElementById('panel-detalle').style.display='block';
+  document.getElementById('d-titulo').textContent=ticker+' · '+a.nombre;
+  const v=a.qty*a.cot,i=a.qty*a.pm,pl=v-i;
+  document.getElementById('d-valor').textContent=fe(v);
+  document.getElementById('d-pl').textContent=(pl>=0?'+':'')+fe(pl);
+  document.getElementById('d-pl').className='metric-value '+(pl>=0?'pos':'neg');
+  document.getElementById('d-pm').textContent='€'+a.pm.toLocaleString('es-ES');
+  document.getElementById('d-cot').textContent='€'+a.cot.toLocaleString('es-ES');
+  document.getElementById('ficha').innerHTML=`
+    <div class="detail-row"><span class="detail-key">ISIN</span><span class="detail-val">${a.isin}</span></div>
+    <div class="detail-row"><span class="detail-key">Tipo</span><span class="detail-val">${a.tipo}</span></div>
+    <div class="detail-row"><span class="detail-key">Mercado</span><span class="detail-val">${a.mercado}</span></div>
+    <div class="detail-row"><span class="detail-key">Divisa</span><span class="detail-val">${a.divisa}</span></div>
+    <div class="detail-row"><span class="detail-key">Índice</span><span class="detail-val">${a.indice}</span></div>
+    <div class="detail-row"><span class="detail-key">Broker</span><span class="detail-val">${a.broker}</span></div>
+    <div class="detail-row"><span class="detail-key">Grupo</span><span class="detail-val"><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></span></div>`;
+  document.getElementById('d-hist').innerHTML=ops.filter(o=>o.ticker===ticker).map(o=>`<tr><td>${o.fecha.slice(5)}</td><td>${o.op}</td><td>${o.qty}</td><td>€${o.precio.toLocaleString('es-ES')}</td><td>€${o.fee}</td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--text-secondary)">Sin operaciones</td></tr>';
+  document.getElementById('d-notas').innerHTML=notas.map(n=>`<div class="note-box">${n}</div>`).join('');
+}
+function backOps(){document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}
+
+// ─── OPS ──────────────────────────────────────────────────────────────────────
+function renderOps(){
+  document.getElementById('tb-ops').innerHTML=ops.filter(o=>o.cartera===activeId).map(o=>{
+    const t=o.qty*o.precio+o.fee;
+    return `<tr class="row-link" onclick="goTo('s-ops');showDetalle('${o.ticker}')"><td>${o.fecha.slice(5)}</td><td><strong>${o.ticker}</strong><br><span style="font-size:10px;color:var(--text-secondary)">${o.broker}</span></td><td><span class="badge ${GC[o.grupo]||'b-gray'}">${o.op}</span></td><td class="${o.op==='Compra'?'neg':'pos'}">${o.op==='Compra'?'-':'+'}{t}</td></tr>`.replace('{t}',fe(t));
+  }).join('');
+}
+function addOp(){
+  const d=document.getElementById('op-date').value,t=document.getElementById('op-tick').value.trim().toUpperCase();
+  if(!d||!t)return;
+  ops.unshift({id:nextId++,fecha:d,ticker:t,tipo:document.getElementById('op-tipo').value,broker:document.getElementById('op-broker').value||'Manual',op:document.getElementById('op-op').value,qty:parseFloat(document.getElementById('op-qty').value)||0,precio:parseFloat(document.getElementById('op-price').value)||0,fee:parseFloat(document.getElementById('op-fee').value)||0,divisa:document.getElementById('op-div').value,grupo:document.getElementById('op-grupo').value,nota:document.getElementById('op-nota').value,cartera:document.getElementById('op-cart').value||activeId});
+  closeModal('m-op');renderOps();
+}
+
+// ─── EFECTIVO ─────────────────────────────────────────────────────────────────
+function renderEfectivo(){
+  document.getElementById('tb-efectivo').innerHTML=efectivo.filter(e=>e.cartera===activeId).map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge ${e.importe>0?'b-teal':'b-coral'}">${e.tipo}</span></td><td class="${e.importe>=0?'pos':'neg'}">${e.importe>=0?'+':''}€${Math.abs(e.importe).toLocaleString('es-ES')}</td></tr>`).join('');
+}
+
+// ─── PROYECCIÓN ───────────────────────────────────────────────────────────────
+function calcProy(){
+  const amt=parseFloat(document.getElementById('dca-amt').value)||300;
+  const freq=document.getElementById('dca-freq').value==='Semanal'?52:document.getElementById('dca-freq').value==='Quincenal'?26:12;
+  const rate=parseFloat(document.getElementById('dca-rate').value)||8;
+  const years=parseInt(document.getElementById('dca-years').value)||10;
+  const base=cVal(activeId)||10000;
+  let v=base;const data=[],labs=[];
+  for(let y=1;y<=years;y++){v=v*(1+rate/100)+amt*freq;data.push(Math.round(v));labs.push(''+(new Date().getFullYear()+y));}
+  document.getElementById('card-proy').style.display='block';
+  document.getElementById('proy-metrics').innerHTML=`<div class="metric"><div class="metric-label">Valor final est.</div><div class="metric-value pos">${fe(v)}</div></div><div class="metric"><div class="metric-label">Total aportado</div><div class="metric-value">${fe(base+amt*freq*years)}</div></div>`;
+  if(chProy)chProy.destroy();
+  chProy=new Chart(document.getElementById('cProy'),{type:'line',data:{labels:labs,datasets:[{label:'Valor',data,borderColor:'#185FA5',backgroundColor:'rgba(55,138,221,0.07)',fill:true,tension:0.4,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'€'+Math.round(v/1000)+'k'}}}}});
+  let h='<table><thead><tr><th>Año</th><th>Valor est.</th></tr></thead><tbody>';
+  let acc=base;for(let y=1;y<=years;y++){acc=acc*(1+rate/100)+amt*freq;h+=`<tr><td>${new Date().getFullYear()+y}</td><td class="pos">${fe(acc)}</td></tr>`;}
+  document.getElementById('tabla-proy').innerHTML=h+'</tbody></table>';
+}
+
+// ─── ÍNDICES ──────────────────────────────────────────────────────────────────
+function renderIndices(){
+  document.getElementById('lista-indices').innerHTML=indices.map(idx=>`<div class="card"><div class="card-header"><span class="card-title">${idx.nombre}</span><span class="badge b-blue">${idx.ticker}</span></div><div class="detail-row"><span class="detail-key">YTD</span><span class="detail-val pos">${idx.ytd}</span></div><div class="detail-row"><span class="detail-key">12 meses</span><span class="detail-val pos">${idx.y1}</span></div><div class="detail-row"><span class="detail-key">PER</span><span class="detail-val">${idx.pe}</span></div><div class="detail-row"><span class="detail-key">Dividendo</span><span class="detail-val">${idx.div}</span></div><div class="detail-row"><span class="detail-key">N.º valores</span><span class="detail-val">${idx.n}</span></div><div style="margin-top:7px;font-size:11px;color:var(--text-secondary)">${idx.desc}</div></div>`).join('');
+}
+
+function saveNota(){const t=document.getElementById('nota-txt').value.trim();if(t)notas.push(t);closeModal('m-nota');}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+document.getElementById('op-date').value=new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
