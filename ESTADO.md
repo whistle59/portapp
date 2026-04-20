@@ -359,3 +359,182 @@ portapp/
 | A10 | Acceso restringido por IP o VPN: el panel no debe ser accesible desde internet abierto | 🔴 Crítica |
 | A11 | Roles de admin: superadmin (acceso total) y admin (acceso limitado, sin BD directa) | 🟡 Alta |
 
+
+
+---
+
+## Actualizaciones puntuales
+
+### Pendientes — próxima iteración (añadidos)
+- **P6** — Campos de contraseña: añadir toggle 👁 "mostrar/ocultar" en login, lock screen y cualquier formulario con contraseña. El campo siempre arranca en modo oculto (`type="password"`).
+
+### Seguridad — Capa 5 Frontend (añadido)
+- **Contraseñas nunca en texto plano** — todos los campos de contraseña usan `type="password"` por defecto. El usuario puede revelarlos explícitamente con un toggle 👁. Nunca autocompletar con `autocomplete="new-password"` en formularios de cambio de contraseña.
+
+
+
+---
+
+### Monetización — Links a canales de YouTube (añadido)
+
+**Concepto:** sección de contenido curado dentro de la app con links directos a canales de YouTube de finanzas e inversión. Los canales solo pueden añadirse, editarse o eliminarse desde el panel de administración, garantizando control editorial y permitiendo acuerdos comerciales con creadores.
+
+**Pendientes — funcionalidad (F12):**
+- Pantalla "Aprende" o "Canales" en la app con lista de canales recomendados
+- Cada canal muestra: nombre, avatar, descripción breve, categoría (ETFs, cripto, value investing, opciones, etc.) y link directo a YouTube
+- Posibilidad de marcar canales como favoritos
+- Filtro por categoría
+
+**Pendientes — panel admin (A12):**
+- CRUD completo de canales: añadir, editar, desactivar, eliminar
+- Campos por canal: nombre, URL de YouTube, descripción, categoría, imagen/avatar, orden de aparición, activo/inactivo
+- Estadísticas de clics por canal (para demostrar valor a los creadores en acuerdos comerciales)
+- Posibilidad de marcar un canal como "destacado" (aparece primero o con badge especial)
+
+**Modelo de monetización sugerido:**
+- Acuerdo directo con el creador (fee fijo mensual o por clics)
+- Canal "destacado" con mayor visibilidad como producto premium
+- Posible integración futura con programa de afiliados de YouTube o cursos del creador
+
+
+
+---
+
+## 12. Modelo de monetización
+
+### Estrategia recomendada: Pago único + Marketplace de contenido + Plan profesional B2B
+
+---
+
+### Tier 1 — Plan gratuito (adquisición)
+Objetivo: eliminar fricción de entrada y generar base de usuarios.
+
+| Funcionalidad | Incluida |
+|---|---|
+| 1 cartera | ✅ |
+| Hasta 20 operaciones | ✅ |
+| Resumen y gráficos básicos | ✅ |
+| Proyección DCA | ✅ |
+| Acceso a canales de YouTube curados | ✅ |
+| Exportación de datos | ❌ |
+| Carteras ilimitadas | ❌ |
+| Historial completo | ❌ |
+| Alertas avanzadas | ❌ |
+| Compartir cartera | ❌ |
+
+---
+
+### Tier 2 — Plan personal (pago único)
+Objetivo: ingresos sin fricción de suscripción. Precio orientativo: **29-49€** pago único.
+
+| Funcionalidad | Incluida |
+|---|---|
+| Carteras ilimitadas | ✅ |
+| Operaciones ilimitadas | ✅ |
+| Historial completo con todos los períodos | ✅ |
+| Exportación Excel / CSV | ✅ |
+| Importación PDF de broker | ✅ |
+| Alertas configurables | ✅ |
+| Compartir cartera (enlace público) | ✅ |
+| Acceso a futuras actualizaciones (1 año) | ✅ |
+
+> Nota: el modelo de pago único está volviendo con fuerza — usuarios hartos de suscripciones lo valoran mucho y la tasa de conversión es mayor.
+
+---
+
+### Tier 3 — Plan profesional B2B
+Objetivo: asesores financieros, family offices, gestores que necesitan gestionar carteras de varios clientes. Precio orientativo: **50-150€/mes por usuario profesional**.
+
+| Funcionalidad | Incluida |
+|---|---|
+| Todo el Plan personal | ✅ |
+| Gestión de múltiples clientes | ✅ |
+| Vistas consolidadas entre clientes | ✅ |
+| Informes personalizados exportables | ✅ |
+| Acceso API para integración con otras herramientas | ✅ |
+| Soporte prioritario | ✅ |
+| Marca blanca (white label) opcional | 🔜 v2 |
+
+> Nota: el ticket B2B es 10-20x mayor que el individual. Con pocos clientes profesionales la app ya es rentable.
+
+---
+
+### Marketplace de contenido (ingresos recurrentes transversales)
+Aplicable a todos los tiers, incluyendo el gratuito.
+
+| Canal de ingreso | Descripción |
+|---|---|
+| Canales YouTube destacados | Acuerdo directo con creadores (fee fijo mensual o por clics demostrados con estadísticas) |
+| Canal "patrocinado" con badge | Mayor visibilidad en la lista, precio premium |
+| Cursos y formación | Links a cursos de los creadores con posible comisión de afiliado |
+| Herramientas de terceros | Integración destacada de brokers, robo-advisors o herramientas de análisis con acuerdo comercial |
+
+---
+
+### Hoja de ruta de monetización sugerida
+
+| Fase | Acción |
+|---|---|
+| Lanzamiento | Solo plan gratuito + pago único personal. Sin B2B todavía. |
+| 3-6 meses | Activar marketplace de contenido con primeros acuerdos de canales YouTube |
+| 6-12 meses | Lanzar plan profesional B2B con primeros asesores beta |
+| 12+ meses | White label, API pública, expansión de marketplace |
+
+
+
+---
+
+## 13. White label — Personalización de marca
+
+Aplicable al **Plan profesional B2B** y como producto independiente para empresas que quieran ofrecer la app con su propia identidad visual.
+
+---
+
+### Elementos personalizables
+
+| Elemento | Descripción |
+|---|---|
+| Logo | Reemplaza el logo de portapp en la pantalla de login, topbar y splash screen |
+| Nombre de la app | Nombre personalizado en toda la interfaz y en las tiendas (App Store / Google Play) |
+| Colores principales | Color de acento, botones primarios, barra de navegación |
+| Paleta completa | Colores de fondo, textos, badges, gráficos |
+| Tipografía | Fuente corporativa del cliente |
+| Imágenes y fondos | Pantalla de login, pantalla de bienvenida, ilustraciones |
+| Favicon e iconos de app | Icono en iOS, Android y navegador |
+| Dominio propio | La app web accesible desde el dominio del cliente (ej. `inversiones.miempresa.com`) |
+| Email de soporte | Dirección de contacto y soporte con la marca del cliente |
+| Canales YouTube | Lista de canales curados propia del cliente (independiente de la lista global) |
+| Textos legales | Términos de uso y política de privacidad propios del cliente |
+
+---
+
+### Lo que NO cambia en white label
+
+| Elemento | Motivo |
+|---|---|
+| Motor de la app (código base) | Es el mismo para todos — las actualizaciones llegan a todos los clientes |
+| Seguridad y cifrado | No negociable, mismo estándar para todos |
+| Aislamiento de datos | Cada cliente tiene sus datos completamente separados |
+
+---
+
+### Modelo de entrega white label
+
+| Opción | Descripción | Precio orientativo |
+|---|---|---|
+| White label estándar | Colores + logo + nombre. Configurado desde el panel admin | Incluido en B2B Pro |
+| White label completo | Tipografía + imágenes + dominio propio + canales propios | Suplemento mensual |
+| App publicada con su marca | Publicación en App Store y Google Play con la cuenta del cliente | Fee único de setup |
+
+---
+
+### Pendientes técnicos (white label)
+
+| # | Descripción |
+|---|---|
+| WL1 | Sistema de temas en el panel admin: editor visual de colores y upload de logo |
+| WL2 | CSS variables globales ya preparadas en el prototipo — base técnica lista |
+| WL3 | Configuración por tenant almacenada en BD y aplicada al cargar la app |
+| WL4 | Pipeline de publicación automatizado para generar builds con marca personalizada |
+| WL5 | Preview en tiempo real del tema antes de publicarlo |
+
