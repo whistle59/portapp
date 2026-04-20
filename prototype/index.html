@@ -88,6 +88,40 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 .qbtn:hover{background:var(--bg1);color:var(--t0)}
 .breadcrumb{display:flex;align-items:center;gap:4px;margin-bottom:12px;font-size:12px;color:var(--t1)}
 .bc-link{cursor:pointer;color:var(--ac);background:none;border:none;font-size:12px;font-family:inherit;padding:0}
+/* ── DRAG & DROP (F10) ─────────────────────────── */
+.dnd-item{cursor:grab;transition:background .15s,opacity .15s;border-radius:10px}
+.dnd-item.dragging{opacity:.4;cursor:grabbing}
+.dnd-item.drag-over{background:var(--ac-bg)!important;border-color:var(--ac)!important}
+.drag-handle{display:flex;align-items:center;justify-content:center;width:24px;height:24px;color:var(--t2);cursor:grab;font-size:14px;flex-shrink:0}
+/* ── CUENTA CARD (F9) ──────────────────────────── */
+.cuenta-card{background:var(--bg0);border:.5px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:8px}
+.cuenta-card-header{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.cuenta-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.cuenta-actions{display:flex;gap:4px;margin-left:auto}
+.cuenta-actions button{background:none;border:none;cursor:pointer;color:var(--t2);padding:3px 5px;border-radius:5px;font-size:13px}
+.cuenta-actions button:hover{background:var(--bg2);color:var(--t0)}
+/* ── ANOTACIONES (F3) ─────────────────────────── */
+.nota-card{background:var(--bg0);border:.5px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:8px;position:relative}
+.nota-card:hover{border-color:var(--bd2)}
+.nota-tag{display:inline-flex;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.04em;margin-right:3px}
+.nota-card-actions{position:absolute;top:10px;right:10px;display:flex;gap:3px;opacity:0;transition:opacity .15s}
+.nota-card:hover .nota-card-actions{opacity:1}
+.nota-fab{position:fixed;bottom:80px;right:calc(50% - 195px + 14px);width:46px;height:46px;border-radius:50%;background:var(--ac);color:#fff;border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(74,127,165,.38);z-index:50;transition:transform .15s}
+@media(max-width:499px){.nota-fab{right:14px;bottom:74px}}
+.nota-fab:hover{transform:scale(1.07)}
+.nota-ctx-badge{background:var(--bg1);border:.5px solid var(--bd);border-radius:5px;padding:2px 7px;font-size:10px;color:var(--t1);display:inline-flex;align-items:center;gap:4px}
+.nota-empty{text-align:center;padding:40px 20px;color:var(--t1);font-size:13px}
+.nota-empty-icon{font-size:32px;margin-bottom:10px;display:block}
+.anotaciones-fab-btn{position:relative}
+.notif-badge-sm{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--ac);border-radius:50%;display:none}
+/* ── GRUPO CHIP EDITOR (F10) ─────────────────── */
+.grupo-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;border:.5px solid var(--bd);background:var(--bg0);margin-bottom:6px;transition:background .12s}
+.grupo-row:hover{background:var(--bg1)}
+.grupo-color-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.grupo-name{flex:1;font-size:13px;font-weight:500;color:var(--t0)}
+.grupo-count{font-size:11px;color:var(--t2)}
+.grupo-edit-btn{background:none;border:none;cursor:pointer;color:var(--t2);padding:3px 5px;border-radius:4px;font-size:12px}
+.grupo-edit-btn:hover{background:var(--bg2);color:var(--t0)}
 .modal-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.48);z-index:100;align-items:flex-end}
 .modal-overlay.open{display:flex}
 .modal{background:var(--bg0);border-radius:18px 18px 0 0;padding:20px;width:100%;max-height:88%;overflow-y:auto}
@@ -233,6 +267,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <button class="tb-btn" onclick="goTo('s-global')">Global</button>
     <button class="tb-btn" onclick="openModal('m-op')">+ Op.</button>
     <button class="tb-btn" onclick="togglePrivacy()" title="Modo privado" style="font-size:15px;padding:5px 8px">👁</button>
+    <div style="position:relative">
+      <button class="tb-btn" onclick="goTo('s-anotaciones')" style="font-size:15px;padding:5px 8px" title="Anotaciones">📝</button>
+      <div class="notif-dot" id="notas-dot" style="display:none"></div>
+    </div>
     <div style="position:relative">
       <button class="tb-btn" onclick="goTo('s-notif')" style="font-size:15px;padding:5px 8px">🔔</button>
       <div class="notif-dot" id="notif-dot"></div>
@@ -438,17 +476,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <div class="screen-title">Ajustes</div>
       <div class="slabel" style="margin-bottom:7px">Divisas activas</div>
       <div class="chip-row"><span class="tag selected">EUR</span><span class="tag selected">USD</span><span class="tag">GBP</span><span class="tag">CHF</span><span class="tag">+ Añadir</span></div>
-      <div class="slabel" style="margin-bottom:7px">Brokers y cuentas</div>
-      <div class="card" style="margin-bottom:10px">
-        <div class="dr"><span class="dk">Interactive Brokers</span><span class="badge b-teal">Activo</span></div>
-        <div class="dr"><span class="dk">DEGIRO</span><span class="badge b-teal">Activo</span></div>
-        <div class="dr"><span class="dk">Coinbase</span><span class="badge b-amber">Manual</span></div>
-        <div class="dr"><span class="dk">ProRealTime</span><span class="badge b-gray">Pendiente</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+        <div class="slabel" style="margin-bottom:0">Brokers y cuentas</div>
+        <button class="btn btn-sm" onclick="openAddCuenta()">+ Añadir</button>
       </div>
-      <button class="btn" style="margin-bottom:10px" onclick="openModal('m-broker')">+ Añadir broker / cuenta bancaria</button>
-      <div class="slabel" style="margin-bottom:7px">Grupos de activos</div>
-      <div class="chip-row" id="grupos-chips"></div>
-      <button class="btn btn-sm" style="margin-bottom:12px" onclick="openModal('m-grupo')">+ Nuevo grupo</button>
+      <div id="cuentas-list"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 7px">
+        <div class="slabel" style="margin-bottom:0">Grupos de activos</div>
+        <button class="btn btn-sm" onclick="openAddGrupo()">+ Nuevo</button>
+      </div>
+      <div id="grupos-dnd-list"></div>
+      <div class="chip-row" id="grupos-chips" style="display:none"></div>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Seguridad</div>
       <div class="card">
         <div class="dr"><span class="dk">Bloqueo al pasar a segundo plano</span><input type="checkbox" checked style="width:auto"></div>
@@ -689,23 +727,68 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 </div></div>
 
 <div class="modal-overlay" id="m-broker"><div class="modal">
-  <div class="mhdr"><span class="mtitle">Añadir broker / cuenta</span><button class="btn-icon" onclick="closeModal('m-broker')">✕</button></div>
-  <div class="fg"><label>Tipo</label><select onchange="brokerTC(this)"><option value="broker">Broker</option><option value="banco">Cuenta bancaria</option></select></div>
-  <div class="fg"><label>Nombre / entidad</label><input type="text" placeholder="Ej: Interactive Brokers"></div>
-  <div class="fg"><label>Titular</label><input type="text" placeholder="Nombre completo"></div>
-  <div id="bk-f"><div class="fg"><label>URL de acceso</label><input type="url" placeholder="https://..."></div><div class="fg"><label>Número de cuenta en el broker</label><input type="text" placeholder="U1234567"></div></div>
-  <div id="bn-f" style="display:none"><div class="fg"><label>IBAN</label><input type="text" placeholder="ES91 2100 0418 4502 0005 1332"></div><div class="fg"><label>BIC / SWIFT</label><input type="text" placeholder="CAIXESBBXXX"></div></div>
-  <div class="fg"><label>Divisa principal</label><select><option>EUR</option><option>USD</option><option>GBP</option></select></div>
-  <div class="fg"><label>Nota</label><textarea rows="2"></textarea></div>
-  <button class="btn btn-p" onclick="closeModal('m-broker')">Guardar</button>
+  <div class="mhdr"><span class="mtitle" id="m-broker-title">Añadir broker / cuenta</span><button class="btn-icon" onclick="closeModal('m-broker')">✕</button></div>
+  <input type="hidden" id="bk-edit-id" value="">
+  <div class="fg"><label>Tipo</label><select id="bk-tipo" onchange="brokerTC(this)"><option value="broker">Broker</option><option value="banco">Cuenta bancaria</option></select></div>
+  <div class="fg"><label>Nombre / entidad</label><input type="text" id="bk-nombre" placeholder="Ej: Interactive Brokers"></div>
+  <div class="fg"><label>Titular</label><input type="text" id="bk-titular" placeholder="Nombre completo"></div>
+  <div id="bk-f">
+    <div class="fg"><label>URL de acceso</label><input type="url" id="bk-url" placeholder="https://..."></div>
+    <div class="fg"><label>Número de cuenta en el broker</label><input type="text" id="bk-cuenta" placeholder="U1234567"></div>
+  </div>
+  <div id="bn-f" style="display:none">
+    <div class="fg"><label>IBAN</label><input type="text" id="bk-iban" placeholder="ES91 2100 0418 4502 0005 1332"></div>
+    <div class="fg"><label>BIC / SWIFT</label><input type="text" id="bk-bic" placeholder="CAIXESBBXXX"></div>
+  </div>
+  <div class="fg"><label>Divisa principal</label><select id="bk-divisa"><option>EUR</option><option>USD</option><option>GBP</option></select></div>
+  <div class="fg"><label>Estado</label><select id="bk-estado"><option value="activo">Activo</option><option value="manual">Manual</option><option value="pendiente">Pendiente</option></select></div>
+  <div class="fg"><label>Nota</label><textarea id="bk-nota" rows="2"></textarea></div>
+  <button class="btn btn-p" onclick="saveCuenta()">Guardar</button>
 </div></div>
 
 <div class="modal-overlay" id="m-grupo"><div class="modal">
-  <div class="mhdr"><span class="mtitle">Nuevo grupo</span><button class="btn-icon" onclick="closeModal('m-grupo')">✕</button></div>
-  <div class="fg"><label>Nombre</label><input type="text" placeholder="Ej: Renta variable EU"></div>
-  <div class="fg"><label>Color pastel</label><select><option>Azul</option><option>Verde</option><option>Ámbar</option><option>Coral</option><option>Morado</option><option>Gris</option></select></div>
-  <div class="fg"><label>Descripción</label><input type="text" placeholder="Breve descripción"></div>
-  <button class="btn btn-p" onclick="closeModal('m-grupo')">Crear grupo</button>
+  <div class="mhdr"><span class="mtitle" id="m-grupo-title">Nuevo grupo</span><button class="btn-icon" onclick="closeModal('m-grupo')">✕</button></div>
+  <input type="hidden" id="gr-edit-id" value="">
+  <div class="fg"><label>Nombre</label><input type="text" id="gr-nombre" placeholder="Ej: Renta variable EU"></div>
+  <div class="fg"><label>Color</label>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:4px" id="gr-color-picker">
+      <div onclick="selectGrupoColor(this,'#a8c8e8')" style="width:26px;height:26px;border-radius:6px;background:#a8c8e8;cursor:pointer;border:2px solid transparent" data-color="#a8c8e8"></div>
+      <div onclick="selectGrupoColor(this,'#a8d8b8')" style="width:26px;height:26px;border-radius:6px;background:#a8d8b8;cursor:pointer;border:2px solid transparent" data-color="#a8d8b8"></div>
+      <div onclick="selectGrupoColor(this,'#f0c8a0')" style="width:26px;height:26px;border-radius:6px;background:#f0c8a0;cursor:pointer;border:2px solid transparent" data-color="#f0c8a0"></div>
+      <div onclick="selectGrupoColor(this,'#c8b0d8')" style="width:26px;height:26px;border-radius:6px;background:#c8b0d8;cursor:pointer;border:2px solid transparent" data-color="#c8b0d8"></div>
+      <div onclick="selectGrupoColor(this,'#f0a8a8')" style="width:26px;height:26px;border-radius:6px;background:#f0a8a8;cursor:pointer;border:2px solid transparent" data-color="#f0a8a8"></div>
+      <div onclick="selectGrupoColor(this,'#a8d8d0')" style="width:26px;height:26px;border-radius:6px;background:#a8d8d0;cursor:pointer;border:2px solid transparent" data-color="#a8d8d0"></div>
+      <div onclick="selectGrupoColor(this,'#d8d0a8')" style="width:26px;height:26px;border-radius:6px;background:#d8d0a8;cursor:pointer;border:2px solid transparent" data-color="#d8d0a8"></div>
+      <div onclick="selectGrupoColor(this,'#d0a8c8')" style="width:26px;height:26px;border-radius:6px;background:#d0a8c8;cursor:pointer;border:2px solid transparent" data-color="#d0a8c8"></div>
+    </div>
+    <input type="hidden" id="gr-color" value="#a8c8e8">
+  </div>
+  <div class="fg"><label>Descripción</label><input type="text" id="gr-desc" placeholder="Breve descripción"></div>
+  <div style="display:flex;gap:8px;margin-top:4px">
+    <button class="btn btn-p" style="flex:1" onclick="saveGrupo()">Guardar</button>
+    <button class="btn" id="gr-del-btn" style="flex:0 0 auto;color:var(--neg);border-color:var(--neg);display:none" onclick="deleteGrupo()">Eliminar</button>
+  </div>
+</div></div>
+
+<div class="modal-overlay" id="m-nota-global"><div class="modal">
+  <div class="mhdr"><span class="mtitle" id="m-nota-title">Nueva anotación</span><button class="btn-icon" onclick="closeModal('m-nota-global')">✕</button></div>
+  <input type="hidden" id="nota-edit-id" value="">
+  <div class="fg"><label>Nota</label><textarea id="nota-global-txt" rows="4" placeholder="Escribe tu anotación..."></textarea></div>
+  <div class="fg"><label>Etiqueta</label>
+    <select id="nota-tag-sel">
+      <option value="general">General</option>
+      <option value="tesis">Tesis</option>
+      <option value="alerta">Alerta</option>
+      <option value="idea">Idea</option>
+      <option value="recordatorio">Recordatorio</option>
+    </select>
+  </div>
+  <div class="fg"><label>Contexto (opcional)</label>
+    <select id="nota-ctx-sel">
+      <option value="">— Sin contexto específico —</option>
+    </select>
+  </div>
+  <button class="btn btn-p" onclick="saveNotaGlobal()">Guardar</button>
 </div></div>
 
 <div class="modal-overlay" id="m-plataforma"><div class="modal">
@@ -778,7 +861,7 @@ function otpMove(i){if(document.getElementById('o'+i).value&&i<5)document.getEle
 function getOtp(){return[0,1,2,3,4,5].map(i=>document.getElementById('o'+i).value).join('');}
 function verifyOtp(){const code=getOtp(),err=document.getElementById('oerr'),ok=document.getElementById('ook');if(code.length<6){err.style.display='block';err.textContent='Introduce los 6 dígitos.';return;}if(code===DEMO){err.style.display='none';ok.style.display='block';clearInterval(tInt);setTimeout(launchApp,900);}else{intentos--;if(intentos<=0){clearInterval(tInt);bSec=899;clearInterval(bInt);bInt=setInterval(()=>{bSec--;if(bSec<=0){clearInterval(bInt);document.getElementById('btime').textContent='Desbloqueado';return;}const m=Math.floor(bSec/60),s=bSec%60;document.getElementById('btime').textContent=m+':'+(s<10?'0':'')+s;},1000);showAuth('as-blocked');}else{err.style.display='block';err.innerHTML='Código incorrecto. Quedan <strong>'+intentos+'</strong> intento'+(intentos===1?'':'s')+'.';for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('o0').focus();}}}
 function resendCode(){tSec=587;intentos=3;for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('oerr').style.display='none';document.getElementById('o0').focus();}
-function launchApp(){document.getElementById('auth-wrap').style.display='none';document.getElementById('app-shell').classList.add('active');const c=carteras[0];document.getElementById('active-dot').style.background=c.color;document.getElementById('active-name').textContent=c.nombre;document.getElementById('notif-dot').style.display=notifs.some(n=>!n.leida)?'block':'none';goTo('s-global',document.getElementById('nav-global'));}
+function launchApp(){document.getElementById('auth-wrap').style.display='none';document.getElementById('app-shell').classList.add('active');const c=carteras[0];document.getElementById('active-dot').style.background=c.color;document.getElementById('active-name').textContent=c.nombre;document.getElementById('notif-dot').style.display=notifs.some(n=>!n.leida)?'block':'none';const nd=document.getElementById('notas-dot');if(nd)nd.style.display=anotaciones.length?'block':'none';goTo('s-global',document.getElementById('nav-global'));}
 function resetAuth(){clearInterval(tInt);clearInterval(bInt);document.getElementById('app-shell').classList.remove('active');document.getElementById('auth-wrap').style.display='flex';privacyOn=false;document.getElementById('privacy-bar').classList.remove('on');document.getElementById('device').classList.remove('masked');showAuth('as-login');}
 function unlockApp(){const p=document.getElementById('lock-pass').value,e=document.getElementById('lock-err');if(p==='demo1234'){document.getElementById('lock-screen').classList.remove('active');document.getElementById('app-shell').classList.add('active');e.style.display='none';document.getElementById('lock-pass').value='';}else{e.style.display='block';e.textContent='Contraseña incorrecta.';}}
 document.querySelectorAll('.otp-in').forEach((inp,i)=>{inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&i>0)document.getElementById('o'+(i-1)).focus();if(e.key==='Enter')verifyOtp();});inp.addEventListener('paste',e=>{const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');if(p.length>=6)for(let j=0;j<6;j++)document.getElementById('o'+j).value=p[j]||'';e.preventDefault();});});
