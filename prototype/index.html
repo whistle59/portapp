@@ -101,11 +101,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 .cuenta-actions button{background:none;border:none;cursor:pointer;color:var(--t2);padding:3px 5px;border-radius:5px;font-size:13px}
 .cuenta-actions button:hover{background:var(--bg2);color:var(--t0)}
 /* ── ANOTACIONES (F3) ─────────────────────────── */
-.nota-card{background:var(--bg0);border:.5px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:8px;position:relative}
+.nota-card{background:var(--bg0);border:.5px solid var(--bd);border-radius:12px;padding:12px;padding-right:70px;margin-bottom:8px;position:relative}
 .nota-card:hover{border-color:var(--bd2)}
 .nota-tag{display:inline-flex;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.04em;margin-right:3px}
-.nota-card-actions{position:absolute;top:10px;right:10px;display:flex;gap:3px;opacity:0;transition:opacity .15s}
-.nota-card:hover .nota-card-actions{opacity:1}
+.nota-card-actions{position:absolute;top:10px;right:10px;display:flex;gap:3px;opacity:1}
 .nota-fab{position:fixed;bottom:80px;right:calc(50% - 195px + 14px);width:46px;height:46px;border-radius:50%;background:var(--ac);color:#fff;border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(74,127,165,.38);z-index:50;transition:transform .15s}
 @media(max-width:499px){.nota-fab{right:14px;bottom:74px}}
 .nota-fab:hover{transform:scale(1.07)}
@@ -518,6 +517,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <!-- RENTABILIDAD (F1) -->
     <div class="screen" id="s-rentabilidad">
       <div class="qnav" id="qn-rentabilidad"></div>
+      <div class="breadcrumb"><button class="bc-link" onclick="goTo('s-resumen')">← Resumen</button></div>
       <div class="screen-title" id="rent-title">Rentabilidad</div>
       <div class="period-row">
         <button class="period-btn active" onclick="setRentPeriod(this,'1M')">1M</button>
@@ -546,6 +546,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <!-- CAPITAL POR GRUPOS (F2) -->
     <div class="screen" id="s-grupos">
       <div class="qnav" id="qn-grupos"></div>
+      <div class="breadcrumb"><button class="bc-link" onclick="goTo('s-resumen')">← Resumen</button></div>
       <div class="screen-title" id="grupos-title">Capital por grupos</div>
       <div class="metric-grid">
         <div class="metric"><div class="mlabel">Total invertido</div><div class="mvalue"><span class="amt" id="g-total"></span></div></div>
@@ -561,6 +562,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 
     <!-- PERFIL (F4) -->
     <div class="screen" id="s-perfil">
+      <div class="breadcrumb">
+        <button class="bc-link" onclick="goTo('s-settings')">← Ajustes</button>
+      </div>
       <div class="screen-title">Perfil</div>
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
         <div style="width:60px;height:60px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0">U</div>
@@ -602,6 +606,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <!-- RENT. EFECTIVO (F5) -->
     <div class="screen" id="s-rent-efectivo">
       <div class="qnav" id="qn-rent-efectivo"></div>
+      <div class="breadcrumb"><button class="bc-link" onclick="goTo('s-efectivo')">← Efectivo</button></div>
       <div class="screen-title">Rentabilidad del efectivo</div>
       <div class="period-row">
         <button class="period-btn active" onclick="setREPeriod(this,'1M')">1M</button>
@@ -627,6 +632,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Broker</th><th>Importe</th></tr></thead>
         <tbody id="tb-re"></tbody></table>
       </div>
+    </div>
+
+    <!-- ANOTACIONES GLOBAL (F3) -->
+    <div class="screen" id="s-anotaciones">
+      <div class="qnav" id="qn-anotaciones"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;margin-top:8px">
+        <div class="screen-title" style="margin-bottom:0">Anotaciones</div>
+        <button class="btn btn-sm" onclick="openAddNota()">+ Nueva</button>
+      </div>
+      <!-- Filtros por etiqueta -->
+      <div class="chip-row" id="notas-filtros" style="margin-bottom:10px"></div>
+      <!-- Lista vacía / lista -->
+      <div id="lista-anotaciones"></div>
     </div>
 
   </div>
@@ -861,21 +879,49 @@ function otpMove(i){if(document.getElementById('o'+i).value&&i<5)document.getEle
 function getOtp(){return[0,1,2,3,4,5].map(i=>document.getElementById('o'+i).value).join('');}
 function verifyOtp(){const code=getOtp(),err=document.getElementById('oerr'),ok=document.getElementById('ook');if(code.length<6){err.style.display='block';err.textContent='Introduce los 6 dígitos.';return;}if(code===DEMO){err.style.display='none';ok.style.display='block';clearInterval(tInt);setTimeout(launchApp,900);}else{intentos--;if(intentos<=0){clearInterval(tInt);bSec=899;clearInterval(bInt);bInt=setInterval(()=>{bSec--;if(bSec<=0){clearInterval(bInt);document.getElementById('btime').textContent='Desbloqueado';return;}const m=Math.floor(bSec/60),s=bSec%60;document.getElementById('btime').textContent=m+':'+(s<10?'0':'')+s;},1000);showAuth('as-blocked');}else{err.style.display='block';err.innerHTML='Código incorrecto. Quedan <strong>'+intentos+'</strong> intento'+(intentos===1?'':'s')+'.';for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('o0').focus();}}}
 function resendCode(){tSec=587;intentos=3;for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('oerr').style.display='none';document.getElementById('o0').focus();}
-function launchApp(){document.getElementById('auth-wrap').style.display='none';document.getElementById('app-shell').classList.add('active');const c=carteras[0];document.getElementById('active-dot').style.background=c.color;document.getElementById('active-name').textContent=c.nombre;document.getElementById('notif-dot').style.display=notifs.some(n=>!n.leida)?'block':'none';const nd=document.getElementById('notas-dot');if(nd)nd.style.display=anotaciones.length?'block':'none';goTo('s-global',document.getElementById('nav-global'));}
+function launchApp(){
+  document.getElementById('auth-wrap').style.display='none';
+  const shell=document.getElementById('app-shell');
+  shell.classList.add('active');
+  const c=carteras[0];
+  document.getElementById('active-dot').style.background=c.color;
+  document.getElementById('active-name').textContent=c.nombre;
+  document.getElementById('notif-dot').style.display=notifs.some(n=>!n.leida)?'block':'none';
+  const nd=document.getElementById('notas-dot');if(nd)nd.style.display=anotaciones.length?'block':'none';
+  // Doble requestAnimationFrame: espera a que el browser complete el layout
+  // del app-shell antes de llamar a goTo (evita canvas con dimensiones 0×0)
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    goTo('s-global',document.getElementById('nav-global'));
+  }));
+}
 function resetAuth(){clearInterval(tInt);clearInterval(bInt);document.getElementById('app-shell').classList.remove('active');document.getElementById('auth-wrap').style.display='flex';privacyOn=false;document.getElementById('privacy-bar').classList.remove('on');document.getElementById('device').classList.remove('masked');showAuth('as-login');}
-function unlockApp(){const p=document.getElementById('lock-pass').value,e=document.getElementById('lock-err');if(p==='demo1234'){document.getElementById('lock-screen').classList.remove('active');document.getElementById('app-shell').classList.add('active');e.style.display='none';document.getElementById('lock-pass').value='';}else{e.style.display='block';e.textContent='Contraseña incorrecta.';}}
+function unlockApp(){const p=document.getElementById('lock-pass').value,e=document.getElementById('lock-err');if(p==='demo1234'){document.getElementById('lock-screen').classList.remove('active');document.getElementById('app-shell').classList.add('active');e.style.display='none';document.getElementById('lock-pass').value='';requestAnimationFrame(()=>requestAnimationFrame(()=>reCharts()));}else{e.style.display='block';e.textContent='Contraseña incorrecta.';}}
 document.querySelectorAll('.otp-in').forEach((inp,i)=>{inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&i>0)document.getElementById('o'+(i-1)).focus();if(e.key==='Enter')verifyOtp();});inp.addEventListener('paste',e=>{const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');if(p.length>=6)for(let j=0;j<6;j++)document.getElementById('o'+j).value=p[j]||'';e.preventDefault();});});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&document.getElementById('app-shell').classList.contains('active')){document.getElementById('app-shell').classList.remove('active');document.getElementById('lock-screen').classList.add('active');}});
 function togglePrivacy(){privacyOn=!privacyOn;document.getElementById('device').classList.toggle('masked',privacyOn);document.getElementById('privacy-bar').classList.toggle('on',privacyOn);}
 function toggleDark(){document.documentElement.classList.toggle('dark');document.getElementById('dark-chk').checked=document.documentElement.classList.contains('dark');reCharts();}
 function setFontSize(cls){['fs-sm','fs-md','fs-lg','fs-xl'].forEach(c=>document.documentElement.classList.remove(c));document.documentElement.classList.add(cls);}
 function togglePwd(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.style.opacity=el.type==='text'?'1':'0.5';}
-function reCharts(){const a=id=>document.getElementById(id).classList.contains('active');if(a('s-global'))setTimeout(renderGlobal,50);if(a('s-resumen')){setTimeout(()=>{renderCR();renderHistorial('1S');},50);}}
-const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo'];
-const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.'};
+function reCharts(){const a=id=>document.getElementById(id).classList.contains('active');if(a('s-global'))requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));if(a('s-resumen'))requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));if(a('s-rentabilidad'))requestAnimationFrame(()=>requestAnimationFrame(renderRentabilidad));if(a('s-grupos'))requestAnimationFrame(()=>requestAnimationFrame(renderGruposCapital));}
+const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones'];
+const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas'};
 const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
-function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;if(sid==='s-global')setTimeout(renderGlobal,80);if(sid==='s-resumen'){renderResumen();setTimeout(()=>{renderCR();renderHistorial('1S');},80);}if(sid==='s-cartera')renderCartera();if(sid==='s-efectivo')renderEfectivo();if(sid==='s-ops'){renderOps();document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}if(sid==='s-indices')renderIndices();if(sid==='s-notif')renderNotif();if(sid==='s-plataformas')renderPlats();if(sid==='s-settings')renderGrupos();if(sid==='s-rentabilidad'){renderRentabilidad();}if(sid==='s-grupos')renderGruposCapital();if(sid==='s-rent-efectivo')renderRentEfectivo();}
-function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
+function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;
+  if(sid==='s-global'){requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));}
+  else if(sid==='s-resumen'){renderResumen();requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));}
+  else if(sid==='s-cartera')renderCartera();
+  else if(sid==='s-efectivo')renderEfectivo();
+  else if(sid==='s-ops'){renderOps();document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}
+  else if(sid==='s-indices')renderIndices();
+  else if(sid==='s-notif')renderNotif();
+  else if(sid==='s-plataformas')renderPlats();
+  else if(sid==='s-settings'){renderCuentas();renderGruposDnd();}
+  else if(sid==='s-rentabilidad'){requestAnimationFrame(()=>requestAnimationFrame(renderRentabilidad));}
+  else if(sid==='s-grupos'){requestAnimationFrame(()=>requestAnimationFrame(renderGruposCapital));}
+  else if(sid==='s-rent-efectivo')renderRentEfectivo();
+  else if(sid==='s-anotaciones')renderAnotaciones();
+}
+function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
 function openModal(id){document.getElementById(id).classList.add('open');if(id==='m-portfolios')renderPortList();if(id==='m-op'||id==='m-efectivo')fillCS();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function closeAllModals(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));}
@@ -920,10 +966,301 @@ function renderNotif(){document.getElementById('notif-dot').style.display='none'
 function toggleFavNotif(id){const n=notifs.find(x=>x.id===id);if(n){n.favorita=!n.favorita;renderNotif();}}
 function borrarNotif(id){const i=notifs.findIndex(x=>x.id===id);if(i>-1){notifs.splice(i,1);renderNotif();}}
 function renderPlats(){document.getElementById('lista-plataformas').innerHTML=plats.map(p=>`<a class="ext-link" href="${p.url}" target="_blank"><div class="ext-icon" style="background:${p.color}20;color:${p.color}">${p.icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--t0)">${p.nombre}</div><div style="font-size:11px;color:var(--t1)">${p.cat}</div></div><span style="font-size:14px;color:var(--t2)">↗</span></a>`).join('');}
-function renderGrupos(){const gs=['Core','Cripto','AI/Tech','Renta fija','Legacy','Core ampliado'];document.getElementById('grupos-chips').innerHTML=gs.map(g=>`<span class="tag selected">${g}</span>`).join('')+'<span class="tag">+ Nuevo</span>';}
 function saveNota(){const t=document.getElementById('nota-txt').value.trim();if(t)notas.push(t);closeModal('m-nota');}
 
-// ── RENTABILIDAD TWR (F1) ─────────────────────────────────────────────────────
+// ── F9: GESTIÓN DE CUENTAS ────────────────────────────────────────────────────
+const ESTADO_BADGE={'activo':'b-teal','manual':'b-amber','pendiente':'b-gray'};
+const ESTADO_LBL={'activo':'Activo','manual':'Manual','pendiente':'Pendiente'};
+let cuentas=[
+  {id:'bk1',tipo:'broker',nombre:'Interactive Brokers',titular:'Demo User',url:'https://www.interactivebrokers.com',cuenta:'U9876543',iban:'',bic:'',divisa:'USD',estado:'activo',nota:'Principal broker de acciones USA'},
+  {id:'bk2',tipo:'broker',nombre:'DEGIRO',titular:'Demo User',url:'https://www.degiro.es',cuenta:'DG-12345',iban:'',bic:'',divisa:'EUR',estado:'activo',nota:'ETFs europeos'},
+  {id:'bk3',tipo:'broker',nombre:'Coinbase',titular:'Demo User',url:'https://www.coinbase.com',cuenta:'CB-demo',iban:'',bic:'',divisa:'USD',estado:'manual',nota:'Cripto'},
+  {id:'bk4',tipo:'banco',nombre:'CaixaBank',titular:'Demo User',url:'',cuenta:'',iban:'ES91 2100 0418 4502 0005 1332',bic:'CAIXESBBXXX',divisa:'EUR',estado:'activo',nota:'Cuenta corriente principal'},
+];
+let nextCuentaId=10;
+
+function renderCuentas(){
+  const brokers=cuentas.filter(c=>c.tipo==='broker');
+  const bancos=cuentas.filter(c=>c.tipo==='banco');
+  let html='';
+  if(brokers.length){
+    html+=`<div class="slabel" style="margin-bottom:6px;margin-top:2px">Brokers</div>`;
+    html+=brokers.map(c=>cuentaCard(c)).join('');
+  }
+  if(bancos.length){
+    html+=`<div class="slabel" style="margin-bottom:6px;margin-top:10px">Cuentas bancarias</div>`;
+    html+=bancos.map(c=>cuentaCard(c)).join('');
+  }
+  document.getElementById('cuentas-list').innerHTML=html||'<div style="font-size:12px;color:var(--t1);padding:8px 0">Sin cuentas configuradas.</div>';
+}
+function cuentaCard(c){
+  const colors={'broker':'#4a7fa5','banco':'#4a8c6f'};
+  const col=colors[c.tipo]||'#999';
+  const initials=c.nombre.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const sub=c.tipo==='banco'?(c.iban?'IBAN: '+c.iban.slice(0,12)+'…':''):( c.cuenta?'Cta: '+c.cuenta:'');
+  return`<div class="cuenta-card">
+    <div class="cuenta-card-header">
+      <div class="cuenta-icon" style="background:${col}20;color:${col}">${initials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.nombre}</div>
+        <div style="font-size:11px;color:var(--t1)">${c.titular}</div>
+      </div>
+      <span class="badge ${ESTADO_BADGE[c.estado]||'b-gray'}" style="flex-shrink:0">${ESTADO_LBL[c.estado]||c.estado}</span>
+      <div class="cuenta-actions">
+        <button onclick="editCuenta('${c.id}')" title="Editar">✏️</button>
+        <button onclick="deleteCuenta('${c.id}')" title="Eliminar">🗑</button>
+      </div>
+    </div>
+    ${sub?`<div style="font-size:11px;color:var(--t1);margin-top:3px">${sub}</div>`:''}
+    ${c.nota?`<div style="font-size:11px;color:var(--t2);margin-top:3px">${c.nota}</div>`:''}
+    ${c.tipo==='broker'&&c.url?`<a href="${c.url}" target="_blank" style="font-size:11px;color:var(--ac);text-decoration:none;margin-top:3px;display:inline-block">↗ Abrir broker</a>`:''}
+  </div>`;
+}
+function openAddCuenta(){
+  document.getElementById('bk-edit-id').value='';
+  document.getElementById('m-broker-title').textContent='Añadir broker / cuenta';
+  document.getElementById('bk-tipo').value='broker';
+  document.getElementById('bk-nombre').value='';
+  document.getElementById('bk-titular').value='';
+  document.getElementById('bk-url').value='';
+  document.getElementById('bk-cuenta').value='';
+  document.getElementById('bk-iban').value='';
+  document.getElementById('bk-bic').value='';
+  document.getElementById('bk-divisa').value='EUR';
+  document.getElementById('bk-estado').value='activo';
+  document.getElementById('bk-nota').value='';
+  brokerTC(document.getElementById('bk-tipo'));
+  openModal('m-broker');
+}
+function editCuenta(id){
+  const c=cuentas.find(x=>x.id===id);if(!c)return;
+  document.getElementById('bk-edit-id').value=id;
+  document.getElementById('m-broker-title').textContent='Editar cuenta';
+  document.getElementById('bk-tipo').value=c.tipo;
+  document.getElementById('bk-nombre').value=c.nombre;
+  document.getElementById('bk-titular').value=c.titular;
+  document.getElementById('bk-url').value=c.url||'';
+  document.getElementById('bk-cuenta').value=c.cuenta||'';
+  document.getElementById('bk-iban').value=c.iban||'';
+  document.getElementById('bk-bic').value=c.bic||'';
+  document.getElementById('bk-divisa').value=c.divisa||'EUR';
+  document.getElementById('bk-estado').value=c.estado||'activo';
+  document.getElementById('bk-nota').value=c.nota||'';
+  brokerTC(document.getElementById('bk-tipo'));
+  openModal('m-broker');
+}
+function deleteCuenta(id){
+  if(!confirm('¿Eliminar esta cuenta?'))return;
+  const i=cuentas.findIndex(x=>x.id===id);
+  if(i>-1)cuentas.splice(i,1);
+  renderCuentas();
+}
+function saveCuenta(){
+  const editId=document.getElementById('bk-edit-id').value;
+  const tipo=document.getElementById('bk-tipo').value;
+  const nombre=document.getElementById('bk-nombre').value.trim();
+  if(!nombre)return;
+  const data={
+    id:editId||'bk'+nextCuentaId++,tipo,nombre,
+    titular:document.getElementById('bk-titular').value.trim(),
+    url:document.getElementById('bk-url').value.trim(),
+    cuenta:document.getElementById('bk-cuenta').value.trim(),
+    iban:document.getElementById('bk-iban').value.trim(),
+    bic:document.getElementById('bk-bic').value.trim(),
+    divisa:document.getElementById('bk-divisa').value,
+    estado:document.getElementById('bk-estado').value,
+    nota:document.getElementById('bk-nota').value.trim(),
+  };
+  if(editId){const i=cuentas.findIndex(x=>x.id===editId);if(i>-1)cuentas[i]=data;}
+  else cuentas.push(data);
+  closeModal('m-broker');
+  renderCuentas();
+}
+
+// ── F10: GRUPOS DRAG & DROP ───────────────────────────────────────────────────
+const GRUPO_BADGE_MAP={'Core':'b-blue','Cripto':'b-amber','AI/Tech':'b-purple','Renta fija':'b-teal','Legacy':'b-gray','Core ampliado':'b-green'};
+let grupos=[
+  {id:'g1',nombre:'Core',color:'#a8c8e8',desc:'ETFs de índices globales'},
+  {id:'g2',nombre:'Cripto',color:'#f0c8a0',desc:'Bitcoin y altcoins'},
+  {id:'g3',nombre:'AI/Tech',color:'#c8b0d8',desc:'Tecnología e IA'},
+  {id:'g4',nombre:'Renta fija',color:'#a8d8d0',desc:'Bonos y renta fija'},
+  {id:'g5',nombre:'Legacy',color:'#d8d0a8',desc:'Posiciones antiguas'},
+  {id:'g6',nombre:'Core ampliado',color:'#a8d8b8',desc:'Core + mercados emergentes'},
+];
+let nextGrupoId=10,dragSrcIdx=null;
+
+function renderGrupos(){renderGruposDnd();}
+function renderGruposDnd(){
+  const list=document.getElementById('grupos-dnd-list');if(!list)return;
+  list.innerHTML=grupos.map((g,i)=>{
+    const cnt=activos.filter(a=>a.grupo===g.nombre).length;
+    return`<div class="grupo-row dnd-item" draggable="true" data-idx="${i}"
+      ondragstart="dndStart(event,${i})"
+      ondragover="dndOver(event,${i})"
+      ondragleave="dndLeave(event)"
+      ondrop="dndDrop(event,${i})"
+      ondragend="dndEnd(event)">
+      <span class="drag-handle" title="Arrastrar para reordenar">⠿</span>
+      <div class="grupo-color-dot" style="background:${g.color}"></div>
+      <span class="grupo-name">${g.nombre}</span>
+      <span class="grupo-count">${cnt} activo${cnt!==1?'s':''}</span>
+      <button class="grupo-edit-btn" onclick="editGrupo('${g.id}')">✏️</button>
+    </div>`;
+  }).join('');
+}
+function dndStart(e,idx){dragSrcIdx=idx;setTimeout(()=>{const el=document.querySelector('[data-idx="'+idx+'"]');if(el)el.classList.add('dragging');},0);}
+function dndOver(e,idx){e.preventDefault();if(dragSrcIdx===idx)return;document.querySelectorAll('.dnd-item').forEach(el=>el.classList.remove('drag-over'));const el=document.querySelector('[data-idx="'+idx+'"]');if(el)el.classList.add('drag-over');}
+function dndLeave(e){e.currentTarget.classList.remove('drag-over');}
+function dndDrop(e,toIdx){e.preventDefault();if(dragSrcIdx===null||dragSrcIdx===toIdx)return;const moved=grupos.splice(dragSrcIdx,1)[0];grupos.splice(toIdx,0,moved);dragSrcIdx=null;renderGruposDnd();}
+function dndEnd(){dragSrcIdx=null;document.querySelectorAll('.dnd-item').forEach(el=>{el.classList.remove('dragging');el.classList.remove('drag-over');});}
+
+function selectGrupoColor(el,color){
+  document.getElementById('gr-color').value=color;
+  document.querySelectorAll('#gr-color-picker div').forEach(d=>{d.style.border=d.dataset.color===color?'2px solid var(--t0)':'2px solid transparent';});
+}
+function openAddGrupo(){
+  document.getElementById('gr-edit-id').value='';
+  document.getElementById('m-grupo-title').textContent='Nuevo grupo';
+  document.getElementById('gr-nombre').value='';
+  document.getElementById('gr-color').value='#a8c8e8';
+  document.getElementById('gr-desc').value='';
+  document.getElementById('gr-del-btn').style.display='none';
+  document.querySelectorAll('#gr-color-picker div').forEach(d=>{d.style.border=d.dataset.color==='#a8c8e8'?'2px solid var(--t0)':'2px solid transparent';});
+  openModal('m-grupo');
+}
+function editGrupo(id){
+  const g=grupos.find(x=>x.id===id);if(!g)return;
+  document.getElementById('gr-edit-id').value=id;
+  document.getElementById('m-grupo-title').textContent='Editar grupo';
+  document.getElementById('gr-nombre').value=g.nombre;
+  document.getElementById('gr-color').value=g.color;
+  document.getElementById('gr-desc').value=g.desc||'';
+  document.getElementById('gr-del-btn').style.display='inline-flex';
+  document.querySelectorAll('#gr-color-picker div').forEach(d=>{d.style.border=d.dataset.color===g.color?'2px solid var(--t0)':'2px solid transparent';});
+  openModal('m-grupo');
+}
+function saveGrupo(){
+  const editId=document.getElementById('gr-edit-id').value;
+  const nombre=document.getElementById('gr-nombre').value.trim();
+  if(!nombre)return;
+  const data={id:editId||'g'+nextGrupoId++,nombre,color:document.getElementById('gr-color').value||'#a8c8e8',desc:document.getElementById('gr-desc').value.trim()};
+  if(editId){
+    const i=grupos.findIndex(x=>x.id===editId);
+    const oldNombre=grupos[i]?.nombre;
+    if(i>-1)grupos[i]=data;
+    if(oldNombre&&oldNombre!==nombre)activos.forEach(a=>{if(a.grupo===oldNombre)a.grupo=nombre;});
+  } else grupos.push(data);
+  closeModal('m-grupo');
+  renderGruposDnd();
+}
+function deleteGrupo(){
+  const editId=document.getElementById('gr-edit-id').value;
+  const g=grupos.find(x=>x.id===editId);
+  if(!g)return;
+  if(!confirm(`¿Eliminar el grupo "${g.nombre}"? Los activos con este grupo quedarán sin asignar.`))return;
+  const i=grupos.findIndex(x=>x.id===editId);
+  if(i>-1)grupos.splice(i,1);
+  closeModal('m-grupo');
+  renderGruposDnd();
+}
+
+// ── F3: ANOTACIONES GLOBAL ────────────────────────────────────────────────────
+const NOTA_TAG_CFG={
+  general:{label:'General',bg:'#eeedea',color:'#505050'},
+  tesis:{label:'Tesis',bg:'#dceef8',color:'#2c5f80'},
+  alerta:{label:'Alerta',bg:'#fce0d8',color:'#7a3020'},
+  idea:{label:'Idea',bg:'#dcecd0',color:'#2a5020'},
+  recordatorio:{label:'Recordatorio',bg:'#faebd0',color:'#7a4a10'},
+};
+let anotaciones=[
+  {id:1,texto:'Tesis: largo plazo DCA sobre índices globales. Revisar anualmente.',tag:'tesis',ctx:'',fecha:'2024-01-15'},
+  {id:2,texto:'NVDA: posición especulativa, no superar 10% de la cartera especulativa.',tag:'alerta',ctx:'NVDA',fecha:'2025-01-08'},
+  {id:3,texto:'Revisar si VWCE sigue siendo mejor opción que IWDA para el tramo europeo.',tag:'idea',ctx:'VWCE',fecha:'2025-02-20'},
+  {id:4,texto:'Recordatorio: revisar la fiscalidad de los dividendos de AAPL antes de la declaración.',tag:'recordatorio',ctx:'AAPL',fecha:'2025-03-01'},
+];
+let nextNotaId=10,notaFiltroActivo='todos';
+
+function renderAnotaciones(){
+  const tags=['todos',...Object.keys(NOTA_TAG_CFG)];
+  const filtrosEl=document.getElementById('notas-filtros');
+  const listaEl=document.getElementById('lista-anotaciones');
+  if(!filtrosEl||!listaEl)return;
+  filtrosEl.innerHTML=tags.map(t=>{
+    const cfg=NOTA_TAG_CFG[t];
+    const active=notaFiltroActivo===t;
+    const label=t==='todos'?'Todas':(cfg?cfg.label:t);
+    const style=active&&cfg?'background:'+cfg.bg+';color:'+cfg.color+';border-color:'+cfg.color:'';
+    return'<span class="tag'+(active?' selected':'')+'" onclick="setNotaFiltro(\''+t+'\')" style="'+style+'">'+label+'</span>';
+  }).join('');
+  const lista=notaFiltroActivo==='todos'?anotaciones:anotaciones.filter(function(n){return n.tag===notaFiltroActivo;});
+  if(!lista.length){
+    listaEl.innerHTML='<div class="nota-empty"><span class="nota-empty-icon">📝</span>Sin anotaciones'+(notaFiltroActivo!=='todos'?' en esta categoría':'')+'.<br><br><button class="btn btn-p" style="width:auto;padding:8px 18px" onclick="openAddNota()">+ Nueva anotación</button></div>';
+    return;
+  }
+  listaEl.innerHTML=[...lista].reverse().map(function(n){
+    const cfg=NOTA_TAG_CFG[n.tag]||NOTA_TAG_CFG.general;
+    const ctxBadge=n.ctx?'<span class="nota-ctx-badge">📎 '+n.ctx+'</span>':'';
+    return'<div class="nota-card">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;flex-wrap:wrap">'
+      +'<span class="nota-tag" style="background:'+cfg.bg+';color:'+cfg.color+'">'+cfg.label+'</span>'
+      +ctxBadge
+      +'<span style="font-size:11px;color:var(--t2);margin-left:auto">'+n.fecha+'</span>'
+      +'</div>'
+      +'<div style="font-size:13px;color:var(--t0);line-height:1.5">'+n.texto+'</div>'
+      +'<div class="nota-card-actions">'
+      +'<button onclick="editNotaGlobal('+n.id+')" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--t2);padding:3px 5px;border-radius:4px" title="Editar">✏️</button>'
+      +'<button onclick="deleteNotaGlobal('+n.id+')" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--neg);padding:3px 5px;border-radius:4px" title="Borrar">🗑</button>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+  const dot=document.getElementById('notas-dot');
+  if(dot)dot.style.display=anotaciones.length?'block':'none';
+}
+function setNotaFiltro(tag){notaFiltroActivo=tag;renderAnotaciones();}
+function fillNotaCtxSel(){
+  const sel=document.getElementById('nota-ctx-sel');
+  const opts=['<option value="">— Sin contexto específico —</option>'];
+  carteras.forEach(c=>opts.push(`<option value="Cartera: ${c.nombre}">🗂 Cartera: ${c.nombre}</option>`));
+  activos.forEach(a=>opts.push(`<option value="${a.ticker}">${a.ticker} · ${a.nombre}</option>`));
+  grupos.forEach(g=>opts.push(`<option value="Grupo: ${g.nombre}">🏷 Grupo: ${g.nombre}</option>`));
+  sel.innerHTML=opts.join('');
+}
+function openAddNota(){
+  document.getElementById('nota-edit-id').value='';
+  document.getElementById('m-nota-title').textContent='Nueva anotación';
+  document.getElementById('nota-global-txt').value='';
+  document.getElementById('nota-tag-sel').value='general';
+  fillNotaCtxSel();
+  document.getElementById('nota-ctx-sel').value='';
+  openModal('m-nota-global');
+}
+function editNotaGlobal(id){
+  const n=anotaciones.find(x=>x.id===id);if(!n)return;
+  document.getElementById('nota-edit-id').value=id;
+  document.getElementById('m-nota-title').textContent='Editar anotación';
+  document.getElementById('nota-global-txt').value=n.texto;
+  document.getElementById('nota-tag-sel').value=n.tag||'general';
+  fillNotaCtxSel();
+  document.getElementById('nota-ctx-sel').value=n.ctx||'';
+  openModal('m-nota-global');
+}
+function deleteNotaGlobal(id){
+  const i=anotaciones.findIndex(x=>x.id===id);if(i>-1)anotaciones.splice(i,1);
+  renderAnotaciones();
+}
+function saveNotaGlobal(){
+  const editId=document.getElementById('nota-edit-id').value;
+  const texto=document.getElementById('nota-global-txt').value.trim();
+  if(!texto)return;
+  const today=new Date().toISOString().split('T')[0];
+  const data={id:editId?parseInt(editId):nextNotaId++,texto,tag:document.getElementById('nota-tag-sel').value,ctx:document.getElementById('nota-ctx-sel').value,fecha:today};
+  if(editId){const i=anotaciones.findIndex(x=>x.id===parseInt(editId));if(i>-1)anotaciones[i]=data;}
+  else anotaciones.push(data);
+  closeModal('m-nota-global');
+  if(document.getElementById('s-anotaciones').classList.contains('active'))renderAnotaciones();
+  const dot=document.getElementById('notas-dot');
+  if(dot)dot.style.display=anotaciones.length?'block':'none';
+}
 let chRent=null,rentPeriod='1M';
 function setRentPeriod(btn,p){document.querySelectorAll('#s-rentabilidad .period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rentPeriod=p;renderRentabilidad();}
 function renderRentabilidad(){
