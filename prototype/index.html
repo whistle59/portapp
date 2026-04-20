@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>portapp — prototipo v3</title>
+<title>portapp — prototipo v5</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root{--bg0:#fff;--bg1:#f7f6f3;--bg2:#eeedea;--t0:#1a1a1a;--t1:#5c5c5c;--t2:#999;--bd:rgba(0,0,0,.1);--bd2:rgba(0,0,0,.18);--ac:#4a7fa5;--ac-bg:#eaf2f8;--ac-t:#2c5f80;--pos:#3a7a58;--neg:#903830;--fs:14px}
@@ -289,6 +289,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <div class="card-header"><span class="card-title">Actividad reciente</span><button class="btn btn-sm" onclick="goTo('s-ops')">Ver todas</button></div>
         <div id="actividad"></div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <button class="btn" onclick="goTo('s-rentabilidad')" style="font-size:12px">📈 Rentabilidad TWR</button>
+        <button class="btn" onclick="goTo('s-grupos')" style="font-size:12px">🗂 Capital por grupos</button>
+        <button class="btn" onclick="goTo('s-rent-efectivo')" style="font-size:12px">💰 Rent. efectivo</button>
+        <button class="btn" onclick="goTo('s-perfil')" style="font-size:12px">👤 Mi perfil</button>
+      </div>
     </div>
 
     <!-- CARTERA -->
@@ -465,8 +471,124 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       </div>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Plataformas externas</div>
       <button class="btn" style="margin-bottom:10px" onclick="goTo('s-plataformas')">Gestionar accesos directos</button>
+      <div class="slabel" style="margin-top:4px;margin-bottom:7px">Cuenta</div>
+      <button class="btn" style="margin-bottom:6px" onclick="goTo('s-perfil')">👤 Mi perfil y sesiones</button>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Sesión</div>
       <button class="btn" onclick="resetAuth()" style="color:var(--neg);border-color:var(--neg)">Cerrar sesión</button>
+    </div>
+
+    <!-- RENTABILIDAD (F1) -->
+    <div class="screen" id="s-rentabilidad">
+      <div class="qnav" id="qn-rentabilidad"></div>
+      <div class="screen-title" id="rent-title">Rentabilidad</div>
+      <div class="period-row">
+        <button class="period-btn active" onclick="setRentPeriod(this,'1M')">1M</button>
+        <button class="period-btn" onclick="setRentPeriod(this,'3M')">3M</button>
+        <button class="period-btn" onclick="setRentPeriod(this,'6M')">6M</button>
+        <button class="period-btn" onclick="setRentPeriod(this,'1A')">1A</button>
+        <button class="period-btn" onclick="setRentPeriod(this,'Todo')">Todo</button>
+      </div>
+      <div class="metric-grid">
+        <div class="metric"><div class="mlabel">Rent. total (TWR)</div><div class="mvalue pos" id="rent-twr">+12,4%</div></div>
+        <div class="metric"><div class="mlabel">Ganancia absoluta</div><div class="mvalue pos"><span class="amt" id="rent-abs">€4.820</span></div></div>
+        <div class="metric"><div class="mlabel">Mejor activo</div><div class="mvalue pos" id="rent-best">AAPL +8,8%</div></div>
+        <div class="metric"><div class="mlabel">Peor activo</div><div class="mvalue neg" id="rent-worst">NVDA -5,2%</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:9px">Rentabilidad por activo</div>
+        <table><thead><tr><th>Activo</th><th>Grupo</th><th>TWR</th><th>Absoluto</th></tr></thead>
+        <tbody id="tb-rentabilidad"></tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:9px">Evolución TWR vs cartera</div>
+        <div style="position:relative;height:155px"><canvas id="cRent" role="img" aria-label="Rentabilidad TWR"></canvas></div>
+      </div>
+    </div>
+
+    <!-- CAPITAL POR GRUPOS (F2) -->
+    <div class="screen" id="s-grupos">
+      <div class="qnav" id="qn-grupos"></div>
+      <div class="screen-title" id="grupos-title">Capital por grupos</div>
+      <div class="metric-grid">
+        <div class="metric"><div class="mlabel">Total invertido</div><div class="mvalue"><span class="amt" id="g-total"></span></div></div>
+        <div class="metric"><div class="mlabel">Grupos activos</div><div class="mvalue" id="g-count"></div></div>
+      </div>
+      <div id="lista-grupos-capital"></div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:9px">Distribución</div>
+        <div id="leg-grupos" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+        <div style="position:relative;height:165px"><canvas id="cGrupos" role="img" aria-label="Capital por grupos"></canvas></div>
+      </div>
+    </div>
+
+    <!-- PERFIL (F4) -->
+    <div class="screen" id="s-perfil">
+      <div class="screen-title">Perfil</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:60px;height:60px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0">U</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;color:var(--t0)">Usuario Demo</div>
+          <div style="font-size:13px;color:var(--t1)">usuario@portapp.com</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:2px">Plan Personal · Activo</div>
+        </div>
+      </div>
+      <div class="slabel" style="margin-bottom:7px">Datos personales</div>
+      <div class="card">
+        <div class="fg"><label>Nombre</label><input type="text" value="Usuario Demo"></div>
+        <div class="fg"><label>Email</label><input type="email" value="usuario@portapp.com"></div>
+        <div class="fg"><label>Teléfono (2FA SMS)</label><input type="tel" value="+34 *** *** 421"></div>
+        <button class="btn btn-p" style="margin-top:4px">Guardar cambios</button>
+      </div>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Seguridad</div>
+      <div class="card">
+        <div class="dr"><span class="dk">Cambiar contraseña</span><button class="btn btn-sm" onclick="openModal('m-cambio-pwd')">Cambiar</button></div>
+        <div class="dr"><span class="dk">2FA activo</span><span class="badge b-teal">Email</span></div>
+        <div class="dr"><span class="dk">Último acceso</span><span class="dv">Hoy 09:02 · Chrome/Mac</span></div>
+      </div>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Sesiones activas</div>
+      <div class="card">
+        <div class="dr"><span class="dk">📱 iPhone · Safari</span><span class="badge b-teal">Esta sesión</span></div>
+        <div class="dr"><span class="dk">💻 MacBook · Chrome</span><button class="btn btn-sm" style="color:var(--neg)">Cerrar</button></div>
+      </div>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Plan</div>
+      <div class="card">
+        <div class="dr"><span class="dk">Plan actual</span><span class="badge b-blue">Personal</span></div>
+        <div class="dr"><span class="dk">Estado</span><span class="badge b-teal">Activo</span></div>
+        <div class="dr"><span class="dk">Carteras</span><span class="dv">3 / ilimitadas</span></div>
+      </div>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Zona de peligro</div>
+      <button class="btn" style="color:var(--neg);border-color:var(--neg);margin-bottom:6px">Eliminar cuenta</button>
+      <button class="btn" onclick="resetAuth()">Cerrar sesión</button>
+    </div>
+
+    <!-- RENT. EFECTIVO (F5) -->
+    <div class="screen" id="s-rent-efectivo">
+      <div class="qnav" id="qn-rent-efectivo"></div>
+      <div class="screen-title">Rentabilidad del efectivo</div>
+      <div class="period-row">
+        <button class="period-btn active" onclick="setREPeriod(this,'1M')">1M</button>
+        <button class="period-btn" onclick="setREPeriod(this,'3M')">3M</button>
+        <button class="period-btn" onclick="setREPeriod(this,'6M')">6M</button>
+        <button class="period-btn" onclick="setREPeriod(this,'1A')">1A</button>
+        <button class="period-btn" onclick="setREPeriod(this,'Todo')">Todo</button>
+      </div>
+      <div class="metric-grid">
+        <div class="metric"><div class="mlabel">Total generado</div><div class="mvalue pos"><span class="amt" id="re-total">€342</span></div></div>
+        <div class="metric"><div class="mlabel">Rentabilidad s/ saldo</div><div class="mvalue pos" id="re-pct">+8,0%</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:9px">Por tipo de ingreso</div>
+        <div id="re-por-tipo"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:9px">Por broker</div>
+        <div id="re-por-broker"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:9px">Detalle de movimientos</div>
+        <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Broker</th><th>Importe</th></tr></thead>
+        <tbody id="tb-re"></tbody></table>
+      </div>
     </div>
 
   </div>
@@ -594,6 +716,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   <button class="btn btn-p" onclick="closeModal('m-plataforma')">Añadir</button>
 </div></div>
 
+<div class="modal-overlay" id="m-cambio-pwd"><div class="modal">
+  <div class="mhdr"><span class="mtitle">Cambiar contraseña</span><button class="btn-icon" onclick="closeModal('m-cambio-pwd')">✕</button></div>
+  <div class="fg"><label>Contraseña actual</label><div style="position:relative"><input type="password" id="pwd-actual" style="padding-right:38px"><button type="button" onclick="togglePwd('pwd-actual',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:16px">👁</button></div></div>
+  <div class="fg"><label>Nueva contraseña</label><div style="position:relative"><input type="password" id="pwd-nueva" style="padding-right:38px"><button type="button" onclick="togglePwd('pwd-nueva',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:16px">👁</button></div></div>
+  <div class="fg"><label>Repetir nueva contraseña</label><div style="position:relative"><input type="password" id="pwd-rep" style="padding-right:38px"><button type="button" onclick="togglePwd('pwd-rep',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:16px">👁</button></div></div>
+  <button class="btn btn-p" onclick="closeModal('m-cambio-pwd')">Guardar contraseña</button>
+</div></div>
+
 </div>
 <script>
 const GC={'Core':'b-blue','Cripto':'b-amber','AI/Tech':'b-purple','Renta fija':'b-teal','Legacy':'b-gray','Core ampliado':'b-green'};
@@ -658,11 +788,11 @@ function toggleDark(){document.documentElement.classList.toggle('dark');document
 function setFontSize(cls){['fs-sm','fs-md','fs-lg','fs-xl'].forEach(c=>document.documentElement.classList.remove(c));document.documentElement.classList.add(cls);}
 function togglePwd(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.style.opacity=el.type==='text'?'1':'0.5';}
 function reCharts(){const a=id=>document.getElementById(id).classList.contains('active');if(a('s-global'))setTimeout(renderGlobal,50);if(a('s-resumen')){setTimeout(()=>{renderCR();renderHistorial('1S');},50);}}
-const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings'];
-const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes'};
+const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo'];
+const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.'};
 const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
-function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;if(sid==='s-global')setTimeout(renderGlobal,80);if(sid==='s-resumen'){renderResumen();setTimeout(()=>{renderCR();renderHistorial('1S');},80);}if(sid==='s-cartera')renderCartera();if(sid==='s-efectivo')renderEfectivo();if(sid==='s-ops'){renderOps();document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}if(sid==='s-indices')renderIndices();if(sid==='s-notif')renderNotif();if(sid==='s-plataformas')renderPlats();if(sid==='s-settings')renderGrupos();}
-function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
+function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;if(sid==='s-global')setTimeout(renderGlobal,80);if(sid==='s-resumen'){renderResumen();setTimeout(()=>{renderCR();renderHistorial('1S');},80);}if(sid==='s-cartera')renderCartera();if(sid==='s-efectivo')renderEfectivo();if(sid==='s-ops'){renderOps();document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}if(sid==='s-indices')renderIndices();if(sid==='s-notif')renderNotif();if(sid==='s-plataformas')renderPlats();if(sid==='s-settings')renderGrupos();if(sid==='s-rentabilidad'){renderRentabilidad();}if(sid==='s-grupos')renderGruposCapital();if(sid==='s-rent-efectivo')renderRentEfectivo();}
+function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
 function openModal(id){document.getElementById(id).classList.add('open');if(id==='m-portfolios')renderPortList();if(id==='m-op'||id==='m-efectivo')fillCS();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function closeAllModals(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));}
@@ -709,6 +839,87 @@ function borrarNotif(id){const i=notifs.findIndex(x=>x.id===id);if(i>-1){notifs.
 function renderPlats(){document.getElementById('lista-plataformas').innerHTML=plats.map(p=>`<a class="ext-link" href="${p.url}" target="_blank"><div class="ext-icon" style="background:${p.color}20;color:${p.color}">${p.icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--t0)">${p.nombre}</div><div style="font-size:11px;color:var(--t1)">${p.cat}</div></div><span style="font-size:14px;color:var(--t2)">↗</span></a>`).join('');}
 function renderGrupos(){const gs=['Core','Cripto','AI/Tech','Renta fija','Legacy','Core ampliado'];document.getElementById('grupos-chips').innerHTML=gs.map(g=>`<span class="tag selected">${g}</span>`).join('')+'<span class="tag">+ Nuevo</span>';}
 function saveNota(){const t=document.getElementById('nota-txt').value.trim();if(t)notas.push(t);closeModal('m-nota');}
+
+// ── RENTABILIDAD TWR (F1) ─────────────────────────────────────────────────────
+let chRent=null,rentPeriod='1M';
+function setRentPeriod(btn,p){document.querySelectorAll('#s-rentabilidad .period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rentPeriod=p;renderRentabilidad();}
+function renderRentabilidad(){
+  const c=carteras.find(x=>x.id===activeId);
+  document.getElementById('rent-title').textContent='Rentabilidad · '+c.nombre;
+  const act=cA(activeId);
+  const C=CC();
+  const rows=act.map(a=>{
+    const seed=a.ticker.charCodeAt(0);
+    const twr=((seed%20)-5+(Math.random()*4-2)).toFixed(1);
+    const abs=Math.round(a.qty*a.cot*(parseFloat(twr)/100));
+    return{ticker:a.ticker,nombre:a.nombre,grupo:a.grupo,twr:parseFloat(twr),abs};
+  }).sort((a,b)=>b.twr-a.twr);
+  const best=rows[0],worst=rows[rows.length-1];
+  const totalTwr=(rows.reduce((s,r)=>s+r.twr,0)/rows.length).toFixed(1);
+  const totalAbs=rows.reduce((s,r)=>s+r.abs,0);
+  document.getElementById('rent-twr').textContent=(totalTwr>=0?'+':'')+totalTwr+'%';
+  document.getElementById('rent-twr').className='mvalue '+(totalTwr>=0?'pos':'neg');
+  document.getElementById('rent-abs').textContent=fe(Math.abs(totalAbs));
+  document.getElementById('rent-best').textContent=best.ticker+' '+(best.twr>=0?'+':'')+best.twr+'%';
+  document.getElementById('rent-worst').textContent=worst.ticker+' '+(worst.twr>=0?'+':'')+worst.twr+'%';
+  document.getElementById('tb-rentabilidad').innerHTML=rows.map(r=>`<tr><td><strong>${r.ticker}</strong></td><td><span class="badge ${GC[r.grupo]||'b-gray'}">${r.grupo}</span></td><td class="${r.twr>=0?'pos':'neg'}">${r.twr>=0?'+':''}${r.twr}%</td><td class="${r.abs>=0?'pos':'neg'}"><span class="amt">${r.abs>=0?'+':''}${fe(Math.abs(r.abs))}</span></td></tr>`).join('');
+  const pts={'1M':30,'3M':90,'6M':180,'1A':365,'Todo':730}[rentPeriod]||30;
+  const labels=[],data=[];
+  for(let i=pts;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);labels.push(i===0?'Hoy':d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}));data.push(parseFloat((totalTwr*(1-i/pts)+(Math.sin(i*.4)*.8)).toFixed(2)));}
+  if(chRent)chRent.destroy();
+  chRent=new Chart(document.getElementById('cRent'),{type:'line',data:{labels,datasets:[{label:'TWR%',data,borderColor:C[0],backgroundColor:C[0]+'40',fill:true,tension:.4,pointRadius:0,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+(c.parsed.y>=0?'+':'')+c.parsed.y+'%'}}},scales:{x:{ticks:{maxTicksLimit:6,color:'var(--t2)',font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>(v>=0?'+':'')+v+'%',color:'var(--t2)',font:{size:10}},grid:{color:'var(--bd)'}}}}});
+}
+
+// ── CAPITAL POR GRUPOS (F2) ───────────────────────────────────────────────────
+let chGrupos=null;
+function renderGruposCapital(){
+  const c=carteras.find(x=>x.id===activeId);
+  document.getElementById('grupos-title').textContent='Capital por grupos · '+c.nombre;
+  const act=cA(activeId);
+  const C=CC();
+  const gV={};act.forEach(a=>{gV[a.grupo]=(gV[a.grupo]||0)+a.qty*a.cot;});
+  const tot=Object.values(gV).reduce((s,v)=>s+v,0);
+  document.getElementById('g-total').textContent=fe(tot).replace('€','€');
+  document.getElementById('g-count').textContent=Object.keys(gV).length;
+  document.getElementById('lista-grupos-capital').innerHTML=Object.entries(gV).sort((a,b)=>b[1]-a[1]).map(([g,v],i)=>{
+    const pct=tot>0?v/tot*100:0;
+    const activos=act.filter(a=>a.grupo===g);
+    return`<div class="card" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="width:10px;height:10px;border-radius:2px;background:${C[i%C.length]}"></div>
+          <span style="font-weight:600;font-size:13px;color:var(--t0)">${g}</span>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:700;color:var(--t0)" class="amt">${fe(v)}</div>
+          <div style="font-size:11px;color:var(--t1)">${pct.toFixed(1)}% del total</div>
+        </div>
+      </div>
+      <div class="pbar"><div class="pfill" style="width:${pct}%;background:${C[i%C.length]}"></div></div>
+      <div style="font-size:11px;color:var(--t1);margin-top:6px">${activos.map(a=>a.ticker).join(' · ')}</div>
+    </div>`;
+  }).join('');
+  const ls=Object.keys(gV),dt=Object.values(gV);
+  document.getElementById('leg-grupos').innerHTML=ls.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1)"><div style="width:9px;height:9px;border-radius:2px;background:${C[i%C.length]}"></div>${l} ${tot>0?(dt[i]/tot*100).toFixed(0)+'%':''}</div>`).join('');
+  if(chGrupos)chGrupos.destroy();
+  chGrupos=new Chart(document.getElementById('cGrupos'),{type:'doughnut',data:{labels:ls,datasets:[{data:dt,backgroundColor:C.slice(0,ls.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});
+}
+
+// ── RENTABILIDAD EFECTIVO (F5) ────────────────────────────────────────────────
+function setREPeriod(btn,p){document.querySelectorAll('#s-rent-efectivo .period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderRentEfectivo();}
+function renderRentEfectivo(){
+  const C=CC();
+  const ingresos=efectivoData.filter(e=>e.cartera===activeId&&e.importe>0);
+  const tipoV={};ingresos.forEach(e=>{tipoV[e.tipo]=(tipoV[e.tipo]||0)+e.importe;});
+  const brokerV={};ingresos.forEach(e=>{brokerV[e.broker]=(brokerV[e.broker]||0)+e.importe;});
+  const total=ingresos.reduce((s,e)=>s+e.importe,0);
+  const saldo=4250;
+  document.getElementById('re-total').textContent=fe(total);
+  document.getElementById('re-pct').textContent='+'+(total/saldo*100).toFixed(1)+'%';
+  document.getElementById('re-por-tipo').innerHTML=Object.entries(tipoV).map(([t,v],i)=>{const p=total>0?v/total*100:0;return pb(p,C[i%C.length],t+' — '+fe(v));}).join('');
+  document.getElementById('re-por-broker').innerHTML=Object.entries(brokerV).map(([b,v],i)=>{const p=total>0?v/total*100:0;return pb(p,C[(i+2)%C.length],b+' — '+fe(v));}).join('');
+  document.getElementById('tb-re').innerHTML=ingresos.map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge b-teal">${e.tipo}</span></td><td>${e.broker}</td><td class="pos"><span class="amt">+€${e.importe.toLocaleString('es-ES')}</span></td></tr>`).join('')||'<tr><td colspan="4" style="color:var(--t1)">Sin ingresos en este período</td></tr>';
+}
 document.getElementById('op-date').value=new Date().toISOString().split('T')[0];
 </script>
 </body>
