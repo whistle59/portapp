@@ -1,6 +1,6 @@
 # portapp — Estado del proyecto
 
-> Última actualización: prototipo v3  
+> Última actualización: prototipo v5 — Bloque 2 (F9, F10, F3)  
 > Credenciales demo: `usuario@portapp.com` / `demo1234` / 2FA: `123456`
 
 ---
@@ -132,14 +132,14 @@
 |---|---|
 | F1 | Pantalla de rentabilidad real por activo y por período (TWR) |
 | F2 | Cuadro de capital por grupos con porcentajes sobre el total |
-| F3 | Módulo de anotaciones global (accesible desde cualquier nivel) |
+| F3 | ~~Módulo de anotaciones global (accesible desde cualquier nivel)~~ ✅ v5 |
 | F4 | Perfil de usuario y gestión de sesión |
 | F5 | Rentabilidad del efectivo en período determinado |
 | F6 | Proyección DCA con arrastre automático de saldos anuales entre años |
 | F7 | Conexión con broker: formulario de credenciales que lanza sesión en URL del broker |
 | F8 | Upload de PDF del broker: lectura e importación automática de movimientos |
-| F9 | Gestión de cuentas bancarias y cuentas broker en Ajustes (IBAN, BIC, titular) |
-| F10 | Grupos de activos: CRUD completo + drag & drop para reordenar |
+| F9 | ~~Gestión de cuentas bancarias y cuentas broker en Ajustes (IBAN, BIC, titular)~~ ✅ v5 |
+| F10 | ~~Grupos de activos: CRUD completo + drag & drop para reordenar~~ ✅ v5 |
 | F11 | Compartir cartera: enlace público (permanente o 3h), solo lectura, opción solo porcentajes |
 
 ---
