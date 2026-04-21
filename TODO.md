@@ -38,6 +38,16 @@
 - **F6** — Proyección DCA con arrastre anual explícito, métricas de capitalización y toggle simple/detallado (#14)
 - **F11** — Compartir cartera: modal con duración (perm/3h/24h), modo solo porcentajes, copiar y revocar (#19)
 
+### Bloque 6 — UX y accesibilidad
+- **S7** — Onboarding: modal 3 pasos al entrar sin carteras
+- **S8** — Tooltips ⓘ en TWR, Exposición Región y Divisa
+- **S9** — Validación en nueva operación + fix ticker desde select existente
+- **S10** — Confirm al borrar anotaciones
+- **S11** — Toast de feedback en guardar op, cartera y perfil
+- **S12** — Estado vacío en Cartera y Operaciones
+- **S13** — Nav: "Proy." → "DCA", "Índices" → "Mercado"
+- **S14** — Valor de cartera activa visible en la topbar
+
 ---
 
 ## 🔄 Prototipo — Pendiente
@@ -58,6 +68,14 @@ Estas son mejoras que surgen al revisar el código actual y que aportarían valo
 | # | Descripción | Por qué |
 |---|---|---|
 | ~~S1~~ | ~~**Datos de muestra más ricos**~~ | ✅ Hecho en bloque 5 |
+| ~~S7~~ | ~~Onboarding~~ | ✅ |
+| ~~S8~~ | ~~Tooltips ⓘ~~ | ✅ |
+| ~~S9~~ | ~~Validación formularios~~ | ✅ |
+| ~~S10~~ | ~~Confirm al borrar~~ | ✅ |
+| ~~S11~~ | ~~Toast feedback~~ | ✅ |
+| ~~S12~~ | ~~Estados vacíos~~ | ✅ |
+| ~~S13~~ | ~~Labels nav bar~~ | ✅ |
+| ~~S14~~ | ~~Valor cartera en topbar~~ | ✅ |
 | S2 | **Estado vacío en pantalla Global** — mensaje si no hay carteras | Robustez básica |
 | S3 | **Validación en formularios** — nueva op, nuevo movimiento, nueva cartera | Actualmente aceptan campos vacíos sin aviso |
 | S4 | **Búsqueda/filtro en Operaciones** — filtrar por ticker o fecha además del tipo | Usabilidad cuando hay muchas ops |
