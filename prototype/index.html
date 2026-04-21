@@ -1060,12 +1060,13 @@ document.addEventListener('visibilitychange',()=>{
     document.getElementById('lock-screen').classList.add('active');
   }
   if(document.hidden){
-    if(appActive)shield.style.display='flex';
+    if(appActive){shield.style.display='flex';document.getElementById('device').classList.add('masked');}
     if(!lockSettings.enabled||!appActive)return;
     hiddenAt=Date.now();
     if(lockSettings.grace===0)doLock();
   } else {
     shield.style.display='none';
+    if(!privacyOn)document.getElementById('device').classList.remove('masked');
     if(lockTimer){clearTimeout(lockTimer);lockTimer=null;}
     if(!lockSettings.enabled||!hiddenAt)return;
     const elapsed=(Date.now()-hiddenAt)/1000;
