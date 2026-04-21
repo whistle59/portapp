@@ -144,6 +144,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 .ext-link{display:flex;align-items:center;gap:10px;padding:10px 12px;border:.5px solid var(--bd);border-radius:8px;margin-bottom:8px;cursor:pointer;background:var(--bg0);text-decoration:none}
 .ext-link:hover{background:var(--bg1)}
 .ext-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:var(--bg2);color:var(--t2);font-size:9px;cursor:help;position:relative;vertical-align:middle;margin-left:3px;flex-shrink:0}
+.tip::after{content:attr(data-tip);position:absolute;bottom:125%;left:50%;transform:translateX(-50%);background:var(--t0);color:var(--bg0);padding:5px 9px;border-radius:6px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .2s;z-index:200;width:170px;text-align:center;white-space:normal;line-height:1.4}
+.tip:hover::after,.tip:focus::after{opacity:1}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--t0);color:var(--bg0);padding:8px 20px;border-radius:20px;font-size:12px;font-weight:500;z-index:300;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty-state{text-align:center;padding:36px 20px;color:var(--t1)}
+.empty-state-icon{font-size:36px;margin-bottom:10px;display:block}
+.empty-state-title{font-size:14px;font-weight:600;color:var(--t0);margin-bottom:5px}
+.empty-state-sub{font-size:12px;color:var(--t1);line-height:1.5}
 </style>
 </head>
 <body>
@@ -260,8 +269,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   <div class="topbar">
     <div class="port-sel" onclick="openModal('m-portfolios')">
       <div class="port-dot" id="active-dot"></div>
-      <span id="active-name">Cartera Principal</span>
-      <span style="font-size:10px;color:var(--t2)">▾</span>
+      <div style="flex:1;min-width:0">
+        <div id="active-name" style="font-size:13px;font-weight:500;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Cartera Principal</div>
+        <div id="active-value" style="font-size:10px;color:var(--t2)"></div>
+      </div>
+      <span style="font-size:10px;color:var(--t2);flex-shrink:0">▾</span>
     </div>
     <button class="tb-btn" onclick="goTo('s-global')">Global</button>
     <button class="tb-btn" onclick="openModal('m-op')">+ Op.</button>
@@ -348,8 +360,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <table><thead><tr><th>Activo</th><th>Grupo</th><th>Valor</th><th>P/L</th></tr></thead>
         <tbody id="tb-cartera"></tbody></table>
       </div></div>
-      <div style="margin-top:11px"><div class="slabel">Exposición por Región</div><div id="exp-region"></div></div>
-      <div style="margin-top:10px"><div class="slabel">Exposición por Divisa</div><div id="exp-divisa"></div></div>
+      <div style="margin-top:11px"><div class="slabel">Exposición por Región<span class="tip" data-tip="Porcentaje del valor de cartera invertido en cada zona geográfica">ⓘ</span></div><div id="exp-region"></div></div>
+      <div style="margin-top:10px"><div class="slabel">Exposición por Divisa<span class="tip" data-tip="Riesgo de tipo de cambio: qué parte de tu cartera está en cada moneda">ⓘ</span></div><div id="exp-divisa"></div></div>
     </div>
 
     <!-- EFECTIVO -->
@@ -534,7 +546,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <button class="period-btn" onclick="setRentPeriod(this,'Todo')">Todo</button>
       </div>
       <div class="metric-grid">
-        <div class="metric"><div class="mlabel">Rent. total (TWR)</div><div class="mvalue pos" id="rent-twr">+12,4%</div></div>
+        <div class="metric"><div class="mlabel">Rent. total (TWR)<span class="tip" data-tip="Time-Weighted Return: mide la rentabilidad real eliminando el efecto de las aportaciones">ⓘ</span></div><div class="mvalue pos" id="rent-twr">+12,4%</div></div>
         <div class="metric"><div class="mlabel">Ganancia absoluta</div><div class="mvalue pos"><span class="amt" id="rent-abs">€4.820</span></div></div>
         <div class="metric"><div class="mlabel">Mejor activo</div><div class="mvalue pos" id="rent-best">AAPL +8,8%</div></div>
         <div class="metric"><div class="mlabel">Peor activo</div><div class="mvalue neg" id="rent-worst">NVDA -5,2%</div></div>
@@ -666,8 +678,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <button class="nav-item" id="nav-cartera" onclick="goTo('s-cartera',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="6" width="16" height="10" rx="2" stroke-width="1.3"/><path d="M5 6V4a2 2 0 014 0v2" stroke-width="1.3"/></svg><span class="nav-label">Cartera</span></button>
     <button class="nav-item" id="nav-efectivo" onclick="goTo('s-efectivo',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="4" width="16" height="10" rx="2" stroke-width="1.3"/><path d="M1 7h16" stroke-width="1.3"/><circle cx="5" cy="11" r="1" fill="var(--t2)" stroke="none"/></svg><span class="nav-label">Efectivo</span></button>
     <button class="nav-item" id="nav-ops" onclick="goTo('s-ops',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5h12M3 9h8M3 13h10" stroke-width="1.3" stroke-linecap="round"/></svg><span class="nav-label">Ops.</span></button>
-    <button class="nav-item" id="nav-proyeccion" onclick="goTo('s-proyeccion',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="1,14 6,8 10,11 17,3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-label">Proy.</span></button>
-    <button class="nav-item" id="nav-indices" onclick="goTo('s-indices',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke-width="1.3"/><line x1="9" y1="2" x2="9" y2="16" stroke-width="1.3"/><line x1="2" y1="9" x2="16" y2="9" stroke-width="1.3"/></svg><span class="nav-label">Índices</span></button>
+    <button class="nav-item" id="nav-proyeccion" onclick="goTo('s-proyeccion',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="1,14 6,8 10,11 17,3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-label">DCA</span></button>
+    <button class="nav-item" id="nav-indices" onclick="goTo('s-indices',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke-width="1.3"/><line x1="9" y1="2" x2="9" y2="16" stroke-width="1.3"/><line x1="2" y1="9" x2="16" y2="9" stroke-width="1.3"/></svg><span class="nav-label">Mercado</span></button>
     <button class="nav-item" id="nav-settings" onclick="goTo('s-settings',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke-width="1.3"/><path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.2 3.2l1.4 1.4M13.4 13.4l1.4 1.4M3.2 14.8l1.4-1.4M13.4 4.6l1.4-1.4" stroke-width="1.3" stroke-linecap="round"/></svg><span class="nav-label">Ajustes</span></button>
   </div>
 </div>
@@ -719,6 +731,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   </div>
   <div class="fg"><label>Grupo</label><select id="op-grupo"><option>Core</option><option>Cripto</option><option>AI/Tech</option><option>Renta fija</option><option>Legacy</option><option>Core ampliado</option></select></div>
   <div class="fg"><label>Nota</label><textarea id="op-nota" rows="2" placeholder="Observación opcional..."></textarea></div>
+  <div id="op-err" class="err-box" style="display:none"></div>
   <button class="btn btn-p" onclick="addOp()">Guardar operación</button>
 </div></div>
 
@@ -835,6 +848,27 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   <button class="btn btn-p" onclick="closeModal('m-cambio-pwd')">Guardar contraseña</button>
 </div></div>
 
+<div class="modal-overlay" id="m-onboarding"><div class="modal">
+  <div style="text-align:center;padding:10px 0 14px">
+    <div style="font-size:40px;margin-bottom:8px">📊</div>
+    <div style="font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px">Bienvenido a portapp</div>
+    <div style="font-size:12px;color:var(--t1)">Gestiona todas tus inversiones en un solo lugar</div>
+  </div>
+  <div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:11px">
+    <div style="width:30px;height:30px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">1</div>
+    <div><div style="font-size:13px;font-weight:600;color:var(--t0)">Crea tu cartera</div><div style="font-size:11px;color:var(--t1)">Pulsa el selector de cartera arriba a la izquierda</div></div>
+  </div></div>
+  <div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:11px">
+    <div style="width:30px;height:30px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">2</div>
+    <div><div style="font-size:13px;font-weight:600;color:var(--t0)">Registra tus operaciones</div><div style="font-size:11px;color:var(--t1)">Usa el botón <strong>+ Op.</strong> para añadir compras y ventas</div></div>
+  </div></div>
+  <div class="card" style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:11px">
+    <div style="width:30px;height:30px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">3</div>
+    <div><div style="font-size:13px;font-weight:600;color:var(--t0)">Analiza tu rendimiento</div><div style="font-size:11px;color:var(--t1)">Sigue tu rentabilidad y evolución desde Resumen</div></div>
+  </div></div>
+  <button class="btn btn-p" onclick="closeModal('m-onboarding')">¡Empezar!</button>
+</div></div>
+
 <div class="modal-overlay" id="m-compartir"><div class="modal">
   <div class="mhdr"><span class="mtitle" id="comp-title">Compartir cartera</span><button class="btn-icon" onclick="closeModal('m-compartir')">✕</button></div>
   <div id="comp-sin-enlace">
@@ -858,6 +892,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 </div></div>
 
 </div>
+<div id="toast" class="toast"></div>
 <script>
 const GC={'Core':'b-blue','Cripto':'b-amber','AI/Tech':'b-purple','Renta fija':'b-teal','Legacy':'b-gray','Core ampliado':'b-green'};
 function CC(){const d=document.documentElement.classList.contains('dark')||window.matchMedia('(prefers-color-scheme:dark)').matches;return d?['#7aaac8','#7abca0','#d8a870','#a890c0','#d08080','#70b8b0','#b8b080','#b080a8']:['#a8c8e8','#a8d8b8','#f0c8a0','#c8b0d8','#f0a8a8','#a8d8d0','#d8d0a8','#d0a8c8'];}
@@ -948,6 +983,7 @@ function otpMove(i){if(document.getElementById('o'+i).value&&i<5)document.getEle
 function getOtp(){return[0,1,2,3,4,5].map(i=>document.getElementById('o'+i).value).join('');}
 function verifyOtp(){const code=getOtp(),err=document.getElementById('oerr'),ok=document.getElementById('ook');if(code.length<6){err.style.display='block';err.textContent='Introduce los 6 dígitos.';return;}if(code===DEMO){err.style.display='none';ok.style.display='block';clearInterval(tInt);setTimeout(launchApp,900);}else{intentos--;if(intentos<=0){clearInterval(tInt);bSec=899;clearInterval(bInt);bInt=setInterval(()=>{bSec--;if(bSec<=0){clearInterval(bInt);document.getElementById('btime').textContent='Desbloqueado';return;}const m=Math.floor(bSec/60),s=bSec%60;document.getElementById('btime').textContent=m+':'+(s<10?'0':'')+s;},1000);showAuth('as-blocked');}else{err.style.display='block';err.innerHTML='Código incorrecto. Quedan <strong>'+intentos+'</strong> intento'+(intentos===1?'':'s')+'.';for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('o0').focus();}}}
 function resendCode(){tSec=587;intentos=3;for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('oerr').style.display='none';document.getElementById('o0').focus();}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function launchApp(){
   document.getElementById('auth-wrap').style.display='none';
   const shell=document.getElementById('app-shell');
@@ -955,12 +991,12 @@ function launchApp(){
   const c=carteras[0];
   document.getElementById('active-dot').style.background=c.color;
   document.getElementById('active-name').textContent=c.nombre;
+  document.getElementById('active-value').textContent=fe(cV(c.id));
   document.getElementById('notif-dot').style.display=notifs.some(n=>!n.leida)?'block':'none';
   const nd=document.getElementById('notas-dot');if(nd)nd.style.display=anotaciones.length?'block':'none';
-  // Doble requestAnimationFrame: espera a que el browser complete el layout
-  // del app-shell antes de llamar a goTo (evita canvas con dimensiones 0×0)
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     goTo('s-global',document.getElementById('nav-global'));
+    if(carteras.length===0)openModal('m-onboarding');
   }));
 }
 function resetAuth(){clearInterval(tInt);clearInterval(bInt);document.getElementById('app-shell').classList.remove('active');document.getElementById('auth-wrap').style.display='flex';privacyOn=false;document.getElementById('privacy-bar').classList.remove('on');document.getElementById('device').classList.remove('masked');showAuth('as-login');}
@@ -1033,20 +1069,36 @@ function renderGlobal(){
   document.getElementById('exp-div-global').innerHTML=Object.entries(dT).map(([d,v])=>{const p=td>0?v/td*100:0;return pb(p,C[0],d);}).join('');
 }
 function renderPortList(){document.getElementById('port-list').innerHTML=carteras.map(c=>{const v=cV(c.id),i=cI(c.id),p=i>0?(v-i)/i*100:0;return`<div class="port-card${c.id===activeId?' active-card':''}" onclick="selectCartera('${c.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="width:9px;height:9px;border-radius:50%;background:${c.color}"></div><span style="font-weight:700;font-size:13px;flex:1;color:var(--t0)">${c.nombre}</span>${c.id===activeId?'<span class="badge b-blue">Activa</span>':''}</div><div style="font-size:11px;color:var(--t1);margin-bottom:5px">${c.desc}</div><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:700;color:var(--t0)" class="amt">${fe(v)}</span><span class="${p>=0?'pos':'neg'}">${fp(p)}</span></div></div>`;}).join('');}
-function selectCartera(cid){activeId=cid;const c=carteras.find(x=>x.id===cid);document.getElementById('active-name').textContent=c.nombre;document.getElementById('active-dot').style.background=c.color;closeAllModals();goTo('s-resumen');}
-function addCartera(){const n=document.getElementById('nc-nom').value.trim();if(!n)return;carteras.push({id:'c'+Date.now(),nombre:n,desc:document.getElementById('nc-desc').value||'',divisa:document.getElementById('nc-div').value,color:document.getElementById('nc-col').value});closeModal('m-nueva-cartera');}
+function selectCartera(cid){activeId=cid;const c=carteras.find(x=>x.id===cid);document.getElementById('active-name').textContent=c.nombre;document.getElementById('active-dot').style.background=c.color;document.getElementById('active-value').textContent=fe(cV(cid));closeAllModals();goTo('s-resumen');}
+function addCartera(){const n=document.getElementById('nc-nom').value.trim();if(!n)return;carteras.push({id:'c'+Date.now(),nombre:n,desc:document.getElementById('nc-desc').value||'',divisa:document.getElementById('nc-div').value,color:document.getElementById('nc-col').value});closeModal('m-nueva-cartera');showToast('Cartera creada ✓');}
 function renderResumen(){const c=carteras.find(x=>x.id===activeId);document.getElementById('res-title').textContent='Resumen · '+c.nombre;const v=cV(activeId),i=cI(activeId),g=v-i,p=i>0?g/i*100:0;document.getElementById('res-metrics').innerHTML=`<div class="metric"><div class="mlabel">Valor cartera</div><div class="mvalue"><span class="amt">${fe(v)}</span></div><div class="msub ${g>=0?'pos':'neg'}">${fp(p)}</div></div><div class="metric"><div class="mlabel">Total invertido</div><div class="mvalue"><span class="amt">${fe(i)}</span></div></div><div class="metric"><div class="mlabel">Ganancia / pérdida</div><div class="mvalue ${g>=0?'pos':'neg'}"><span class="amt">${(g>=0?'+':'')+fe(Math.abs(g))}</span></div></div><div class="metric"><div class="mlabel">Activos</div><div class="mvalue">${cA(activeId).length}</div></div>`;document.getElementById('actividad').innerHTML=ops.filter(o=>o.cartera===activeId).slice(0,4).map(o=>`<div class="dr"><span class="dk">${o.fecha.slice(5)} · ${o.op} ${o.ticker}</span><span class="dv ${o.op==='Compra'?'neg':'pos'}">${o.op==='Compra'?'-':'+'}<span class="amt">${fe(o.qty*o.precio)}</span></span></div>`).join('')||'<div style="font-size:12px;color:var(--t1);padding:8px 0">Sin operaciones recientes</div>';}
 function renderCR(){const C=CC(),gV={};cA(activeId).forEach(a=>{gV[a.grupo]=(gV[a.grupo]||0)+a.qty*a.cot;});const ls=Object.keys(gV),dt=Object.values(gV),tot=dt.reduce((s,v)=>s+v,0);document.getElementById('leg-resumen').innerHTML=ls.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1)"><div style="width:9px;height:9px;border-radius:2px;background:${C[i%C.length]}"></div>${l} ${tot>0?(dt[i]/tot*100).toFixed(0)+'%':''}</div>`).join('');if(chR)chR.destroy();chR=new Chart(document.getElementById('cResumen'),{type:'doughnut',data:{labels:ls,datasets:[{data:dt,backgroundColor:C.slice(0,ls.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});}
 function setPeriod(btn,p){document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderHistorial(p);}
 function renderHistorial(period){const pts={'1S':7,'1M':30,'3M':90,'6M':180,'1A':365,'Todo':730}[period]||30,base=cV(activeId)||10000,C=CC(),labels=[],data=[];for(let i=pts;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);labels.push(i===0?'Hoy':d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}));const noise=(Math.sin(i*.3)+Math.cos(i*.7))*.02;data.push(Math.round(base*(.85+i/pts*.15+noise)));}if(chH)chH.destroy();chH=new Chart(document.getElementById('cHistorial'),{type:'line',data:{labels,datasets:[{data,borderColor:C[0],backgroundColor:C[0]+'40',fill:true,tension:.4,pointRadius:0,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed.y)}}},scales:{x:{ticks:{maxTicksLimit:6,color:'var(--t2)',font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>'€'+Math.round(v/1000)+'k',color:'var(--t2)',font:{size:10}},grid:{color:'var(--bd)'}}}}});}
-function renderCartera(){const C=CC(),act=cA(activeId);document.getElementById('tb-cartera').innerHTML=act.map(a=>{const v=a.qty*a.cot,i=a.qty*a.pm,p=(v-i)/i*100;return`<tr class="row-link" onclick="showDetalle('${a.ticker}');goTo('s-ops')"><td><strong>${a.ticker}</strong><br><span style="color:var(--t1);font-size:10px">${a.broker}</span></td><td><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></td><td class="amt">${fe(v)}</td><td class="${p>=0?'pos':'neg'}">${fp(p)}</td></tr>`;}).join('');const rT={};let rt=0;act.forEach(a=>{const v=a.qty*a.cot;rt+=v;Object.entries(a.region).forEach(([r,p])=>{rT[r]=(rT[r]||0)+v*p/100;});});document.getElementById('exp-region').innerHTML=Object.entries(rT).map(([r,v])=>{const p=rt>0?v/rt*100:0;return pb(p,C[1],r);}).join('');const dT={};let dt=0;act.forEach(a=>{const v=a.qty*a.cot;dt+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});document.getElementById('exp-divisa').innerHTML=Object.entries(dT).map(([d,v])=>{const p=dt>0?v/dt*100:0;return pb(p,C[0],d);}).join('');}
+function renderCartera(){const C=CC(),act=cA(activeId);document.getElementById('tb-cartera').innerHTML=act.length?act.map(a=>{const v=a.qty*a.cot,i=a.qty*a.pm,p=(v-i)/i*100;return`<tr class="row-link" onclick="showDetalle('${a.ticker}');goTo('s-ops')"><td><strong>${a.ticker}</strong><br><span style="color:var(--t1);font-size:10px">${a.broker}</span></td><td><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></td><td class="amt">${fe(v)}</td><td class="${p>=0?'pos':'neg'}">${fp(p)}</td></tr>`;}).join(''):'<tr><td colspan="4"><div class="empty-state"><span class="empty-state-icon">📭</span><div class="empty-state-title">Cartera vacía</div><div class="empty-state-sub">Registra tu primera operación con el botón + Op. de la barra superior</div></div></td></tr>';const rT={};let rt=0;act.forEach(a=>{const v=a.qty*a.cot;rt+=v;Object.entries(a.region).forEach(([r,p])=>{rT[r]=(rT[r]||0)+v*p/100;});});document.getElementById('exp-region').innerHTML=Object.entries(rT).map(([r,v])=>{const p=rt>0?v/rt*100:0;return pb(p,C[1],r);}).join('');const dT={};let dt=0;act.forEach(a=>{const v=a.qty*a.cot;dt+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});document.getElementById('exp-divisa').innerHTML=Object.entries(dT).map(([d,v])=>{const p=dt>0?v/dt*100:0;return pb(p,C[0],d);}).join('');}
 function filterCt(el,tipo){document.querySelectorAll('#s-cartera .chip-row .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');const act=tipo==='todos'?cA(activeId):cA(activeId).filter(a=>a.tipo===tipo);const C=CC();document.getElementById('tb-cartera').innerHTML=act.map(a=>{const v=a.qty*a.cot,i=a.qty*a.pm,p=(v-i)/i*100;return`<tr class="row-link" onclick="showDetalle('${a.ticker}');goTo('s-ops')"><td><strong>${a.ticker}</strong><br><span style="color:var(--t1);font-size:10px">${a.broker}</span></td><td><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></td><td class="amt">${fe(v)}</td><td class="${p>=0?'pos':'neg'}">${fp(p)}</td></tr>`;}).join('');const rT={};let rt=0;act.forEach(a=>{const v=a.qty*a.cot;rt+=v;Object.entries(a.region).forEach(([r,p])=>{rT[r]=(rT[r]||0)+v*p/100;});});document.getElementById('exp-region').innerHTML=Object.entries(rT).length?Object.entries(rT).map(([r,v])=>{const p=rt>0?v/rt*100:0;return pb(p,C[1],r);}).join(''):'<div style="font-size:12px;color:var(--t1);padding:6px 0">Sin datos para este filtro</div>';const dT={};let dt=0;act.forEach(a=>{const v=a.qty*a.cot;dt+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});document.getElementById('exp-divisa').innerHTML=Object.entries(dT).length?Object.entries(dT).map(([d,v])=>{const p=dt>0?v/dt*100:0;return pb(p,C[0],d);}).join(''):'<div style="font-size:12px;color:var(--t1);padding:6px 0">Sin datos para este filtro</div>';}
 function showDetalle(ticker){const a=activos.find(x=>x.ticker===ticker);if(!a)return;document.getElementById('panel-ops').style.display='none';document.getElementById('panel-detalle').style.display='block';document.getElementById('d-titulo').textContent=ticker+' · '+a.nombre;const v=a.qty*a.cot,i=a.qty*a.pm,pl=v-i;document.getElementById('d-valor').textContent=fe(v);document.getElementById('d-pl').innerHTML=`<span class="amt">${(pl>=0?'+':'')+fe(Math.abs(pl))}</span>`;document.getElementById('d-pl').className='mvalue '+(pl>=0?'pos':'neg');document.getElementById('d-pm').textContent=fe(a.pm);document.getElementById('d-cot').textContent=fe(a.cot);document.getElementById('ficha').innerHTML=`<div class="dr"><span class="dk">ISIN</span><span class="dv">${a.isin}</span></div><div class="dr"><span class="dk">Tipo</span><span class="dv">${a.tipo}</span></div><div class="dr"><span class="dk">Mercado</span><span class="dv">${a.mercado}</span></div><div class="dr"><span class="dk">Divisa</span><span class="dv">${a.divisa}</span></div><div class="dr"><span class="dk">Índice</span><span class="dv">${a.indice}</span></div><div class="dr"><span class="dk">Broker</span><span class="dv">${a.broker}</span></div><div class="dr"><span class="dk">Grupo</span><span class="dv"><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></span></div>`;document.getElementById('d-hist').innerHTML=ops.filter(o=>o.ticker===ticker).map(o=>`<tr><td>${o.fecha.slice(5)}</td><td>${o.op}</td><td>${o.qty}</td><td class="amt">€${o.precio.toLocaleString('es-ES')}</td><td>€${o.fee}</td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--t1)">Sin operaciones</td></tr>';document.getElementById('d-notas').innerHTML=notas.map(n=>`<div class="note-box">${n}</div>`).join('');}
 function backOps(){document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}
 const REND=['Dividendo','Staking','Interés','Saveback'];
-function renderOps(){const f=ops.filter(o=>{if(o.cartera!==activeId)return false;if(opsFilter==='todas')return true;if(opsFilter==='rendimiento')return REND.includes(o.op);return o.op===opsFilter;});document.getElementById('tb-ops').innerHTML=f.map(o=>{const t=o.qty*o.precio+o.fee;const r=REND.includes(o.op);return`<tr class="row-link" onclick="showDetalle('${o.ticker}')"><td>${o.fecha.slice(5)}</td><td><strong>${o.ticker}</strong><br><span style="font-size:10px;color:var(--t1)">${o.broker}</span></td><td><span class="badge ${GC[o.grupo]||'b-gray'}">${o.op}</span></td><td class="${o.op==='Compra'?'neg':'pos'}"><span class="amt">${o.op==='Compra'?'-':'+'}{t}</span></td></tr>`.replace('{t}',fe(t));}).join('')||'<tr><td colspan="4" style="color:var(--t1);padding:12px 7px">Sin operaciones</td></tr>';}
+function renderOps(){const f=ops.filter(o=>{if(o.cartera!==activeId)return false;if(opsFilter==='todas')return true;if(opsFilter==='rendimiento')return REND.includes(o.op);return o.op===opsFilter;});document.getElementById('tb-ops').innerHTML=f.map(o=>{const t=o.qty*o.precio+o.fee;const r=REND.includes(o.op);return`<tr class="row-link" onclick="showDetalle('${o.ticker}')"><td>${o.fecha.slice(5)}</td><td><strong>${o.ticker}</strong><br><span style="font-size:10px;color:var(--t1)">${o.broker}</span></td><td><span class="badge ${GC[o.grupo]||'b-gray'}">${o.op}</span></td><td class="${o.op==='Compra'?'neg':'pos'}"><span class="amt">${o.op==='Compra'?'-':'+'}{t}</span></td></tr>`.replace('{t}',fe(t));}).join('')||'<tr><td colspan="4"><div class="empty-state" style="padding:24px 12px"><span class="empty-state-icon" style="font-size:28px">🔍</span><div class="empty-state-title">Sin operaciones</div><div class="empty-state-sub">Usa + Op. para registrar tu primera compra o venta</div></div></td></tr>';}
 function filterOps(el,tipo){document.querySelectorAll('#ops-chips .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');opsFilter=tipo;renderOps();}
-function addOp(){const d=document.getElementById('op-date').value,t=document.getElementById('op-tick').value.trim().toUpperCase();if(!d||!t)return;ops.unshift({id:nextId++,fecha:d,ticker:t,tipo:document.getElementById('op-tipo').value,broker:document.getElementById('op-broker-sel').value,op:document.getElementById('op-op').value,qty:parseFloat(document.getElementById('op-qty').value)||0,precio:parseFloat(document.getElementById('op-price').value)||0,fee:parseFloat(document.getElementById('op-fee').value)||0,divisa:document.getElementById('op-div').value,grupo:document.getElementById('op-grupo').value,nota:document.getElementById('op-nota').value,cartera:document.getElementById('op-cart').value||activeId});closeModal('m-op');renderOps();}
+function addOp(){
+  const err=document.getElementById('op-err');
+  const d=document.getElementById('op-date').value;
+  const actSel=document.getElementById('op-activo').value;
+  const isNuevo=actSel==='__nuevo__'||!actSel;
+  const t=isNuevo?document.getElementById('op-tick').value.trim().toUpperCase():actSel;
+  const qty=parseFloat(document.getElementById('op-qty').value);
+  const precio=parseFloat(document.getElementById('op-price').value);
+  if(!d){err.style.display='block';err.textContent='La fecha es obligatoria.';return;}
+  if(!t){err.style.display='block';err.textContent='Selecciona o escribe el activo.';return;}
+  if(!qty||qty<=0){err.style.display='block';err.textContent='La cantidad debe ser mayor que 0.';return;}
+  if(isNaN(precio)||precio<0){err.style.display='block';err.textContent='El precio no puede ser negativo.';return;}
+  err.style.display='none';
+  const tipoActivo=isNuevo?document.getElementById('op-tipo').value:(activos.find(a=>a.ticker===t)?.tipo||document.getElementById('op-tipo').value);
+  ops.unshift({id:nextId++,fecha:d,ticker:t,tipo:tipoActivo,broker:document.getElementById('op-broker-sel').value,op:document.getElementById('op-op').value,qty,precio,fee:parseFloat(document.getElementById('op-fee').value)||0,divisa:document.getElementById('op-div').value,grupo:document.getElementById('op-grupo').value,nota:document.getElementById('op-nota').value,cartera:document.getElementById('op-cart').value||activeId});
+  closeModal('m-op');renderOps();showToast('Operación guardada ✓');
+}
 function renderEfectivo(){document.getElementById('tb-efectivo').innerHTML=efectivoData.filter(e=>e.cartera===activeId).map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge ${e.importe>0?'b-teal':'b-coral'}">${e.tipo}</span></td><td><span class="badge ${e.origen==='op'?'b-purple':'b-gray'}">${e.origen==='op'?'Op.':'Cta.'}</span></td><td class="${e.importe>=0?'pos':'neg'}"><span class="amt">${e.importe>=0?'+':''}€${Math.abs(e.importe).toLocaleString('es-ES')}</span></td></tr>`).join('');}
 let proyDetalle=true;
 function toggleTablaProy(btn){proyDetalle=!proyDetalle;btn.textContent=proyDetalle?'Vista simple':'Vista detallada';calcProy();}
@@ -1373,6 +1425,7 @@ function editNotaGlobal(id){
   openModal('m-nota-global');
 }
 function deleteNotaGlobal(id){
+  if(!confirm('¿Eliminar esta anotación?'))return;
   const i=anotaciones.findIndex(x=>x.id===id);if(i>-1)anotaciones.splice(i,1);
   renderAnotaciones();
 }
@@ -1564,6 +1617,7 @@ function savePerfil(){
   perfil.tel=document.getElementById('perfil-tel').value.trim()||perfil.tel;
   renderPerfil();
   document.getElementById('perfil-ok').style.display='block';
+  showToast('Cambios guardados ✓');
 }
 function cerrarSesion(id){perfil.sesiones=perfil.sesiones.filter(s=>s.id!==id);renderPerfil();}
 
