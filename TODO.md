@@ -33,13 +33,17 @@
 - **F4** — Perfil de usuario dinámico (renderPerfil, savePerfil, sesiones) (#12)
 - **F12** — Pantalla "Aprende": canales YouTube curados con filtros y favoritos (#20)
 
+### Bloque 5 — Datos reales + DCA mejorado
+- **S1** — Datos de muestra enriquecidos: +4 activos, +11 ops (cubre 1M/3M/6M), +13 movimientos efectivo en 3 carteras
+- **F6** — Proyección DCA con arrastre anual explícito, métricas de capitalización y toggle simple/detallado (#14)
+
 ---
 
 ## 🔄 Prototipo — Pendiente
 
 | # | Issue | Descripción | Prioridad |
 |---|---|---|---|
-| F6 | #14 | Proyección DCA con arrastre automático de saldos anuales | Alta |
+| ~~F6~~ | ~~#14~~ | ~~Proyección DCA con arrastre automático de saldos anuales~~ | ✅ |
 | F11 | #19 | Compartir cartera: enlace público (permanente o 3h) | Alta |
 | F7 | #15 | Conexión con broker: lanzar sesión desde la app | Media |
 | F8 | #16 | Upload PDF broker: importación automática de movimientos | Media |
@@ -52,7 +56,7 @@ Estas son mejoras que surgen al revisar el código actual y que aportarían valo
 
 | # | Descripción | Por qué |
 |---|---|---|
-| S1 | **Datos de muestra más ricos** — ampliar `ops`, `efectivoData` y carteras con más historial | El período "1M" en TWR y Rent. Efectivo siempre queda vacío con los datos actuales |
+| ~~S1~~ | ~~**Datos de muestra más ricos**~~ | ✅ Hecho en bloque 5 |
 | S2 | **Estado vacío en pantalla Global** — mensaje si no hay carteras | Robustez básica |
 | S3 | **Validación en formularios** — nueva op, nuevo movimiento, nueva cartera | Actualmente aceptan campos vacíos sin aviso |
 | S4 | **Búsqueda/filtro en Operaciones** — filtrar por ticker o fecha además del tipo | Usabilidad cuando hay muchas ops |
