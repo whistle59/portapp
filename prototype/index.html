@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>portapp — prototipo v5</title>
+<title>portapp — prototipo v6</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root{--bg0:#fff;--bg1:#f7f6f3;--bg2:#eeedea;--t0:#1a1a1a;--t1:#5c5c5c;--t2:#999;--bd:rgba(0,0,0,.1);--bd2:rgba(0,0,0,.18);--ac:#4a7fa5;--ac-bg:#eaf2f8;--ac-t:#2c5f80;--pos:#3a7a58;--neg:#903830;--fs:14px}
@@ -282,10 +282,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <div class="screen active" id="s-global">
       <div class="screen-title">Todas las carteras</div>
       <div class="metric-grid">
-        <div class="metric"><div class="mlabel">Valor total</div><div class="mvalue"><span class="amt">€62.340</span></div><div class="msub pos">+10,4%</div></div>
-        <div class="metric"><div class="mlabel">Efectivo global</div><div class="mvalue"><span class="amt">€7.420</span></div></div>
-        <div class="metric"><div class="mlabel">Total invertido</div><div class="mvalue"><span class="amt">€56.450</span></div></div>
-        <div class="metric"><div class="mlabel">Rent. media</div><div class="mvalue pos">+9,1%</div></div>
+        <div class="metric"><div class="mlabel">Valor total</div><div class="mvalue"><span class="amt" id="g-valor-total"></span></div><div class="msub" id="g-rent-total"></div></div>
+        <div class="metric"><div class="mlabel">Carteras</div><div class="mvalue" id="g-n-carteras"></div></div>
+        <div class="metric"><div class="mlabel">Total invertido</div><div class="mvalue"><span class="amt" id="g-invertido"></span></div></div>
+        <div class="metric"><div class="mlabel">Ganancia total</div><div class="mvalue" id="g-ganancia"></div></div>
       </div>
       <div class="slabel">Carteras activas</div>
       <div id="lista-carteras"></div>
@@ -732,7 +732,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     </select>
   </div>
   <div id="ef-cf">
-    <div class="fg"><label>Cuenta / Broker</label><select><option>Interactive Brokers (USD)</option><option>DEGIRO (EUR)</option><option>Coinbase (USD)</option><option>IBAN ES91 2100...</option></select></div>
+    <div class="fg"><label>Cuenta / Broker</label><select id="ef-broker-sel"></select></div>
     <div class="fg"><label>Tipo</label><select><option>Transferencia entrada</option><option>Bizum entrada</option><option>Dividendo</option><option>Interés cuenta</option><option>Staking</option><option>Saveback</option><option>Transferencia salida</option><option>Comisión</option><option>Otro</option></select></div>
   </div>
   <div id="ef-of" style="display:none">
@@ -997,7 +997,13 @@ function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indic
 function openModal(id){document.getElementById(id).classList.add('open');if(id==='m-portfolios')renderPortList();if(id==='m-op'||id==='m-efectivo')fillCS();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function closeAllModals(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));}
-function fillCS(){['op-cart','ef-cart'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=carteras.map(c=>`<option value="${c.id}"${c.id===activeId?' selected':''}>${c.nombre}</option>`).join('');});fillActivos();}
+function fillCS(){
+  ['op-cart','ef-cart'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML=carteras.map(c=>`<option value="${c.id}"${c.id===activeId?' selected':''}>${c.nombre}</option>`).join('');});
+  fillActivos();
+  const brokerOpts=cuentas.filter(c=>c.tipo==='broker').map(c=>`<option>${c.nombre}</option>`).join('');
+  const opB=document.getElementById('op-broker-sel');if(opB)opB.innerHTML=brokerOpts||'<option>Sin brokers</option>';
+  const efB=document.getElementById('ef-broker-sel');if(efB)efB.innerHTML=cuentas.map(c=>`<option>${c.nombre}${c.iban?' ('+c.iban.slice(0,8)+'...)':''}</option>`).join('')||'<option>Sin cuentas</option>';
+}
 function fillActivos(){const cid=document.getElementById('op-cart')?.value||activeId;const act=activos.filter(a=>a.cartera===cid);const sel=document.getElementById('op-activo');if(!sel)return;sel.innerHTML='<option value="">— Selecciona activo —</option>'+act.map(a=>`<option value="${a.ticker}">${a.ticker} · ${a.nombre}</option>`).join('')+'<option value="__nuevo__">+ Nuevo activo...</option>';}
 function opActivoChange(sel){const nuevo=sel.value==='__nuevo__';document.getElementById('op-nuevo-campos').style.display=nuevo?'block':'none';}
 function efTC(){const v=document.getElementById('ef-tipo').value;document.getElementById('ef-cf').style.display=v==='cuenta'?'block':'none';document.getElementById('ef-of').style.display=v==='op'?'block':'none';}
@@ -1009,6 +1015,16 @@ const cV=cid=>cA(cid).reduce((s,a)=>s+a.qty*a.cot,0);
 const cI=cid=>cA(cid).reduce((s,a)=>s+a.qty*a.pm,0);
 function pb(pct,col,lbl){return`<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t0)"><span>${lbl}</span><span>${pct.toFixed(1)}%</span></div><div class="pbar"><div class="pfill" style="width:${pct}%;background:${col}"></div></div></div>`;}
 function renderGlobal(){
+  const totV=carteras.reduce((s,c)=>s+cV(c.id),0);
+  const totI=carteras.reduce((s,c)=>s+cI(c.id),0);
+  const totG=totV-totI;
+  const totP=totI>0?totG/totI*100:0;
+  document.getElementById('g-valor-total').textContent=fe(totV).replace('€','');
+  document.getElementById('g-rent-total').textContent=(totP>=0?'+':'')+totP.toFixed(1)+'%';
+  document.getElementById('g-rent-total').className='msub '+(totP>=0?'pos':'neg');
+  document.getElementById('g-n-carteras').textContent=carteras.length;
+  document.getElementById('g-invertido').textContent=fe(totI).replace('€','');
+  document.getElementById('g-ganancia').innerHTML=`<span class="amt ${totG>=0?'pos':'neg'}">${(totG>=0?'+':'')+fe(Math.abs(totG))}</span>`;
   document.getElementById('lista-carteras').innerHTML=carteras.map(c=>{const v=cV(c.id),i=cI(c.id),p=i>0?(v-i)/i*100:0;return`<div class="port-card" onclick="selectCartera('${c.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="width:9px;height:9px;border-radius:50%;background:${c.color}"></div><span style="font-weight:700;font-size:13px;flex:1;color:var(--t0)">${c.nombre}</span><span style="font-size:13px;font-weight:700;color:var(--t0)" class="amt">${fe(v)}</span></div><div style="font-size:11px;color:var(--t1);margin-bottom:6px">${c.desc}</div><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--t1)">Invertido: <span class="amt">${fe(i)}</span></span><span style="font-size:12px" class="${p>=0?'pos':'neg'}">${fp(p)}</span></div><div class="pbar" style="margin-top:6px"><div class="pfill" style="width:${Math.min(100,Math.abs(p)*3+40)}%;background:${c.color};opacity:.65"></div></div></div>`;}).join('');
   const C=CC(),gV={};activos.forEach(a=>{gV[a.grupo]=(gV[a.grupo]||0)+a.qty*a.cot;});const ls=Object.keys(gV),dt=Object.values(gV),tot=dt.reduce((s,v)=>s+v,0);
   document.getElementById('leg-global').innerHTML=ls.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1)"><div style="width:9px;height:9px;border-radius:2px;background:${C[i%C.length]}"></div>${l} ${tot>0?(dt[i]/tot*100).toFixed(0)+'%':''}</div>`).join('');
