@@ -338,6 +338,7 @@ portapp/
 | M9 | Testing en dispositivos reales: iPhone SE, iPhone 15, iPad, Android gama media | 🟡 Alta |
 | M10 | Publicación en App Store (Apple) y Google Play si se elige app nativa | 🟡 Alta |
 | M11 | PWA: manifest.json, service worker, instalable desde el navegador (alternativa sin tiendas) | 🟢 Media |
+| M12 | **Protección de pantalla en multitarea** — implementar `FLAG_SECURE` (Android) y `UIWindow.isSecure` (iOS) en la app nativa para impedir que el OS capture contenido financiero en el app switcher y en screenshots. En el prototipo web se enmascaran los valores `.amt` como solución provisional, pero no es posible bloquear la captura del OS desde un navegador. | 🔴 Crítica |
 
 ---
 
