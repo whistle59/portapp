@@ -34,11 +34,10 @@ jobs:
           echo "✅ File size OK (${SIZE} bytes)"
 
       - name: Validate HTML syntax
-        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
-        with:
-          root: prototype/
-          css: false
-          extra: "--filterpattern 'CSS:'"
+        run: |
+          pip install html5validator --quiet
+          html5validator --root prototype/ --ignore-re "CSS:" --log WARNING
+        continue-on-error: false
 
       - name: Check copyright notice present
         run: |
