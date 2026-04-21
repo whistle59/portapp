@@ -1,6 +1,6 @@
 # portapp — Estado del proyecto
 
-> Última actualización: prototipo v5 — Bloque 2 (F9, F10, F3)  
+> Última actualización: prototipo v6 — Bloques 3–6 completados  
 > Credenciales demo: `usuario@portapp.com` / `demo1234` / 2FA: `123456`
 
 ---
@@ -538,3 +538,40 @@ Aplicable al **Plan profesional B2B** y como producto independiente para empresa
 | WL4 | Pipeline de publicación automatizado para generar builds con marca personalizada |
 | WL5 | Preview en tiempo real del tema antes de publicarlo |
 
+---
+
+## 14. Análisis de mercado y competencia
+
+### Competencia directa
+
+| App | Fortalezas | Debilidades |
+|---|---|---|
+| **Sharesight** | La más completa del mercado, TWR real, informes fiscales | Cara (€25–50/mes), solo en inglés, UI compleja |
+| **Portfolio Performance** | Muy potente, gratuita | Solo escritorio, curva de aprendizaje alta, no móvil |
+| **Seeking Alpha** | Análisis de mercado, seguimiento de precios | No es gestión de cartera real, orientada a EE.UU. |
+| **Morningstar / Yahoo Finance** | Datos de mercado excelentes | Solo seguimiento de precios, sin gestión de operaciones |
+| **Fintonic / Wallet** | Buena UX, mercado español | Finanzas generales, no especializadas en inversión |
+| **Trade Republic / Revolut** | App del broker integrada | Solo gestiona activos de su propia plataforma |
+
+### El hueco de mercado
+
+El espacio no cubierto es específico: **inversor particular hispanohablante que opera en múltiples brokers y quiere una app móvil bien diseñada para gestionar toda su cartera en un solo lugar.**
+
+- Las apps potentes (Sharesight, Portfolio Performance) son para usuarios avanzados o angloparlantes
+- Las apps en español (Fintonic, etc.) no cubren inversión multi-broker
+- Ninguna combina de forma sencilla: multi-cartera + efectivo + DCA + TWR + UI móvil cuidada
+
+### Diferenciadores clave de portapp
+
+| Diferenciador | Por qué importa |
+|---|---|
+| **Mercado hispanohablante** | Casi sin competencia directa en español con buena UX |
+| **Móvil-first** | La mayoría de competidores son web o escritorio |
+| **Multi-broker** | El inversor típico opera en 2–3 plataformas distintas |
+| **Pago único (vs suscripción)** | Tendencia creciente — usuarios hartos de suscripciones |
+| **UX accesible** | Cubre al inversor medio, no solo al avanzado |
+| **White label B2B** | Abre un canal de ingresos 10–20x mayor que el individual |
+
+### Riesgo principal
+
+Que Revolut, Trade Republic o un banco grande lance una funcionalidad similar integrada en su app de broker. La protección frente a esto es la independencia multi-broker (portapp agrega datos de cualquier plataforma, algo que un broker nunca hará con sus competidores).
