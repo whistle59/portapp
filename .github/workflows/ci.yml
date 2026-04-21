@@ -38,7 +38,7 @@ jobs:
         with:
           root: prototype/
           css: false
-          blacklist: "error:"
+          extra: "--filterpattern 'CSS:'"
 
       - name: Check copyright notice present
         run: |
