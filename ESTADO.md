@@ -1040,7 +1040,84 @@ La realidad es que **el código en sí tiene poco valor estratégico** — lo ve
 
 ---
 
-## 18. Infraestructura de producción
+## 18. Equipo, roles y modelo de trabajo
+
+### Perfil del fundador
+
+| Área | Nivel |
+|---|---|
+| SQL, BigQuery, dbt | Experto (30+ años) |
+| Looker y herramientas de BI/analytics | Experto |
+| Dirección de proyectos | Experto |
+| Arquitectura de datos y modelado | Experto |
+| Programación general | Experto |
+| Frontend React/Next.js | Curva de aprendizaje |
+| DevOps / CI/CD / cloud | Curva de aprendizaje |
+| Seguridad web (JWT, OAuth, XSS) | Conoce conceptos, implementación a aprender |
+
+---
+
+### Rol de Claude Code en el proyecto
+
+Claude Code actúa como co-desarrollador técnico full-stack. La división de trabajo es:
+
+| Tarea | Quién |
+|---|---|
+| Decisiones de producto y negocio | Fundador |
+| Arquitectura de datos y esquema BD | Fundador (con revisión de Claude) |
+| Revisión y aprobación de código via PR | Fundador |
+| Testing con usuarios reales | Fundador |
+| Componentes React/Next.js | Claude Code |
+| Backend API routes | Claude Code |
+| Integraciones con terceros (Stripe, Resend, Anthropic) | Claude Code |
+| CI/CD y configuración DevOps | Claude Code |
+| Implementación de seguridad (JWT, rate limiting, sanitización) | Claude Code |
+| Documentación técnica | Claude Code |
+
+**El modelo de trabajo es el mismo que se ha usado para el prototipo:** el fundador dirige y aprueba, Claude implementa y explica. Cada cambio pasa por PR en GitHub antes de llegar a `main`.
+
+---
+
+### ¿Se necesita contratar a alguien para la v1?
+
+**No.** Con esta división de trabajo la v1 puede construirse sin contratar a nadie externo.
+
+Lo que Claude Code puede hacer por el fundador en las áreas de curva de aprendizaje:
+
+**Frontend React/Next.js**
+Generación completa de componentes, hooks, layouts y páginas. El fundador revisa, aprueba y aprende en el proceso sin necesidad de dominar React de antemano.
+
+**DevOps / CI/CD**
+Escritura de workflows de GitHub Actions, configuración de Vercel, gestión de variables de entorno y scripts de migración de BD. El fundador ejecuta los comandos, Claude proporciona exactamente qué ejecutar y por qué.
+
+**Seguridad web**
+Implementación correcta de JWT, refresh tokens, rate limiting, sanitización de inputs y cabeceras de seguridad HTTP. Código generado y explicado, no algo que el fundador tenga que memorizar.
+
+**Integraciones con terceros**
+Stripe/Paddle (pagos), Resend (email), Anthropic SDK (IA), Supabase SDK (BD y auth), Alpha Vantage (cotizaciones). Claude escribe las integraciones completas.
+
+**Lo que Claude Code NO puede hacer:**
+- Ejecutar comandos directamente en la máquina — el fundador los ejecuta
+- Tomar decisiones de negocio — esas son del fundador
+- Probar visualmente la UI en un navegador real
+- Garantizar que algo funciona sin pruebas reales con usuarios
+
+---
+
+### Cuándo sí tendría sentido contratar
+
+| Situación | Perfil a contratar |
+|---|---|
+| La app tiene tracción y hay que acelerar el desarrollo | Frontend developer senior React/Next.js (freelance, 3–6 meses) |
+| Se lanza el plan B2B y hay clientes enterprise | Backend developer para APIs avanzadas y SLAs |
+| El blog y el contenido requieren dedicación continua | Content manager / redactor de finanzas |
+| Se necesita presencia en redes sociales activa | Community manager |
+
+**Ninguno de estos perfiles es necesario para llegar al lanzamiento v1.**
+
+---
+
+## 19. Infraestructura de producción
 
 ### Visión general
 
