@@ -402,12 +402,18 @@ portapp/
 
 ## 12. Modelo de monetización
 
-### Estrategia recomendada: Pago único + Marketplace de contenido + Plan profesional B2B
+### Estrategia revisada: Híbrido pago único + suscripción por servicios + B2B
+
+> **Por qué no solo pago único:** el pago único genera ingresos lineales con la adquisición de clientes. Cuando el mercado se satura, los ingresos caen. No es un modelo sostenible a largo plazo por sí solo.
+>
+> **Por qué no solo suscripción:** los usuarios están hartos de suscripciones. La tasa de conversión es menor y genera fricción en la adquisición.
+>
+> **La solución:** pago único como gancho de entrada + suscripción anual opcional solo para servicios que tienen **coste recurrente real y valor tangible** (APIs de datos, almacenamiento en nube) + B2B como pilar de ingresos recurrentes estables.
 
 ---
 
 ### Tier 1 — Plan gratuito (adquisición)
-Objetivo: eliminar fricción de entrada y generar base de usuarios.
+Objetivo: eliminar fricción de entrada, generar base de usuarios y demostrar valor.
 
 | Funcionalidad | Incluida |
 |---|---|
@@ -416,69 +422,99 @@ Objetivo: eliminar fricción de entrada y generar base de usuarios.
 | Resumen y gráficos básicos | ✅ |
 | Proyección DCA | ✅ |
 | Acceso a canales de YouTube curados | ✅ |
+| Cotizaciones con retraso (15 min) | ✅ |
 | Exportación de datos | ❌ |
 | Carteras ilimitadas | ❌ |
 | Historial completo | ❌ |
 | Alertas avanzadas | ❌ |
 | Compartir cartera | ❌ |
+| Cotizaciones en tiempo real | ❌ |
+| Sincronización en la nube / multi-dispositivo | ❌ |
 
 ---
 
 ### Tier 2 — Plan personal (pago único)
-Objetivo: ingresos sin fricción de suscripción. Precio orientativo: **29-49€** pago único.
+Objetivo: conversión sin fricción de suscripción. Precio orientativo: **29–49€** pago único.
 
-| Funcionalidad | Incluida |
+Incluye todo lo del plan gratuito, más:
+
+| Funcionalidad adicional | Notas |
 |---|---|
-| Carteras ilimitadas | ✅ |
-| Operaciones ilimitadas | ✅ |
-| Historial completo con todos los períodos | ✅ |
-| Exportación Excel / CSV | ✅ |
-| Importación PDF de broker | ✅ |
-| Alertas configurables | ✅ |
-| Compartir cartera (enlace público) | ✅ |
-| Acceso a futuras actualizaciones (1 año) | ✅ |
+| Carteras ilimitadas | — |
+| Operaciones ilimitadas | — |
+| Historial completo con todos los períodos | — |
+| Exportación Excel / CSV | — |
+| Importación PDF de broker | — |
+| Alertas configurables | — |
+| Compartir cartera (enlace público) | — |
+| Actualizaciones durante 1 año | Pasado el año, la app sigue funcionando; las nuevas funciones requieren renovar |
 
-> Nota: el modelo de pago único está volviendo con fuerza — usuarios hartos de suscripciones lo valoran mucho y la tasa de conversión es mayor.
+---
+
+### Tier 2+ — Suscripción anual por servicios con coste real
+Opcional para usuarios del Plan personal. Precio orientativo: **12–24€/año**.
+
+> Solo se cobra por servicios que tienen un coste de infraestructura recurrente real. Esto lo hace justificable y no se percibe como "pagar por lo que ya tengo".
+
+| Servicio | Por qué tiene coste recurrente |
+|---|---|
+| Cotizaciones en tiempo real | API de datos de mercado (Yahoo Finance, Alpha Vantage, etc.) |
+| Tipos de cambio automáticos | API de divisas (ECB, Fixer.io) |
+| Sincronización en la nube | Almacenamiento y backend |
+| Backup automático | Almacenamiento |
+| Actualizaciones pasado el primer año | Mantenimiento continuo |
 
 ---
 
 ### Tier 3 — Plan profesional B2B
-Objetivo: asesores financieros, family offices, gestores que necesitan gestionar carteras de varios clientes. Precio orientativo: **50-150€/mes por usuario profesional**.
+Objetivo: asesores financieros, family offices, gestores de patrimonios. Precio orientativo: **50–150€/mes por usuario profesional**.
 
-| Funcionalidad | Incluida |
+> El ticket B2B es 10–20x mayor que el individual. La retención es muy alta porque cambiar de herramienta de gestión tiene un coste operativo elevado. Con 20–30 asesores la app ya es rentable de forma sostenible.
+
+Incluye todo lo anterior, más:
+
+| Funcionalidad B2B | Notas |
 |---|---|
-| Todo el Plan personal | ✅ |
-| Gestión de múltiples clientes | ✅ |
-| Vistas consolidadas entre clientes | ✅ |
-| Informes personalizados exportables | ✅ |
-| Acceso API para integración con otras herramientas | ✅ |
-| Soporte prioritario | ✅ |
-| Marca blanca (white label) opcional | 🔜 v2 |
-
-> Nota: el ticket B2B es 10-20x mayor que el individual. Con pocos clientes profesionales la app ya es rentable.
+| Gestión de múltiples clientes | Panel dedicado, vista consolidada |
+| Informes personalizados exportables | PDF / Excel con marca del asesor |
+| Acceso API para integración con otras herramientas | CRM, hojas de cálculo, etc. |
+| Soporte prioritario (SLA 24h) | — |
+| Interface desktop optimizada | Ver sección 15 |
+| White label (marca blanca) | 🔜 v2 — suplemento mensual |
 
 ---
 
-### Marketplace de contenido (ingresos recurrentes transversales)
-Aplicable a todos los tiers, incluyendo el gratuito.
+### Marketplace de contenido (ingresos transversales, todos los tiers)
 
 | Canal de ingreso | Descripción |
 |---|---|
-| Canales YouTube destacados | Acuerdo directo con creadores (fee fijo mensual o por clics demostrados con estadísticas) |
-| Canal "patrocinado" con badge | Mayor visibilidad en la lista, precio premium |
-| Cursos y formación | Links a cursos de los creadores con posible comisión de afiliado |
-| Herramientas de terceros | Integración destacada de brokers, robo-advisors o herramientas de análisis con acuerdo comercial |
+| Canales YouTube destacados | Acuerdo directo con creadores: fee fijo mensual o por clics verificados con estadísticas |
+| Badge "Patrocinado" | Mayor visibilidad, precio premium |
+| Cursos y formación | Links a cursos del creador con comisión de afiliado |
+| Brokers y herramientas destacadas | Integración preferente de brokers o robo-advisors con acuerdo comercial |
 
 ---
 
-### Hoja de ruta de monetización sugerida
+### Hoja de ruta de monetización
 
-| Fase | Acción |
-|---|---|
-| Lanzamiento | Solo plan gratuito + pago único personal. Sin B2B todavía. |
-| 3-6 meses | Activar marketplace de contenido con primeros acuerdos de canales YouTube |
-| 6-12 meses | Lanzar plan profesional B2B con primeros asesores beta |
-| 12+ meses | White label, API pública, expansión de marketplace |
+| Fase | Acción | Objetivo |
+|---|---|---|
+| Lanzamiento | Plan gratuito + pago único personal | Adquisición y validación |
+| 3–6 meses | Activar suscripción anual por servicios (cotizaciones, nube) | Ingresos recurrentes iniciales |
+| 3–6 meses | Primeros acuerdos marketplace (1–2 canales YouTube) | Ingresos complementarios |
+| 6–12 meses | Lanzar plan B2B con primeros asesores beta (5–10) | Validar modelo profesional |
+| 12+ meses | White label, API pública, expansión marketplace | Escala y diversificación |
+
+---
+
+### Por qué el B2B protege frente a la saturación del mercado individual
+
+El mercado de inversores particulares hispanohablantes es finito. Cuando se satura, los ingresos por pago único caen. El B2B resuelve esto porque:
+
+1. El mercado de asesores y gestores es más pequeño pero más estable
+2. La churn (tasa de abandono) es mínima — nadie migra de herramienta de gestión fácilmente
+3. El ticket mensual recurrente compensa la menor base de clientes
+4. El white label abre un tercer mercado: empresas que quieren ofrecer la herramienta con su propia marca
 
 
 
@@ -575,3 +611,82 @@ El espacio no cubierto es específico: **inversor particular hispanohablante que
 ### Riesgo principal
 
 Que Revolut, Trade Republic o un banco grande lance una funcionalidad similar integrada en su app de broker. La protección frente a esto es la independencia multi-broker (portapp agrega datos de cualquier plataforma, algo que un broker nunca hará con sus competidores).
+
+---
+
+## 15. Estrategia de plataformas (móvil / web / desktop)
+
+### Por qué desktop es necesario
+
+Los segmentos de usuario usan dispositivos distintos:
+
+| Segmento | Dispositivo principal | Uso típico |
+|---|---|---|
+| Inversor particular | Móvil | Consulta rápida, registrar operaciones, revisar rentabilidad |
+| Asesor financiero / B2B | Desktop | Gestión de múltiples clientes, informes, análisis en profundidad |
+
+**Desktop no es opcional si se quiere el mercado B2B.** Un asesor no va a gestionar 30 carteras de clientes desde el móvil. La interfaz desktop para B2B requiere funcionalidades específicas que no existen en la versión móvil (ver abajo).
+
+---
+
+### Estrategia recomendada: Web responsive + PWA (sin app nativa inicialmente)
+
+| Opción | Pros | Contras | Recomendación |
+|---|---|---|---|
+| **Web responsive** | Una base de código, cubre móvil + tablet + desktop, sin tiendas | Sin acceso a APIs nativas (biometría, notificaciones push avanzadas) | ✅ Primera fase |
+| **PWA** (Progressive Web App) | Instalable desde el navegador, funciona offline, notificaciones push, sin pasar por App Store | Limitaciones en iOS (Apple restringe PWAs), no aparece en tiendas | ✅ Añadir sobre la web responsive |
+| **React Native** | App nativa real, acceso completo a APIs del dispositivo, presencia en tiendas | Base de código separada (aunque compartida), coste de mantenimiento mayor | 🔜 v2 si la tracción lo justifica |
+| **Flutter** | Similar a React Native, excelente rendimiento | Menos ecosistema JS, curva de aprendizaje | ❌ No recomendado dado el stack actual |
+
+**Conclusión:** empezar con **web responsive + PWA** cubre el 80% de los casos de uso con un solo codebase. La app nativa (React Native) solo tiene sentido cuando hay tracción demostrada y los usuarios piden funcionalidades que la web no puede ofrecer (biometría real, widgets en pantalla de inicio, etc.).
+
+---
+
+### Layout adaptativo según dispositivo
+
+| Breakpoint | Layout | Navegación |
+|---|---|---|
+| < 480px (móvil) | Una columna, pantalla completa | Barra inferior (8 pestañas) |
+| 480–768px (tablet vertical) | Una columna ampliada | Barra inferior o sidebar colapsado |
+| 768–1024px (tablet horizontal) | Dos columnas | Sidebar fijo izquierdo |
+| > 1024px (desktop) | Dos o tres columnas | Sidebar fijo izquierdo expandido |
+
+El prototipo actual (CSS variables + flexbox) ya tiene la base técnica lista. El trabajo principal es añadir media queries y el componente de sidebar.
+
+---
+
+### Funcionalidades exclusivas de desktop (B2B)
+
+Estas pantallas no tienen sentido en móvil y deben diseñarse específicamente para desktop:
+
+| Funcionalidad | Descripción |
+|---|---|
+| Panel multi-cliente | Tabla resumen de todos los clientes del asesor con valor, rentabilidad y alertas |
+| Vista comparativa | Comparar carteras de distintos clientes lado a lado |
+| Generador de informes | Configurar y exportar informes en PDF con el logo del asesor |
+| Dashboard de actividad | Resumen de operaciones recientes de todos los clientes |
+| Gestión de permisos | Qué clientes puede ver cada usuario del equipo |
+
+---
+
+### Hoja de ruta de plataformas
+
+| Fase | Acción |
+|---|---|
+| Ahora (prototipo) | HTML/CSS single-file — validar concepto y flujos |
+| Producción v1 | React + Tailwind, web responsive móvil-first + PWA básica |
+| v1.5 | Layout desktop completo + sidebar + vistas B2B |
+| v2 | React Native si la tracción lo justifica (App Store + Google Play) |
+| v2+ | White label con builds personalizados por cliente |
+
+---
+
+### Decisión pendiente más importante (M1)
+
+Antes de empezar producción hay que decidir si el stack de producción será:
+
+- **Next.js** (React, SSR, buena SEO, fácil despliegue en Vercel/Netlify) — recomendado
+- **React SPA** (más simple, sin SSR, suficiente para una app autenticada)
+- **Vue / Svelte** (alternativas válidas pero menor ecosistema para este tipo de app)
+
+La recomendación es **Next.js** porque permite tener tanto la app autenticada (React SPA dentro) como la landing page pública (con SEO) en el mismo proyecto.
