@@ -508,6 +508,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       </div>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Plataformas externas</div>
       <button class="btn" style="margin-bottom:10px" onclick="goTo('s-plataformas')">Gestionar accesos directos</button>
+      <div class="slabel" style="margin-top:4px;margin-bottom:7px">Contenido</div>
+      <button class="btn" style="margin-bottom:10px" onclick="goTo('s-canales')">🎓 Canales recomendados</button>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Cuenta</div>
       <button class="btn" style="margin-bottom:6px" onclick="goTo('s-perfil')">👤 Mi perfil y sesiones</button>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Sesión</div>
@@ -626,6 +628,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Broker</th><th>Importe</th></tr></thead>
         <tbody id="tb-re"></tbody></table>
       </div>
+    </div>
+
+    <!-- CANALES YOUTUBE (F12) -->
+    <div class="screen" id="s-canales">
+      <div class="qnav" id="qn-canales"></div>
+      <div class="screen-title">Aprende</div>
+      <div style="font-size:12px;color:var(--t1);margin-bottom:11px">Canales de inversión recomendados</div>
+      <div class="chip-row" id="canales-filtros" style="margin-bottom:12px"></div>
+      <div id="lista-canales"></div>
     </div>
 
     <!-- ANOTACIONES GLOBAL (F3) -->
@@ -861,6 +872,14 @@ const plats=[
 ];
 const idxData={'FTSE All-World':{ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},'MSCI World':{ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados'},'S&P 500':{ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'}};
 let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=10,privacyOn=false,opsFilter='todas';
+const canales=[
+  {id:'ch1',nombre:'Fondos Indexados',ini:'FI',color:'#4a7fa5',cat:'ETFs',desc:'Inversión pasiva en índices globales, ETFs y estrategias de largo plazo.',url:'#',fav:false,dest:true},
+  {id:'ch2',nombre:'Value School',ini:'VS',color:'#4a8c6f',cat:'Value',desc:'Value investing, análisis fundamental y filosofía de inversión a largo plazo.',url:'#',fav:true,dest:false},
+  {id:'ch3',nombre:'Crypto Academy',ini:'CA',color:'#d4a017',cat:'Cripto',desc:'Análisis técnico y noticias del mercado de criptomonedas.',url:'#',fav:false,dest:false},
+  {id:'ch4',nombre:'Opciones y Derivados',ini:'OD',color:'#7a68a8',cat:'Opciones',desc:'Estrategias con opciones, covered calls y gestión del riesgo.',url:'#',fav:false,dest:false},
+  {id:'ch5',nombre:'Dividendo Activo',ini:'DA',color:'#3a7a58',cat:'Dividendos',desc:'Carteras de dividendos crecientes, REITs y renta pasiva.',url:'#',fav:true,dest:false},
+  {id:'ch6',nombre:'ETF Insider',ini:'EI',color:'#c8552a',cat:'ETFs',desc:'Comparativas de ETFs, TER, tracking error y carteras modelo.',url:'#',fav:false,dest:false},
+];
 let perfil={nombre:'Usuario Demo',email:'usuario@portapp.com',tel:'+34 *** *** 421',plan:'Personal',planEstado:'Activo',twofa:'Email',ultimoAcceso:'Hoy 09:02 · Chrome/Mac',sesiones:[{id:'s1',device:'📱 iPhone · Safari',actual:true},{id:'s2',device:'💻 MacBook · Chrome',actual:false}]};
 let chG=null,chR=null,chH=null,chP=null;
 const DEMO='123456';
@@ -898,8 +917,8 @@ function toggleDark(){document.documentElement.classList.toggle('dark');document
 function setFontSize(cls){['fs-sm','fs-md','fs-lg','fs-xl'].forEach(c=>document.documentElement.classList.remove(c));document.documentElement.classList.add(cls);}
 function togglePwd(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.style.opacity=el.type==='text'?'1':'0.5';}
 function reCharts(){const a=id=>document.getElementById(id).classList.contains('active');if(a('s-global'))requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));if(a('s-resumen'))requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));if(a('s-rentabilidad'))requestAnimationFrame(()=>requestAnimationFrame(renderRentabilidad));if(a('s-grupos'))requestAnimationFrame(()=>requestAnimationFrame(renderGruposCapital));}
-const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones'];
-const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas'};
+const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones','s-canales'];
+const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas','s-canales':'Aprende'};
 const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
 function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;
   if(sid==='s-global'){requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));}
@@ -916,8 +935,9 @@ function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.r
   else if(sid==='s-rent-efectivo')renderRentEfectivo();
   else if(sid==='s-anotaciones')renderAnotaciones();
   else if(sid==='s-perfil')renderPerfil();
+  else if(sid==='s-canales')renderCanales();
 }
-function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
+function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones','canales'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
 function openModal(id){document.getElementById(id).classList.add('open');if(id==='m-portfolios')renderPortList();if(id==='m-op'||id==='m-efectivo')fillCS();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function closeAllModals(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));}
@@ -1338,6 +1358,35 @@ function renderGruposCapital(){
 }
 
 // ── RENTABILIDAD EFECTIVO (F5) ────────────────────────────────────────────────
+// ── CANALES YOUTUBE (F12) ────────────────────────────────────────────────────
+const CANAL_CAT_COLOR={'ETFs':'b-blue','Value':'b-teal','Cripto':'b-amber','Opciones':'b-purple','Dividendos':'b-green'};
+let canalFiltro='Todos';
+function renderCanales(){
+  const cats=['Todos',...[...new Set(canales.map(c=>c.cat))]];
+  document.getElementById('canales-filtros').innerHTML=cats.map(c=>`<span class="tag${c===canalFiltro?' selected':''}" onclick="filterCanal('${c}',this)">${c}</span>`).join('');
+  const lista=canalFiltro==='Todos'?canales:canales.filter(c=>c.cat===canalFiltro);
+  document.getElementById('lista-canales').innerHTML=lista.map(c=>`
+    <div class="card" style="margin-bottom:8px">
+      <div style="display:flex;align-items:flex-start;gap:11px">
+        <div style="width:44px;height:44px;border-radius:10px;background:${c.color}22;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${c.color};flex-shrink:0">${c.ini}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+            <span style="font-size:13px;font-weight:600;color:var(--t0)">${c.nombre}</span>
+            ${c.dest?'<span class="badge b-coral" style="font-size:9px">Destacado</span>':''}
+            <span class="badge ${CANAL_CAT_COLOR[c.cat]||'b-gray'}">${c.cat}</span>
+          </div>
+          <div style="font-size:12px;color:var(--t1);line-height:1.4;margin-bottom:8px">${c.desc}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <a href="${c.url}" target="_blank" class="btn btn-sm btn-p" style="text-decoration:none;display:inline-block">Ver canal ↗</a>
+            <button onclick="toggleFavCanal('${c.id}')" style="background:none;border:none;cursor:pointer;font-size:18px;padding:2px;line-height:1" title="Favorito">${c.fav?'⭐':'☆'}</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('')||'<div style="font-size:13px;color:var(--t1);padding:16px 0;text-align:center">Sin canales en esta categoría</div>';
+}
+function filterCanal(cat,el){canalFiltro=cat;renderCanales();}
+function toggleFavCanal(id){const c=canales.find(x=>x.id===id);if(c){c.fav=!c.fav;renderCanales();}}
+
 // ── PERFIL (F4) ──────────────────────────────────────────────────────────────
 function renderPerfil(){
   const p=perfil;
