@@ -567,39 +567,33 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       </div>
       <div class="screen-title">Perfil</div>
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
-        <div style="width:60px;height:60px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0">U</div>
+        <div id="perfil-avatar" style="width:60px;height:60px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;flex-shrink:0"></div>
         <div>
-          <div style="font-size:16px;font-weight:700;color:var(--t0)">Usuario Demo</div>
-          <div style="font-size:13px;color:var(--t1)">usuario@portapp.com</div>
-          <div style="font-size:11px;color:var(--t2);margin-top:2px">Plan Personal · Activo</div>
+          <div id="perfil-nombre-hdr" style="font-size:16px;font-weight:700;color:var(--t0)"></div>
+          <div id="perfil-email-hdr" style="font-size:13px;color:var(--t1)"></div>
+          <div id="perfil-plan-hdr" style="font-size:11px;color:var(--t2);margin-top:2px"></div>
         </div>
       </div>
       <div class="slabel" style="margin-bottom:7px">Datos personales</div>
       <div class="card">
-        <div class="fg"><label>Nombre</label><input type="text" value="Usuario Demo"></div>
-        <div class="fg"><label>Email</label><input type="email" value="usuario@portapp.com"></div>
-        <div class="fg"><label>Teléfono (2FA SMS)</label><input type="tel" value="+34 *** *** 421"></div>
-        <button class="btn btn-p" style="margin-top:4px">Guardar cambios</button>
+        <div class="fg"><label>Nombre</label><input type="text" id="perfil-nombre"></div>
+        <div class="fg"><label>Email</label><input type="email" id="perfil-email"></div>
+        <div class="fg"><label>Teléfono (2FA SMS)</label><input type="tel" id="perfil-tel"></div>
+        <div id="perfil-ok" style="display:none;font-size:12px;color:var(--pos);padding:4px 0">Cambios guardados.</div>
+        <button class="btn btn-p" style="margin-top:4px" onclick="savePerfil()">Guardar cambios</button>
       </div>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Seguridad</div>
       <div class="card">
         <div class="dr"><span class="dk">Cambiar contraseña</span><button class="btn btn-sm" onclick="openModal('m-cambio-pwd')">Cambiar</button></div>
-        <div class="dr"><span class="dk">2FA activo</span><span class="badge b-teal">Email</span></div>
-        <div class="dr"><span class="dk">Último acceso</span><span class="dv">Hoy 09:02 · Chrome/Mac</span></div>
+        <div class="dr"><span class="dk">2FA activo</span><span id="perfil-2fa" class="badge b-teal"></span></div>
+        <div class="dr"><span class="dk">Último acceso</span><span id="perfil-acceso" class="dv"></span></div>
       </div>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Sesiones activas</div>
-      <div class="card">
-        <div class="dr"><span class="dk">📱 iPhone · Safari</span><span class="badge b-teal">Esta sesión</span></div>
-        <div class="dr"><span class="dk">💻 MacBook · Chrome</span><button class="btn btn-sm" style="color:var(--neg)">Cerrar</button></div>
-      </div>
+      <div class="card" id="perfil-sesiones"></div>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Plan</div>
-      <div class="card">
-        <div class="dr"><span class="dk">Plan actual</span><span class="badge b-blue">Personal</span></div>
-        <div class="dr"><span class="dk">Estado</span><span class="badge b-teal">Activo</span></div>
-        <div class="dr"><span class="dk">Carteras</span><span class="dv">3 / ilimitadas</span></div>
-      </div>
+      <div class="card" id="perfil-plan-card"></div>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Zona de peligro</div>
-      <button class="btn" style="color:var(--neg);border-color:var(--neg);margin-bottom:6px">Eliminar cuenta</button>
+      <button class="btn" style="color:var(--neg);border-color:var(--neg);margin-bottom:6px" onclick="if(confirm('¿Eliminar cuenta? Esta acción no se puede deshacer.'))resetAuth()">Eliminar cuenta</button>
       <button class="btn" onclick="resetAuth()">Cerrar sesión</button>
     </div>
 
@@ -867,6 +861,7 @@ const plats=[
 ];
 const idxData={'FTSE All-World':{ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},'MSCI World':{ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados'},'S&P 500':{ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'}};
 let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=10,privacyOn=false,opsFilter='todas';
+let perfil={nombre:'Usuario Demo',email:'usuario@portapp.com',tel:'+34 *** *** 421',plan:'Personal',planEstado:'Activo',twofa:'Email',ultimoAcceso:'Hoy 09:02 · Chrome/Mac',sesiones:[{id:'s1',device:'📱 iPhone · Safari',actual:true},{id:'s2',device:'💻 MacBook · Chrome',actual:false}]};
 let chG=null,chR=null,chH=null,chP=null;
 const DEMO='123456';
 let intentos=3,tSec=587,bSec=899,tInt=null,bInt=null,curM='email';
@@ -920,6 +915,7 @@ function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.r
   else if(sid==='s-grupos'){requestAnimationFrame(()=>requestAnimationFrame(renderGruposCapital));}
   else if(sid==='s-rent-efectivo')renderRentEfectivo();
   else if(sid==='s-anotaciones')renderAnotaciones();
+  else if(sid==='s-perfil')renderPerfil();
 }
 function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
 function openModal(id){document.getElementById(id).classList.add('open');if(id==='m-portfolios')renderPortList();if(id==='m-op'||id==='m-efectivo')fillCS();}
@@ -1342,6 +1338,32 @@ function renderGruposCapital(){
 }
 
 // ── RENTABILIDAD EFECTIVO (F5) ────────────────────────────────────────────────
+// ── PERFIL (F4) ──────────────────────────────────────────────────────────────
+function renderPerfil(){
+  const p=perfil;
+  const ini=p.nombre.trim()[0]?.toUpperCase()||'U';
+  document.getElementById('perfil-avatar').textContent=ini;
+  document.getElementById('perfil-nombre-hdr').textContent=p.nombre;
+  document.getElementById('perfil-email-hdr').textContent=p.email;
+  document.getElementById('perfil-plan-hdr').textContent='Plan '+p.plan+' · '+p.planEstado;
+  document.getElementById('perfil-nombre').value=p.nombre;
+  document.getElementById('perfil-email').value=p.email;
+  document.getElementById('perfil-tel').value=p.tel;
+  document.getElementById('perfil-2fa').textContent=p.twofa;
+  document.getElementById('perfil-acceso').textContent=p.ultimoAcceso;
+  document.getElementById('perfil-ok').style.display='none';
+  document.getElementById('perfil-sesiones').innerHTML=p.sesiones.map(s=>`<div class="dr"><span class="dk">${s.device}</span>${s.actual?'<span class="badge b-teal">Esta sesión</span>':`<button class="btn btn-sm" style="color:var(--neg)" onclick="cerrarSesion('${s.id}')">Cerrar</button>`}</div>`).join('');
+  document.getElementById('perfil-plan-card').innerHTML=`<div class="dr"><span class="dk">Plan actual</span><span class="badge b-blue">${p.plan}</span></div><div class="dr"><span class="dk">Estado</span><span class="badge b-teal">${p.planEstado}</span></div><div class="dr"><span class="dk">Carteras</span><span class="dv">${carteras.length} / ilimitadas</span></div><div class="dr"><span class="dk">Activos totales</span><span class="dv">${activos.filter(a=>carteras.some(c=>c.id===a.cartera)).length}</span></div>`;
+}
+function savePerfil(){
+  perfil.nombre=document.getElementById('perfil-nombre').value.trim()||perfil.nombre;
+  perfil.email=document.getElementById('perfil-email').value.trim()||perfil.email;
+  perfil.tel=document.getElementById('perfil-tel').value.trim()||perfil.tel;
+  renderPerfil();
+  document.getElementById('perfil-ok').style.display='block';
+}
+function cerrarSesion(id){perfil.sesiones=perfil.sesiones.filter(s=>s.id!==id);renderPerfil();}
+
 let rePeriod='1M';
 function setREPeriod(btn,p){document.querySelectorAll('#s-rent-efectivo .period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rePeriod=p;renderRentEfectivo();}
 function renderRentEfectivo(){
