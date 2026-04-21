@@ -690,3 +690,97 @@ Antes de empezar producción hay que decidir si el stack de producción será:
 - **Vue / Svelte** (alternativas válidas pero menor ecosistema para este tipo de app)
 
 La recomendación es **Next.js** porque permite tener tanto la app autenticada (React SPA dentro) como la landing page pública (con SEO) en el mismo proyecto.
+
+---
+
+## 16. Certificaciones y cumplimiento legal
+
+### Obligatorio antes de lanzar con usuarios reales
+
+| Requisito | Descripción | Coste orientativo |
+|---|---|---|
+| **RGPD / GDPR** | Reglamento europeo de protección de datos. No es una certificación sino una obligación legal. Requiere: política de privacidad, consentimiento explícito, derecho al olvido, registro de actividades de tratamiento de datos, DPO si procesa datos a gran escala. Multa por incumplimiento: hasta el 4% de la facturación anual o 20M€. | Asesoría legal: 1.000–3.000€ |
+| **Términos y condiciones** | Documento legal que regula la relación con el usuario. Debe cubrir: limitación de responsabilidad, uso aceptable, propiedad intelectual, resolución de disputas. Redactado por abogado especializado en software. | 500–1.500€ |
+| **Política de privacidad** | Documento separado de los T&C, obligatorio por RGPD. Debe especificar qué datos se recogen, con qué finalidad, durante cuánto tiempo y con quién se comparten. | Incluido en el punto anterior |
+| **Aviso de cookies** | Si se usan cookies de analítica o publicidad, es obligatorio el banner de consentimiento y la opción de rechazarlas. | Soluciones gratuitas disponibles (Cookiebot, etc.) |
+
+---
+
+### Muy recomendable para credibilidad B2B
+
+| Certificación | Descripción | Cuándo obtenerla |
+|---|---|---|
+| **ISO 27001** | Estándar internacional de seguridad de la información. Es lo que los clientes B2B (asesores financieros, family offices, empresas) van a exigir antes de confiar datos de sus clientes. Cubre: gestión de riesgos, control de accesos, cifrado, continuidad de negocio. | Con los primeros clientes B2B serios |
+| **ENS (Esquema Nacional de Seguridad)** | Equivalente español a ISO 27001 para organismos públicos. Relevante si se vende a Administración Pública. | Solo si se apunta al sector público |
+| **SOC 2 Type II** | Estándar anglosajón equivalente a ISO 27001. Más orientado a mercado USA/UK. | Si se expande internacionalmente |
+
+> **Coste de ISO 27001:** el proceso completo (consultoría + auditoría + certificación) cuesta entre 15.000€ y 30.000€ dependiendo del tamaño de la empresa. Existe un camino intermedio: contratar una **auditoría de seguridad externa** (pentest + informe) por 3.000–8.000€, que da credibilidad sin el coste de la certificación formal.
+
+---
+
+### Línea regulatoria a no cruzar (CNMV)
+
+Si portapp en algún momento **ejecuta operaciones, da recomendaciones de inversión personalizadas o gestiona dinero de clientes**, necesita registro como proveedor de servicios de inversión ante la CNMV.
+
+**Registrar operaciones manualmente introducidas por el propio usuario NO requiere licencia CNMV.** Hay que mantener esta distinción clara en el producto y en la comunicación.
+
+| Acción | ¿Requiere CNMV? |
+|---|---|
+| El usuario registra sus propias operaciones | ❌ No |
+| Mostrar cotizaciones de mercado | ❌ No |
+| Mostrar rentabilidad histórica del usuario | ❌ No |
+| Recomendar qué comprar o vender | ✅ Sí |
+| Ejecutar órdenes en el broker | ✅ Sí |
+| Gestionar dinero de clientes | ✅ Sí |
+
+---
+
+### Hoja de ruta legal
+
+| Fase | Acción |
+|---|---|
+| Antes del lanzamiento | RGPD + T&C + Política de privacidad (abogado) + Aviso cookies |
+| Primeros clientes B2B | Auditoría de seguridad externa (pentest) + NDA con clientes |
+| Crecimiento B2B | ISO 27001 o equivalente |
+| Expansión internacional | SOC 2 Type II |
+| Si se añaden recomendaciones automáticas | Consultar CNMV antes de implementar |
+
+---
+
+## 17. Protección del código y la propiedad intelectual
+
+### Protección legal
+
+| Medida | Descripción | Coste / Esfuerzo |
+|---|---|---|
+| **Copyright automático** | Todo código creado está protegido por copyright desde su escritura sin necesidad de registro. Añadir `© 2025 portapp. Todos los derechos reservados.` en el código fuente y en la app. | Gratuito |
+| **Registro de obra intelectual** | Registro en el Registro de la Propiedad Intelectual de España. Da fecha fehaciente probatoria: si alguien copia el código, puedes demostrar ante un juez que eras el autor original. | ~15€ por obra |
+| **NDA con colaboradores** | Cualquier persona que acceda al código (desarrolladores, diseñadores, inversores técnicos) debe firmar un acuerdo de confidencialidad + cesión de derechos de autor. Sin esto, un colaborador podría reclamar coautoría. | Plantilla legal: 200–500€ |
+| **Repositorio privado** | El código fuente nunca debe ser público. ✅ Ya aplicado — repositorio GitHub en privado. | Hecho |
+
+---
+
+### Protección técnica (producción)
+
+| Medida | Descripción |
+|---|---|
+| **Minificación y ofuscación** | El bundle JS compilado con webpack/Vite + terser es prácticamente ilegible. No impide la copia pero eleva enormemente el coste de ingeniería inversa. |
+| **Lógica crítica en el backend** | Los algoritmos de negocio más valiosos (cálculo TWR real, motor de informes B2B, reglas de precios) deben vivir en el servidor y nunca llegar al cliente. Lo que no se descarga no se puede copiar. |
+| **Ofuscación adicional** | Herramientas como JavaScript Obfuscator añaden una capa extra sobre la minificación estándar. |
+| **Rate limiting en API** | Impide que alguien automatice la extracción masiva de datos o funcionalidades desde el cliente. |
+
+---
+
+### Lo que realmente protege el negocio
+
+La realidad es que **el código en sí tiene poco valor estratégico** — lo verdaderamente difícil de copiar es:
+
+| Activo intangible | Por qué es difícil de copiar |
+|---|---|
+| **Base de usuarios fidelizada** | El usuario ya tiene su historial de operaciones en portapp. Migrar a otra app implica reintroducir todo desde cero. |
+| **Datos históricos del usuario** | Con el tiempo, el usuario acumula años de operaciones, anotaciones y rentabilidades. Ese historial es suyo pero vive en portapp. |
+| **Reputación y marca** | Construida con tiempo y ejecución consistente. No se puede copiar de un día para otro. |
+| **Red de asesores B2B** | Un asesor que lleva 2 años con portapp y tiene 50 clientes configurados no va a migrar fácilmente. |
+| **Velocidad de ejecución** | Llegar primero al mercado hispanohablante y ejecutar bien es la ventaja más difícil de replicar. |
+
+> Dropbox, Notion, Linear y cientos de apps exitosas tienen competidores con código casi idéntico. La ventaja competitiva real nunca es el código — es la ejecución, la comunidad y los datos acumulados.
