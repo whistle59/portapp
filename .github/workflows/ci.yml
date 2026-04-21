@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-prototype:
+    name: Validate prototype
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check index.html exists
+        run: |
+          if [ ! -f "prototype/index.html" ]; then
+            echo "❌ prototype/index.html not found"
+            exit 1
+          fi
+          echo "✅ prototype/index.html found"
+
+      - name: Check index.html file size (min 100KB)
+        run: |
+          SIZE=$(wc -c < prototype/index.html)
+          echo "File size: ${SIZE} bytes"
+          if [ "$SIZE" -lt 102400 ]; then
+            echo "❌ prototype/index.html is too small (${SIZE} bytes). Possible corrupt file."
+            exit 1
+          fi
+          echo "✅ File size OK (${SIZE} bytes)"
+
+      - name: Validate HTML syntax
+        uses: Cyb3r-Jak3/html5validator-action@v7.2.0
+        with:
+          root: prototype/
+          css: false
+          blacklist: "error:"
+
+      - name: Check copyright notice present
+        run: |
+          if ! grep -q "Todos los derechos reservados" prototype/index.html; then
+            echo "❌ Copyright notice missing from index.html"
+            exit 1
+          fi
+          echo "✅ Copyright notice present"
+
+      - name: Check no debug code left
+        run: |
+          if grep -n "console\.log\|debugger\|TODO.*urgent\|FIXME" prototype/index.html; then
+            echo "⚠️  Debug code or urgent TODOs found (review before merging)"
+          else
+            echo "✅ No debug code found"
+          fi
