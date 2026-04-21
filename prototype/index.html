@@ -163,6 +163,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 </head>
 <body>
 <div class="device" id="device">
+<div id="bg-shield" style="display:none;position:absolute;inset:0;background:var(--bg0);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+  <div style="width:60px;height:60px;background:var(--ac);border-radius:18px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" width="34" height="34"><rect x="3" y="10" width="4" height="10" rx="1" fill="white"/><rect x="10" y="6" width="4" height="14" rx="1" fill="white"/><rect x="17" y="2" width="4" height="18" rx="1" fill="white"/></svg></div>
+  <div style="font-size:18px;font-weight:700;color:var(--t0)">portapp</div>
+  <div style="font-size:12px;color:var(--t2)">Contenido protegido</div>
+</div>
 <div class="privacy-bar" id="privacy-bar" onclick="togglePrivacy()">
   <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 8s2.5-5 6-5 6 5 6 5-2.5 5-6 5-6-5-6-5z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/><line x1="3" y1="3" x2="13" y2="13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
   Modo privado · toca para mostrar cifras
@@ -1048,16 +1053,19 @@ document.querySelectorAll('.otp-in').forEach((inp,i)=>{inp.addEventListener('key
 const lockSettings={enabled:true,grace:60};
 let lockTimer=null,hiddenAt=null;
 document.addEventListener('visibilitychange',()=>{
+  const shield=document.getElementById('bg-shield');
   const appActive=document.getElementById('app-shell').classList.contains('active');
   function doLock(){
     document.getElementById('app-shell').classList.remove('active');
     document.getElementById('lock-screen').classList.add('active');
   }
   if(document.hidden){
+    if(appActive)shield.style.display='flex';
     if(!lockSettings.enabled||!appActive)return;
     hiddenAt=Date.now();
     if(lockSettings.grace===0)doLock();
   } else {
+    shield.style.display='none';
     if(lockTimer){clearTimeout(lockTimer);lockTimer=null;}
     if(!lockSettings.enabled||!hiddenAt)return;
     const elapsed=(Date.now()-hiddenAt)/1000;
