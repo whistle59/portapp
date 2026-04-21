@@ -1584,7 +1584,7 @@ function renderCanales(){
           </div>
           <div style="font-size:12px;color:var(--t1);line-height:1.4;margin-bottom:8px">${c.desc}</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <a href="${c.url}" target="_blank" class="btn btn-sm btn-p" style="text-decoration:none;display:inline-block">Ver canal ↗</a>
+            <button class="btn btn-sm btn-p" onclick="${c.url==='#'?`showToast('URL no disponible en el prototipo')`:`window.open('${c.url}','_blank')`}">Ver canal ↗</button>
             <button onclick="toggleFavCanal('${c.id}')" style="background:none;border:none;cursor:pointer;font-size:18px;padding:2px;line-height:1" title="Favorito">${c.fav?'⭐':'☆'}</button>
           </div>
         </div>
