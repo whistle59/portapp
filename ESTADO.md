@@ -693,6 +693,58 @@ La recomendación es **Next.js** porque permite tener tanto la app autenticada (
 
 ---
 
+### Arquitectura de archivos: prototipo vs. producción
+
+#### Por qué el monolito HTML es correcto para el prototipo
+
+El prototipo vive en un único archivo `prototype/index.html` por diseño deliberado:
+
+- Se comparte con un solo link (Netlify Drop — URL pública en 30 segundos)
+- No requiere servidor, build ni dependencias
+- Cualquiera lo abre directamente en el navegador
+- Facilita iterar rápido sin configuración ni pipeline
+- Perfecto para validar concepto, flujos y UX antes de invertir en infraestructura
+
+#### Por qué el monolito NO escala a producción
+
+A medida que crece la app, un único archivo HTML se convierte en un problema serio:
+
+| Problema | Consecuencia en producción |
+|---|---|
+| Sin caché por recurso | El navegador no puede cachear CSS/JS por separado — descarga todo en cada visita aunque nada haya cambiado |
+| Bundle enorme | Con más funcionalidades el archivo crece linealmente; el tiempo de carga inicial sube |
+| Sin code splitting | Se carga todo el código aunque el usuario solo use el 20% de la app |
+| Imposible trabajar en equipo | Múltiples desarrolladores editando el mismo archivo genera conflictos constantes en git |
+| Sin tests unitarios | No se puede testear lógica de negocio separada del DOM |
+| Sin tipado estático | Sin módulos ES no hay TypeScript real, lo que aumenta los bugs en bases de código grandes |
+| Sin lazy loading | Imágenes, gráficos y pantallas secundarias se cargan aunque el usuario no las visite |
+
+#### Cómo cambia la arquitectura en producción (Next.js)
+
+El build de producción genera automáticamente lo que el monolito no puede ofrecer:
+
+| Característica | Monolito HTML | Next.js producción |
+|---|---|---|
+| CSS | Un bloque inline | Archivos separados, minificados, con hash para caché perfecta |
+| JavaScript | Un bloque al final del body | Dividido por ruta — solo se carga el código de la página activa |
+| Imágenes | Sin optimización | Compresión automática, WebP, lazy loading, tamaños adaptativos |
+| Caché | Ninguna | Cada recurso tiene hash único — caché máxima sin romper actualizaciones |
+| Carga inicial | Todo de golpe | Solo el shell + la ruta activa (~10x más rápido) |
+| Trabajo en equipo | Un archivo, conflictos constantes | Componentes independientes, cada desarrollador trabaja en su área |
+| Tests | Imposibles sin refactorizar | Cada función/componente es testeable de forma aislada |
+
+#### Rol del prototipo en producción
+
+El archivo `prototype/index.html` **no se migra ni se adapta** para producción — se usa como:
+
+- **Referencia de diseño**: todos los estilos, colores, componentes y animaciones ya están definidos
+- **Referencia de flujos**: todos los flujos de usuario (auth, navegación, modales) están validados
+- **Fuente de verdad visual**: el equipo de frontend lo usa como spec viva durante la construcción en React
+
+Todo el CSS de `index.html` se traduce a componentes Tailwind/CSS Modules en React. Todo el JS se convierte en hooks, contextos y componentes React tipados con TypeScript.
+
+---
+
 ## 16. Estrategia de contenidos y blog
 
 ### Por qué el blog es obligatorio
