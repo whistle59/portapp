@@ -557,18 +557,18 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <button class="period-btn" onclick="setRentPeriod(this,'Todo')">Todo</button>
       </div>
       <div class="metric-grid">
-        <div class="metric"><div class="mlabel">Rent. total (TWR)<span class="tip" data-tip="Time-Weighted Return: mide la rentabilidad real eliminando el efecto de las aportaciones">ⓘ</span></div><div class="mvalue pos" id="rent-twr">+12,4%</div></div>
+        <div class="metric"><div class="mlabel">Rentabilidad total<span class="tip" data-tip="Time-Weighted Return (TWR): mide la rentabilidad real eliminando el efecto de las aportaciones">ⓘ</span></div><div class="mvalue pos" id="rent-twr">+12,4%</div></div>
         <div class="metric"><div class="mlabel">Ganancia absoluta</div><div class="mvalue pos"><span class="amt" id="rent-abs">€4.820</span></div></div>
         <div class="metric"><div class="mlabel">Mejor activo</div><div class="mvalue pos" id="rent-best">AAPL +8,8%</div></div>
         <div class="metric"><div class="mlabel">Peor activo</div><div class="mvalue neg" id="rent-worst">NVDA -5,2%</div></div>
       </div>
       <div class="card">
         <div class="card-title" style="margin-bottom:9px">Rentabilidad por activo</div>
-        <table><thead><tr><th>Activo</th><th>Grupo</th><th>TWR</th><th>Absoluto</th></tr></thead>
+        <table><thead><tr><th>Activo</th><th>Grupo</th><th>Rentab.</th><th>Ganancia</th></tr></thead>
         <tbody id="tb-rentabilidad"></tbody></table>
       </div>
       <div class="card">
-        <div class="card-title" style="margin-bottom:9px">Evolución TWR vs cartera</div>
+        <div class="card-title" style="margin-bottom:9px">Evolución de la rentabilidad</div>
         <div style="position:relative;height:155px"><canvas id="cRent" role="img" aria-label="Rentabilidad TWR"></canvas></div>
       </div>
     </div>
