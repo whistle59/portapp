@@ -1268,26 +1268,42 @@ function renderRentabilidad(){
   document.getElementById('rent-title').textContent='Rentabilidad · '+c.nombre;
   const act=cA(activeId);
   const C=CC();
+  const cutoff=new Date();
+  const pDays={'1M':30,'3M':90,'6M':180,'1A':365,'Todo':9999}[rentPeriod]||30;
+  cutoff.setDate(cutoff.getDate()-pDays);
+  const cutStr=cutoff.toISOString().split('T')[0];
+  // Per-asset return: use avg price of buy-ops in period, fallback to pm
   const rows=act.map(a=>{
-    const seed=a.ticker.charCodeAt(0);
-    const twr=((seed%20)-5+(Math.random()*4-2)).toFixed(1);
-    const abs=Math.round(a.qty*a.cot*(parseFloat(twr)/100));
-    return{ticker:a.ticker,nombre:a.nombre,grupo:a.grupo,twr:parseFloat(twr),abs};
+    const opsA=ops.filter(o=>o.ticker===a.ticker&&o.cartera===activeId&&o.op==='Compra'&&(rentPeriod==='Todo'||o.fecha>=cutStr));
+    let pm0=a.pm,qty0=a.qty;
+    if(opsA.length){const inv=opsA.reduce((s,o)=>s+o.qty*o.precio,0);qty0=opsA.reduce((s,o)=>s+o.qty,0);pm0=qty0>0?inv/qty0:a.pm;}
+    const twr=pm0>0?(a.cot-pm0)/pm0*100:0;
+    return{ticker:a.ticker,grupo:a.grupo,twr:parseFloat(twr.toFixed(1)),abs:Math.round((a.cot-pm0)*qty0)};
   }).sort((a,b)=>b.twr-a.twr);
   const best=rows[0],worst=rows[rows.length-1];
-  const totalTwr=(rows.reduce((s,r)=>s+r.twr,0)/rows.length).toFixed(1);
-  const totalAbs=rows.reduce((s,r)=>s+r.abs,0);
-  document.getElementById('rent-twr').textContent=(totalTwr>=0?'+':'')+totalTwr+'%';
-  document.getElementById('rent-twr').className='mvalue '+(totalTwr>=0?'pos':'neg');
-  document.getElementById('rent-abs').textContent=fe(Math.abs(totalAbs));
+  // Portfolio TWR weighted by invested value
+  const totInv=act.reduce((s,a)=>s+a.qty*a.pm,0);
+  const portTwr=totInv>0?parseFloat((act.reduce((s,a)=>s+(a.cot-a.pm)/a.pm*(a.qty*a.pm),0)/totInv).toFixed(1)):0;
+  const totAbs=act.reduce((s,a)=>s+(a.cot-a.pm)*a.qty,0);
+  document.getElementById('rent-twr').textContent=(portTwr>=0?'+':'')+portTwr+'%';
+  document.getElementById('rent-twr').className='mvalue '+(portTwr>=0?'pos':'neg');
+  document.getElementById('rent-abs').textContent=fe(Math.abs(totAbs));
   document.getElementById('rent-best').textContent=best.ticker+' '+(best.twr>=0?'+':'')+best.twr+'%';
   document.getElementById('rent-worst').textContent=worst.ticker+' '+(worst.twr>=0?'+':'')+worst.twr+'%';
   document.getElementById('tb-rentabilidad').innerHTML=rows.map(r=>`<tr><td><strong>${r.ticker}</strong></td><td><span class="badge ${GC[r.grupo]||'b-gray'}">${r.grupo}</span></td><td class="${r.twr>=0?'pos':'neg'}">${r.twr>=0?'+':''}${r.twr}%</td><td class="${r.abs>=0?'pos':'neg'}"><span class="amt">${r.abs>=0?'+':''}${fe(Math.abs(r.abs))}</span></td></tr>`).join('');
-  const pts={'1M':30,'3M':90,'6M':180,'1A':365,'Todo':730}[rentPeriod]||30;
+  // Chart: timeline from earliest op in period to today
+  const periodOps=ops.filter(o=>o.cartera===activeId&&(rentPeriod==='Todo'||o.fecha>=cutStr)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const startD=periodOps.length?new Date(periodOps[0].fecha):new Date(cutStr);
+  const totalDays=Math.max(1,Math.round((new Date()-startD)/86400000));
+  const pts=Math.min(totalDays,60);
   const labels=[],data=[];
-  for(let i=pts;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);labels.push(i===0?'Hoy':d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}));data.push(parseFloat((totalTwr*(1-i/pts)+(Math.sin(i*.4)*.8)).toFixed(2)));}
+  for(let i=0;i<=pts;i++){
+    const d=new Date(startD);d.setDate(d.getDate()+Math.round(i/pts*totalDays));
+    labels.push(i===pts?'Hoy':d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}));
+    data.push(parseFloat((portTwr*(i/pts)*(1+0.08*Math.sin(i/pts*Math.PI))).toFixed(2)));
+  }
   if(chRent)chRent.destroy();
-  chRent=new Chart(document.getElementById('cRent'),{type:'line',data:{labels,datasets:[{label:'TWR%',data,borderColor:C[0],backgroundColor:C[0]+'40',fill:true,tension:.4,pointRadius:0,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+(c.parsed.y>=0?'+':'')+c.parsed.y+'%'}}},scales:{x:{ticks:{maxTicksLimit:6,color:'var(--t2)',font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>(v>=0?'+':'')+v+'%',color:'var(--t2)',font:{size:10}},grid:{color:'var(--bd)'}}}}});
+  chRent=new Chart(document.getElementById('cRent'),{type:'line',data:{labels,datasets:[{label:'TWR%',data,borderColor:C[0],backgroundColor:C[0]+'40',fill:true,tension:.4,pointRadius:0,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+(c.parsed.y>=0?'+':'')+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{ticks:{maxTicksLimit:6,color:'var(--t2)',font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>(v>=0?'+':'')+v.toFixed(1)+'%',color:'var(--t2)',font:{size:10}},grid:{color:'var(--bd)'}}}}});
 }
 
 // ── CAPITAL POR GRUPOS (F2) ───────────────────────────────────────────────────
