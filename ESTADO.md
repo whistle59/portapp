@@ -745,7 +745,106 @@ Todo el CSS de `index.html` se traduce a componentes Tailwind/CSS Modules en Rea
 
 ---
 
-## 16. Estrategia de contenidos y blog
+## 16. Publicación en App Store y Google Play
+
+### Decisión previa obligatoria: ¿PWA o app nativa?
+
+Como se documenta en la sección 15, la recomendación es comenzar con **web responsive + PWA** y solo desarrollar app nativa (React Native) si la tracción lo justifica. Una PWA evita el proceso de revisión, las comisiones y el coste anual de las cuentas de desarrollador en la fase inicial.
+
+Si en algún momento se decide publicar en tiendas:
+
+| Cuenta de desarrollador | Coste | Notas |
+|---|---|---|
+| Apple Developer Program | 99$/año | Obligatorio para publicar en App Store (iOS + macOS) |
+| Google Play Console | 25$ pago único | Obligatorio para publicar en Google Play |
+
+---
+
+### App Store (Apple) — el más restrictivo
+
+Apple tiene el proceso de revisión más exigente. Cada actualización pasa por revisión humana (1–7 días). Un rechazo puede retrasar semanas una corrección crítica.
+
+#### Regla crítica: pagos In-App Purchase
+
+Si la app permite compras dentro de la app (el pago único de 29–49€ o la suscripción anual), Apple **obliga** a usar su sistema de pagos In-App Purchase y se queda:
+- **30%** de cada transacción (regla general)
+- **15%** si la facturación anual es inferior a 1M$ (Small Business Program)
+
+Esto significa que si el producto cuesta 39€, el usuario paga 39€ pero portapp recibe ~27€.
+
+**No se puede enlazar a una web de pago externa desde dentro de la app** (Apple lo detecta y rechaza la app o la expulsa de la tienda).
+
+#### Solución estándar del sector (Spotify, Netflix, Notion, Linear)
+
+- La app en las tiendas es **gratuita** — sin ningún pago dentro
+- El pago se realiza **exclusivamente desde la web** (`portapp.com/pricing`)
+- La app detecta si el usuario tiene cuenta activa y desbloquea las funciones premium
+- Es perfectamente legal, Apple lo permite siempre que la app no mencione ni enlace al pago externo
+
+**Esta debe ser la estrategia de portapp desde el primer día.** Diseñar el sistema de autenticación y licencias pensando en esto desde el inicio evita una refactorización costosa después.
+
+#### Privacidad — App Privacy Label (obligatorio)
+
+Apple obliga a declarar en la ficha de la App Store exactamente qué datos recoge la app, con qué finalidad y si se vinculan a la identidad del usuario. Es el "nutrition label" de privacidad.
+
+Datos que portapp recogerá y que hay que declarar:
+
+| Dato | Categoría Apple | Vinculado a identidad |
+|---|---|---|
+| Email | Datos de contacto | Sí |
+| Nombre | Datos de contacto | Sí |
+| Datos financieros (carteras, operaciones) | Información financiera | Sí |
+| Historial de uso de la app | Datos de uso | Sí |
+
+Mentir o ser impreciso en esta declaración es causa de rechazo y puede derivar en expulsión de la tienda.
+
+#### Contenido financiero
+
+Apple puede solicitar aclaración de que la app **no da asesoramiento de inversión** — exactamente la línea CNMV documentada en la sección 17. Conviene incluir un disclaimer visible en la app y en la descripción de la tienda: *"portapp es una herramienta de registro y seguimiento de inversiones personales. No constituye asesoramiento financiero."*
+
+---
+
+### Google Play — más flexible pero con sus reglas
+
+- Proceso de revisión más rápido (horas en lugar de días)
+- Misma política de comisiones (15–30%) con las mismas alternativas
+- Desde 2023 exige **política de privacidad** accesible desde la ficha — ya en la hoja de ruta legal
+- Para apps de categoría Finanzas puede solicitar verificación adicional según funcionalidad
+- Permite actualizaciones más frecuentes sin el riesgo de bloqueo prolongado de Apple
+
+---
+
+### Lo que hay que diseñar desde ya (coste alto si se arregla después)
+
+Estos elementos son baratos de hacer bien desde el principio y muy caros de corregir cuando la app ya está en producción:
+
+| Elemento | Qué hacer | Estado actual |
+|---|---|---|
+| **Safe areas** | Respetar notch, Dynamic Island (iPhone) y barra de navegación (Android) con `env(safe-area-inset-*)` | Pendiente (M2, M3) |
+| **Touch targets** | Todos los elementos interactivos mínimo 44×44px (Apple HIG) / 48×48dp (Material Design) | Pendiente (M7) |
+| **Fuentes relativas** | Usar `rem` en lugar de `px` para respetar la configuración de accesibilidad del sistema operativo | Pendiente (M6) |
+| **Modo oscuro del sistema** | La app ya respeta `prefers-color-scheme` | ✅ Hecho |
+| **Sin dependencias de hover** | En móvil no existe hover — ninguna funcionalidad crítica puede depender solo de él | Revisar en producción |
+| **Teclado virtual** | El teclado empuja el contenido — los formularios deben permanecer accesibles cuando el teclado está visible | Pendiente |
+| **Sin `position: fixed` problemático** | En iOS Safari, `position: fixed` dentro de un scroll container da comportamiento inesperado conocido | Revisar en producción |
+| **Iconos y splash screen** | Necesitas iconos en múltiples resoluciones: 1024×1024 para App Store, múltiples densidades para Android (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi) | Pendiente de diseño |
+| **Descripción de tienda** | Texto de la ficha en App Store / Google Play, capturas de pantalla (mínimo 3, máximo 10), vídeo preview opcional | Pendiente de redacción |
+
+---
+
+### Impacto en el modelo de negocio — resumen ejecutivo
+
+| Escenario | Comisión | Recomendación |
+|---|---|---|
+| Cobro dentro de la app (In-App Purchase) | 15–30% a Apple/Google | ❌ Evitar |
+| Cobro solo desde la web, app gratuita en tiendas | 0% | ✅ Estrategia recomendada |
+| Suscripción gestionada externamente (Stripe, etc.) | Solo comisión de pasarela (~1,5%) | ✅ Óptimo |
+
+**Acción concreta:** desde el primer día de producción, el sistema de licencias debe estar desacoplado de las tiendas. El usuario se registra y paga en `portapp.com`, la app solo verifica si la cuenta tiene licencia activa consultando el backend.
+
+---
+
+## 17. Estrategia de contenidos y blog
 
 ### Por qué el blog es obligatorio
 
