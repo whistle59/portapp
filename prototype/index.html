@@ -529,6 +529,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <button class="btn" style="margin-bottom:10px" onclick="goTo('s-canales')">🎓 Canales recomendados</button>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Cuenta</div>
       <button class="btn" style="margin-bottom:6px" onclick="goTo('s-perfil')">👤 Mi perfil y sesiones</button>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Soporte y ayuda</div>
+      <div class="card">
+        <div class="dr"><span class="dk">Email de soporte</span><a href="mailto:soporte@portapp.com" style="font-size:12px;color:var(--ac);text-decoration:none">soporte@portapp.com</a></div>
+        <div class="dr"><span class="dk">Versión</span><span class="dv">v6 · prototipo</span></div>
+      </div>
+      <button class="btn" style="margin-top:6px;margin-bottom:10px" onclick="openModal('m-soporte')">✉️ Enviar mensaje al soporte</button>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Sesión</div>
       <button class="btn" onclick="resetAuth()" style="color:var(--neg);border-color:var(--neg)">Cerrar sesión</button>
     </div>
@@ -848,6 +854,23 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   <button class="btn btn-p" onclick="closeModal('m-cambio-pwd')">Guardar contraseña</button>
 </div></div>
 
+<div class="modal-overlay" id="m-soporte"><div class="modal">
+  <div class="mhdr"><span class="mtitle">Contactar con soporte</span><button class="btn-icon" onclick="closeModal('m-soporte')">✕</button></div>
+  <div style="font-size:12px;color:var(--t1);margin-bottom:12px">Te responderemos en menos de 48h en <strong>soporte@portapp.com</strong></div>
+  <div class="fg"><label>Asunto</label>
+    <select id="sop-asunto">
+      <option>Tengo un problema técnico</option>
+      <option>Tengo una duda sobre una función</option>
+      <option>Quiero sugerir una mejora</option>
+      <option>Problema con mi cuenta</option>
+      <option>Otro</option>
+    </select>
+  </div>
+  <div class="fg"><label>Mensaje</label><textarea id="sop-msg" rows="4" placeholder="Describe tu consulta con el máximo detalle posible..."></textarea></div>
+  <div id="sop-err" class="err-box" style="display:none">El mensaje no puede estar vacío.</div>
+  <button class="btn btn-p" onclick="enviarSoporte()">Enviar mensaje</button>
+</div></div>
+
 <div class="modal-overlay" id="m-onboarding"><div class="modal">
   <div style="text-align:center;padding:10px 0 14px">
     <div style="font-size:40px;margin-bottom:8px">📊</div>
@@ -983,6 +1006,15 @@ function otpMove(i){if(document.getElementById('o'+i).value&&i<5)document.getEle
 function getOtp(){return[0,1,2,3,4,5].map(i=>document.getElementById('o'+i).value).join('');}
 function verifyOtp(){const code=getOtp(),err=document.getElementById('oerr'),ok=document.getElementById('ook');if(code.length<6){err.style.display='block';err.textContent='Introduce los 6 dígitos.';return;}if(code===DEMO){err.style.display='none';ok.style.display='block';clearInterval(tInt);setTimeout(launchApp,900);}else{intentos--;if(intentos<=0){clearInterval(tInt);bSec=899;clearInterval(bInt);bInt=setInterval(()=>{bSec--;if(bSec<=0){clearInterval(bInt);document.getElementById('btime').textContent='Desbloqueado';return;}const m=Math.floor(bSec/60),s=bSec%60;document.getElementById('btime').textContent=m+':'+(s<10?'0':'')+s;},1000);showAuth('as-blocked');}else{err.style.display='block';err.innerHTML='Código incorrecto. Quedan <strong>'+intentos+'</strong> intento'+(intentos===1?'':'s')+'.';for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('o0').focus();}}}
 function resendCode(){tSec=587;intentos=3;for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('oerr').style.display='none';document.getElementById('o0').focus();}
+function enviarSoporte(){
+  const msg=document.getElementById('sop-msg').value.trim();
+  const err=document.getElementById('sop-err');
+  if(!msg){err.style.display='block';return;}
+  err.style.display='none';
+  document.getElementById('sop-msg').value='';
+  closeModal('m-soporte');
+  showToast('Mensaje enviado ✓');
+}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function launchApp(){
   document.getElementById('auth-wrap').style.display='none';
