@@ -1048,22 +1048,20 @@ const lockSettings={enabled:true,grace:60};
 let lockTimer=null,hiddenAt=null;
 document.addEventListener('visibilitychange',()=>{
   const appActive=document.getElementById('app-shell').classList.contains('active');
+  function doLock(){
+    document.getElementById('app-shell').classList.remove('active');
+    document.getElementById('lock-screen').classList.add('active');
+  }
   if(document.hidden){
     if(!lockSettings.enabled||!appActive)return;
     hiddenAt=Date.now();
-    if(lockSettings.grace===0){
-      document.getElementById('app-shell').classList.remove('active');
-      document.getElementById('lock-screen').classList.add('active');
-    } else {
-      lockTimer=setTimeout(()=>{
-        if(document.getElementById('app-shell').classList.contains('active')){
-          document.getElementById('app-shell').classList.remove('active');
-          document.getElementById('lock-screen').classList.add('active');
-        }
-      },lockSettings.grace*1000);
-    }
+    if(lockSettings.grace===0)doLock();
   } else {
     if(lockTimer){clearTimeout(lockTimer);lockTimer=null;}
+    if(!lockSettings.enabled||!hiddenAt)return;
+    const elapsed=(Date.now()-hiddenAt)/1000;
+    hiddenAt=null;
+    if(appActive&&elapsed>lockSettings.grace)doLock();
   }
 });
 function togglePrivacy(){privacyOn=!privacyOn;document.getElementById('device').classList.toggle('masked',privacyOn);document.getElementById('privacy-bar').classList.toggle('on',privacyOn);}
