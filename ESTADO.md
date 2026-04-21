@@ -1037,3 +1037,176 @@ La realidad es que **el código en sí tiene poco valor estratégico** — lo ve
 | **Velocidad de ejecución** | Llegar primero al mercado hispanohablante y ejecutar bien es la ventaja más difícil de replicar. |
 
 > Dropbox, Notion, Linear y cientos de apps exitosas tienen competidores con código casi idéntico. La ventaja competitiva real nunca es el código — es la ejecución, la comunidad y los datos acumulados.
+
+---
+
+## 18. Estrategia de agentes IA en portapp
+
+### Cuándo tiene sentido usar agentes y cuándo no
+
+No toda la IA es un agente. En portapp hay que distinguir tres niveles:
+
+| Nivel | Descripción | Ejemplo en portapp |
+|---|---|---|
+| **Código determinista** | Lógica fija, resultado predecible | Cálculo TWR, proyección DCA, exposición por divisa |
+| **IA generativa puntual** | Una llamada a un LLM para generar texto o extraer datos | Importación de PDF de broker |
+| **Agente** | LLM con acceso a herramientas, capaz de razonar en múltiples pasos y tomar decisiones | Bot de asistencia con acceso a los datos del usuario |
+
+**Regla general:** usar código determinista siempre que sea posible para cálculos financieros — es más fiable, auditable y predecible. Los agentes aportan valor donde la lógica es difusa, el input es lenguaje natural o el problema requiere razonamiento multi-paso.
+
+---
+
+### Caso 1 — Bot de asistencia al usuario (PR9) ⭐ Prioritario
+
+**Qué hace:** el usuario hace preguntas en lenguaje natural sobre sus propios datos de inversión y recibe respuestas calculadas y personalizadas.
+
+**Ejemplos de preguntas reales:**
+- *"¿Cuándo fue mi mejor mes de rentabilidad?"*
+- *"¿Qué activo me ha dado más rentabilidad este año?"*
+- *"¿Cuánto necesito aportar mensualmente para llegar a 100.000€ en 10 años con un 7% anual?"*
+- *"¿Cuál es mi exposición total a renta variable americana?"*
+- *"¿He batido al S&P 500 este año?"*
+- *"Resume mi actividad inversora de los últimos 6 meses"*
+
+**Por qué tiene valor:**
+- El usuario no tiene que navegar por la app — pregunta y obtiene la respuesta directamente
+- Las preguntas financieras personales son difíciles de responder con filtros fijos
+- Diferenciador claro frente a competidores que no tienen esto
+- Alta percepción de valor — el usuario siente que la app "le entiende"
+
+**Arquitectura técnica:**
+
+```
+Usuario escribe pregunta
+        ↓
+Claude API (claude-sonnet-4-6)
+        ↓ tool_use
+Herramientas con acceso a datos del usuario:
+  - get_carteras() → lista de carteras y valores
+  - get_activos(cartera_id) → posiciones actuales
+  - get_ops(cartera_id, desde, hasta) → historial de operaciones
+  - get_rentabilidad(cartera_id, periodo) → TWR calculado
+  - get_efectivo(cartera_id) → movimientos de efectivo
+  - calc_proyeccion(aportacion, años, tasa) → proyección DCA
+        ↓
+Claude sintetiza la respuesta en lenguaje natural
+        ↓
+Respuesta mostrada al usuario en la app
+```
+
+**Implementación con Anthropic SDK:**
+```python
+# Ejemplo simplificado con Python SDK
+import anthropic
+
+client = anthropic.Anthropic()
+
+tools = [
+    {
+        "name": "get_rentabilidad",
+        "description": "Obtiene la rentabilidad de una cartera en un período",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "cartera_id": {"type": "string"},
+                "periodo": {"type": "string", "enum": ["1M","3M","6M","1A","Todo"]}
+            },
+            "required": ["cartera_id", "periodo"]
+        }
+    }
+    # ... más herramientas
+]
+
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=1024,
+    system="Eres el asistente financiero personal de portapp. Tienes acceso a los datos de inversión del usuario. Responde de forma concisa y en español. Nunca des recomendaciones de inversión — solo analiza los datos existentes.",
+    tools=tools,
+    messages=[{"role": "user", "content": pregunta_usuario}]
+)
+```
+
+**Consideraciones importantes:**
+- El sistema siempre debe aclarar que **no es asesoramiento financiero** (línea CNMV)
+- Los datos del usuario nunca salen del backend — Claude solo recibe los resultados de las herramientas, no acceso directo a la BD
+- Añadir **prompt caching** para el system prompt y las herramientas (reduce coste ~90% en conversaciones largas)
+- Limitar el historial de conversación a los últimos 10 turnos para controlar tokens
+
+**Coste estimado:**
+- claude-sonnet-4-6: ~0,003$ por pregunta media (con caching)
+- Para 1.000 preguntas/mes: ~3$/mes por usuario activo
+- Incluible en la suscripción anual sin impacto significativo en margen
+
+**Dónde integrarlo en la app:**
+- Botón flotante en todas las pantallas (similar al botón de anotaciones)
+- O sección dedicada "Pregúntame" en el menú de navegación
+
+---
+
+### Caso 2 — Importación automática de PDF de broker (F8)
+
+**Qué hace:** el usuario sube el PDF de extracto de su broker (DEGIRO, IBKR, Coinbase, etc.) y el sistema extrae automáticamente las operaciones e importa al historial.
+
+**Por qué es un caso de IA y no de código determinista:**
+Cada broker tiene un formato de PDF diferente, y esos formatos cambian con el tiempo. Mantener parsers específicos por broker es inviable a escala. Un LLM es mucho más robusto ante variaciones de formato.
+
+**Arquitectura técnica:**
+```
+Usuario sube PDF
+        ↓
+Backend extrae texto del PDF (pdfplumber / PyMuPDF)
+        ↓
+Claude API con el texto extraído
+        ↓
+Prompt: "Extrae todas las operaciones de este extracto de broker.
+         Devuelve JSON con: fecha, ticker, tipo_op, cantidad, precio, comisión, divisa"
+        ↓
+Validación del JSON resultante
+        ↓
+Preview al usuario: "Se encontraron 12 operaciones. ¿Importar?"
+        ↓
+Importación confirmada por el usuario
+```
+
+**Consideraciones:**
+- Siempre mostrar preview antes de importar — el usuario debe revisar y confirmar
+- Marcar las operaciones importadas como "importadas" para distinguirlas de las manuales
+- Gestionar errores: PDFs escaneados (sin texto), formatos no reconocidos
+- Usar `claude-haiku-4-5` para esta tarea (más barato, suficiente para extracción estructurada)
+
+---
+
+### Caso 3 — Alertas inteligentes contextuales
+
+**Qué hace:** en lugar de alertas por umbral fijo ("NVDA bajó 5%"), el agente analiza el contexto del mercado y personaliza la alerta.
+
+**Ejemplo:**
+- Alerta básica: *"NVDA bajó 8% hoy"*
+- Alerta inteligente: *"NVDA bajó 8% hoy, pero el sector semiconductores bajó 11%. Tu posición lo está haciendo mejor que el sector. El S&P 500 bajó 2% en el mismo período."*
+
+**Implementación:** job nocturno que procesa alertas pendientes con acceso a datos de mercado y genera el texto contextualizado con Claude.
+
+**Prioridad:** baja — las alertas básicas cubren el 80% del valor. Implementar como mejora v2.
+
+---
+
+### Lo que NO debe hacerse con agentes
+
+| Tarea | Por qué NO usar agente |
+|---|---|
+| Cálculo TWR | Debe ser determinista y auditable. Un LLM puede cometer errores aritméticos. |
+| Proyección DCA | Mismo motivo — el usuario confía en el número exacto |
+| Gestión de datos (CRUD) | Una BD con validaciones es más segura y fiable |
+| Navegación de la app | Ya está resuelta con código |
+| Autenticación y seguridad | Nunca delegar decisiones de seguridad a un LLM |
+
+---
+
+### Hoja de ruta de agentes
+
+| Fase | Agente | Prioridad |
+|---|---|---|
+| Producción v1 | Bot de asistencia (PR9) — preguntas en lenguaje natural | ⭐ Alta |
+| Producción v1 | Importación PDF de broker (F8) | 🟡 Media |
+| Producción v2 | Alertas inteligentes contextuales | 🟢 Baja |
+| Producción v2 | Resumen semanal automático por email | 🟢 Baja |
