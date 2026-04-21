@@ -419,6 +419,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <div class="qnav" id="qn-proyeccion"></div>
       <div class="screen-title">Proyección DCA</div>
       <div class="card">
+        <div style="font-size:11px;color:var(--t1);margin-bottom:8px">Saldo inicial: <span id="dca-base-display" style="color:var(--t0);font-weight:600"></span> <span style="color:var(--t2)">(cartera activa)</span></div>
         <div class="two-col">
           <div class="fg"><label>Aportación (€)</label><input type="number" id="dca-amt" value="300" step="50"></div>
           <div class="fg"><label>Frecuencia</label><select id="dca-freq"><option>Mensual</option><option>Quincenal</option><option>Semanal</option></select></div>
@@ -432,7 +433,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <div class="card" id="card-proy" style="display:none">
         <div class="metric-grid" id="proy-metrics"></div>
         <div style="position:relative;height:180px;margin-top:10px"><canvas id="cProy" role="img" aria-label="Proyección"></canvas></div>
-        <div id="tabla-proy" style="margin-top:10px;overflow-x:auto"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:6px">
+          <div class="card-title">Detalle anual</div>
+          <button class="btn btn-sm" onclick="toggleTablaProy(this)">Vista simple</button>
+        </div>
+        <div id="tabla-proy" style="overflow-x:auto"></div>
       </div>
     </div>
 
@@ -839,10 +844,14 @@ let activeId='c1';
 const activos=[
   {ticker:'AAPL',nombre:'Apple Inc.',isin:'US0378331005',tipo:'Acción',broker:'Interactive Brokers',grupo:'AI/Tech',divisa:'USD',mercado:'NASDAQ',qty:10,pm:170,cot:185,cartera:'c1',indice:'-',region:{USA:100},exposDiv:{USD:100}},
   {ticker:'VWCE',nombre:'Vanguard FTSE All-World',isin:'IE00BK5BQT80',tipo:'ETF',broker:'DEGIRO',grupo:'Core',divisa:'EUR',mercado:'XETRA',qty:20,pm:105,cot:112,cartera:'c1',indice:'FTSE All-World',region:{USA:61,Europa:15,Asia:20,Otros:4},exposDiv:{USD:63,EUR:15,JPY:6,Otros:16}},
-  {ticker:'BTC',nombre:'Bitcoin',isin:'-',tipo:'Cripto',broker:'Coinbase',grupo:'Cripto',divisa:'USD',mercado:'Crypto',qty:0.5,pm:58000,cot:62000,cartera:'c3',indice:'-',region:{Global:100},exposDiv:{USD:100}},
   {ticker:'MSFT',nombre:'Microsoft Corp.',isin:'US5949181045',tipo:'Acción',broker:'Interactive Brokers',grupo:'AI/Tech',divisa:'USD',mercado:'NASDAQ',qty:5,pm:420,cot:440,cartera:'c1',indice:'-',region:{USA:100},exposDiv:{USD:100}},
+  {ticker:'AMZN',nombre:'Amazon.com Inc.',isin:'US0231351067',tipo:'Acción',broker:'Interactive Brokers',grupo:'AI/Tech',divisa:'USD',mercado:'NASDAQ',qty:3,pm:180,cot:195,cartera:'c1',indice:'-',region:{USA:100},exposDiv:{USD:100}},
+  {ticker:'EIMI',nombre:'iShares MSCI EM IMI',isin:'IE00BKM4GZ66',tipo:'ETF',broker:'DEGIRO',grupo:'Core ampliado',divisa:'USD',mercado:'XETRA',qty:50,pm:32,cot:35,cartera:'c1',indice:'-',region:{Asia:42,LatAm:14,África:8,Europa:10,Otros:26},exposDiv:{USD:78,CNY:12,Otros:10}},
+  {ticker:'IWDA',nombre:'iShares Core MSCI World',isin:'IE00B4L5Y983',tipo:'ETF',broker:'DEGIRO',grupo:'Core',divisa:'EUR',mercado:'XETRA',qty:40,pm:85,cot:94,cartera:'c2',indice:'MSCI World',region:{USA:68,Europa:16,Asia:14,Otros:2},exposDiv:{USD:70,EUR:14,JPY:5,Otros:11}},
+  {ticker:'VUSA',nombre:'Vanguard S&P 500 ETF',isin:'IE00B3XXRP09',tipo:'ETF',broker:'DEGIRO',grupo:'Core',divisa:'USD',mercado:'XETRA',qty:25,pm:90,cot:98,cartera:'c2',indice:'S&P 500',region:{USA:100},exposDiv:{USD:100}},
+  {ticker:'BTC',nombre:'Bitcoin',isin:'-',tipo:'Cripto',broker:'Coinbase',grupo:'Cripto',divisa:'USD',mercado:'Crypto',qty:0.5,pm:58000,cot:62000,cartera:'c3',indice:'-',region:{Global:100},exposDiv:{USD:100}},
+  {ticker:'ETH',nombre:'Ethereum',isin:'-',tipo:'Cripto',broker:'Coinbase',grupo:'Cripto',divisa:'USD',mercado:'Crypto',qty:2,pm:2800,cot:3100,cartera:'c3',indice:'-',region:{Global:100},exposDiv:{USD:100}},
   {ticker:'NVDA',nombre:'NVIDIA Corp.',isin:'US67066G1040',tipo:'Acción',broker:'DEGIRO',grupo:'AI/Tech',divisa:'USD',mercado:'NASDAQ',qty:8,pm:135,cot:128,cartera:'c3',indice:'-',region:{USA:100},exposDiv:{USD:100}},
-  {ticker:'IWDA',nombre:'iShares Core MSCI World',isin:'IE00B4L5Y983',tipo:'ETF',broker:'DEGIRO',grupo:'Core',divisa:'EUR',mercado:'XETRA',qty:30,pm:85,cot:94,cartera:'c2',indice:'MSCI World',region:{USA:68,Europa:16,Asia:14,Otros:2},exposDiv:{USD:70,EUR:14,JPY:5,Otros:11}},
 ];
 let ops=[
   {id:1,fecha:'2024-03-10',ticker:'AAPL',tipo:'Acción',broker:'IB',op:'Compra',qty:10,precio:170,fee:2,divisa:'USD',grupo:'AI/Tech',nota:'Primera posición',cartera:'c1'},
@@ -851,12 +860,36 @@ let ops=[
   {id:4,fecha:'2024-09-15',ticker:'VWCE',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:20,precio:105,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c1'},
   {id:5,fecha:'2025-01-08',ticker:'NVDA',tipo:'Acción',broker:'DEGIRO',op:'Compra',qty:8,precio:135,fee:1,divisa:'USD',grupo:'AI/Tech',nota:'',cartera:'c3'},
   {id:6,fecha:'2025-02-01',ticker:'IWDA',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:30,precio:85,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c2'},
+  {id:7,fecha:'2025-03-15',ticker:'VUSA',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:25,precio:90,fee:0.5,divisa:'USD',grupo:'Core',nota:'DCA mensual',cartera:'c2'},
+  {id:8,fecha:'2025-04-10',ticker:'VWCE',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:5,precio:108,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c1'},
+  {id:9,fecha:'2025-06-10',ticker:'ETH',tipo:'Cripto',broker:'Coinbase',op:'Compra',qty:2,precio:2800,fee:10,divisa:'USD',grupo:'Cripto',nota:'',cartera:'c3'},
+  {id:10,fecha:'2025-07-20',ticker:'AMZN',tipo:'Acción',broker:'IB',op:'Compra',qty:3,precio:180,fee:2,divisa:'USD',grupo:'AI/Tech',nota:'',cartera:'c1'},
+  {id:11,fecha:'2025-09-18',ticker:'EIMI',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:50,precio:32,fee:0.5,divisa:'USD',grupo:'Core ampliado',nota:'Diversificación emergentes',cartera:'c1'},
+  {id:12,fecha:'2025-11-05',ticker:'VWCE',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:5,precio:110,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c1'},
+  {id:13,fecha:'2025-12-10',ticker:'IWDA',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:10,precio:88,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c2'},
+  {id:14,fecha:'2026-01-08',ticker:'VWCE',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:5,precio:111,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c1'},
+  {id:15,fecha:'2026-02-05',ticker:'IWDA',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:10,precio:92,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c2'},
+  {id:16,fecha:'2026-03-10',ticker:'VWCE',tipo:'ETF',broker:'DEGIRO',op:'Compra',qty:5,precio:112,fee:0.5,divisa:'EUR',grupo:'Core',nota:'DCA mensual',cartera:'c1'},
+  {id:17,fecha:'2026-04-05',ticker:'MSFT',tipo:'Acción',broker:'IB',op:'Compra',qty:2,precio:435,fee:2,divisa:'USD',grupo:'AI/Tech',nota:'Ampliación posición',cartera:'c1'},
 ];
 const efectivoData=[
   {fecha:'2024-01-05',tipo:'Transferencia entrada',origen:'cuenta',broker:'IB',importe:5000,divisa:'EUR',cartera:'c1'},
   {fecha:'2024-03-01',tipo:'Bizum',origen:'cuenta',broker:'DEGIRO',importe:300,divisa:'EUR',cartera:'c1'},
   {fecha:'2024-04-15',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:18.4,divisa:'USD',cartera:'c1'},
   {fecha:'2024-09-15',tipo:'Compra activo',origen:'op',broker:'DEGIRO',importe:-2100.5,divisa:'EUR',cartera:'c1'},
+  {fecha:'2025-01-10',tipo:'Transferencia entrada',origen:'cuenta',broker:'DEGIRO',importe:3000,divisa:'EUR',cartera:'c2'},
+  {fecha:'2025-05-01',tipo:'Transferencia entrada',origen:'cuenta',broker:'Coinbase',importe:2000,divisa:'EUR',cartera:'c3'},
+  {fecha:'2025-06-20',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:22.5,divisa:'USD',cartera:'c1'},
+  {fecha:'2025-07-10',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:55,divisa:'USD',cartera:'c3'},
+  {fecha:'2025-09-10',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:24,divisa:'USD',cartera:'c1'},
+  {fecha:'2025-10-05',tipo:'Interés',origen:'cuenta',broker:'IB',importe:35,divisa:'EUR',cartera:'c1'},
+  {fecha:'2025-11-20',tipo:'Dividendo',origen:'cuenta',broker:'DEGIRO',importe:12,divisa:'EUR',cartera:'c2'},
+  {fecha:'2026-01-15',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:25.5,divisa:'USD',cartera:'c1'},
+  {fecha:'2026-01-20',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:68,divisa:'USD',cartera:'c3'},
+  {fecha:'2026-02-18',tipo:'Dividendo',origen:'cuenta',broker:'DEGIRO',importe:14.5,divisa:'EUR',cartera:'c2'},
+  {fecha:'2026-03-20',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:23,divisa:'USD',cartera:'c1'},
+  {fecha:'2026-04-01',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:72,divisa:'USD',cartera:'c3'},
+  {fecha:'2026-04-10',tipo:'Interés',origen:'cuenta',broker:'IB',importe:40,divisa:'EUR',cartera:'c1'},
 ];
 const notifs=[
   {id:1,tipo:'alerta',texto:'NVDA bajó un 5,2% hoy',fecha:'Hoy 09:14',leida:false,favorita:false},
@@ -871,7 +904,7 @@ const plats=[
   {nombre:'Coinbase',url:'https://www.coinbase.com',cat:'Cripto',color:'#0052ff',icon:'CB'},
 ];
 const idxData={'FTSE All-World':{ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},'MSCI World':{ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados'},'S&P 500':{ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'}};
-let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=10,privacyOn=false,opsFilter='todas';
+let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=20,privacyOn=false,opsFilter='todas';
 const canales=[
   {id:'ch1',nombre:'Fondos Indexados',ini:'FI',color:'#4a7fa5',cat:'ETFs',desc:'Inversión pasiva en índices globales, ETFs y estrategias de largo plazo.',url:'#',fav:false,dest:true},
   {id:'ch2',nombre:'Value School',ini:'VS',color:'#4a8c6f',cat:'Value',desc:'Value investing, análisis fundamental y filosofía de inversión a largo plazo.',url:'#',fav:true,dest:false},
@@ -936,6 +969,7 @@ function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.r
   else if(sid==='s-anotaciones')renderAnotaciones();
   else if(sid==='s-perfil')renderPerfil();
   else if(sid==='s-canales')renderCanales();
+  else if(sid==='s-proyeccion'){const el=document.getElementById('dca-base-display');if(el)el.textContent=fe(cV(activeId)||0);}
 }
 function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones','canales'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
 function openModal(id){document.getElementById(id).classList.add('open');if(id==='m-portfolios')renderPortList();if(id==='m-op'||id==='m-efectivo')fillCS();}
@@ -976,7 +1010,47 @@ function renderOps(){const f=ops.filter(o=>{if(o.cartera!==activeId)return false
 function filterOps(el,tipo){document.querySelectorAll('#ops-chips .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');opsFilter=tipo;renderOps();}
 function addOp(){const d=document.getElementById('op-date').value,t=document.getElementById('op-tick').value.trim().toUpperCase();if(!d||!t)return;ops.unshift({id:nextId++,fecha:d,ticker:t,tipo:document.getElementById('op-tipo').value,broker:document.getElementById('op-broker-sel').value,op:document.getElementById('op-op').value,qty:parseFloat(document.getElementById('op-qty').value)||0,precio:parseFloat(document.getElementById('op-price').value)||0,fee:parseFloat(document.getElementById('op-fee').value)||0,divisa:document.getElementById('op-div').value,grupo:document.getElementById('op-grupo').value,nota:document.getElementById('op-nota').value,cartera:document.getElementById('op-cart').value||activeId});closeModal('m-op');renderOps();}
 function renderEfectivo(){document.getElementById('tb-efectivo').innerHTML=efectivoData.filter(e=>e.cartera===activeId).map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge ${e.importe>0?'b-teal':'b-coral'}">${e.tipo}</span></td><td><span class="badge ${e.origen==='op'?'b-purple':'b-gray'}">${e.origen==='op'?'Op.':'Cta.'}</span></td><td class="${e.importe>=0?'pos':'neg'}"><span class="amt">${e.importe>=0?'+':''}€${Math.abs(e.importe).toLocaleString('es-ES')}</span></td></tr>`).join('');}
-function calcProy(){const amt=parseFloat(document.getElementById('dca-amt').value)||300,freq={'Mensual':12,'Quincenal':26,'Semanal':52}[document.getElementById('dca-freq').value]||12,rate=parseFloat(document.getElementById('dca-rate').value)||8,years=parseInt(document.getElementById('dca-years').value)||10,base=cV(activeId)||10000,C=CC();let v=base;const data=[],labs=[];for(let y=1;y<=years;y++){v=v*(1+rate/100)+amt*freq;data.push(Math.round(v));labs.push(''+(new Date().getFullYear()+y));}document.getElementById('card-proy').style.display='block';document.getElementById('proy-metrics').innerHTML=`<div class="metric"><div class="mlabel">Valor final est.</div><div class="mvalue pos"><span class="amt">${fe(v)}</span></div></div><div class="metric"><div class="mlabel">Total aportado</div><div class="mvalue"><span class="amt">${fe(base+amt*freq*years)}</span></div></div>`;if(chP)chP.destroy();chP=new Chart(document.getElementById('cProy'),{type:'line',data:{labels,datasets:[{data,borderColor:C[0],backgroundColor:C[0]+'50',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:C[0]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'€'+Math.round(v/1000)+'k',color:'var(--t2)',font:{size:10}},grid:{color:'var(--bd)'}},x:{ticks:{color:'var(--t2)',font:{size:10}},grid:{display:false}}}}});let h='<table><thead><tr><th>Año</th><th>Valor est.</th></tr></thead><tbody>',acc=base;for(let y=1;y<=years;y++){acc=acc*(1+rate/100)+amt*freq;h+=`<tr><td>${new Date().getFullYear()+y}</td><td class="pos"><span class="amt">${fe(acc)}</span></td></tr>`;}document.getElementById('tabla-proy').innerHTML=h+'</tbody></table>';}
+let proyDetalle=true;
+function toggleTablaProy(btn){proyDetalle=!proyDetalle;btn.textContent=proyDetalle?'Vista simple':'Vista detallada';calcProy();}
+function calcProy(){
+  const amt=parseFloat(document.getElementById('dca-amt').value)||300;
+  const freq={'Mensual':12,'Quincenal':26,'Semanal':52}[document.getElementById('dca-freq').value]||12;
+  const rate=parseFloat(document.getElementById('dca-rate').value)||8;
+  const years=parseInt(document.getElementById('dca-years').value)||10;
+  const base=cV(activeId)||10000;
+  const C=CC();
+  document.getElementById('dca-base-display').textContent=fe(base);
+  // Construir filas con arrastre explícito año a año
+  const rows=[];let acc=base;
+  for(let y=1;y<=years;y++){
+    const inicio=acc;
+    const aport=amt*freq;
+    const revalor=Math.round(inicio*(rate/100));
+    acc=Math.round(inicio*(1+rate/100)+aport);
+    rows.push({y,inicio:Math.round(inicio),aport:Math.round(aport),revalor,final:acc});
+  }
+  const totalAport=Math.round(base+amt*freq*years);
+  const ganancia=acc-totalAport;
+  document.getElementById('card-proy').style.display='block';
+  document.getElementById('proy-metrics').innerHTML=
+    `<div class="metric"><div class="mlabel">Valor final est.</div><div class="mvalue pos"><span class="amt">${fe(acc)}</span></div></div>`+
+    `<div class="metric"><div class="mlabel">Total aportado</div><div class="mvalue"><span class="amt">${fe(totalAport)}</span></div></div>`+
+    `<div class="metric"><div class="mlabel">Ganancia capitalización</div><div class="mvalue pos"><span class="amt">${fe(ganancia)}</span></div></div>`+
+    `<div class="metric"><div class="mlabel">Multiplicador</div><div class="mvalue">${(acc/totalAport).toFixed(1)}x</div></div>`;
+  const data=rows.map(r=>r.final);
+  const labs=rows.map(r=>''+(new Date().getFullYear()+r.y));
+  if(chP)chP.destroy();
+  chP=new Chart(document.getElementById('cProy'),{type:'line',data:{labels:labs,datasets:[{data,borderColor:C[0],backgroundColor:C[0]+'50',fill:true,tension:.4,pointRadius:3,pointBackgroundColor:C[0]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'€'+Math.round(v/1000)+'k',color:'var(--t2)',font:{size:10}},grid:{color:'var(--bd)'}},x:{ticks:{color:'var(--t2)',font:{size:10}},grid:{display:false}}}}});
+  if(proyDetalle){
+    document.getElementById('tabla-proy').innerHTML='<table><thead><tr><th>Año</th><th>Inicio</th><th>Aportado</th><th>Revalor.</th><th>Final</th></tr></thead><tbody>'+
+      rows.map(r=>`<tr><td>${new Date().getFullYear()+r.y}</td><td class="amt">${fe(r.inicio)}</td><td style="color:var(--t1)">${fe(r.aport)}</td><td class="pos">${fe(r.revalor)}</td><td class="pos"><strong class="amt">${fe(r.final)}</strong></td></tr>`).join('')+
+      '</tbody></table>';
+  } else {
+    document.getElementById('tabla-proy').innerHTML='<table><thead><tr><th>Año</th><th>Valor estimado</th></tr></thead><tbody>'+
+      rows.map(r=>`<tr><td>${new Date().getFullYear()+r.y}</td><td class="pos"><span class="amt">${fe(r.final)}</span></td></tr>`).join('')+
+      '</tbody></table>';
+  }
+}
 function renderIndices(){const idx={};activos.forEach(a=>{if(a.indice&&a.indice!=='-'){if(!idx[a.indice])idx[a.indice]=[];idx[a.indice].push(a.ticker);}});if(!Object.keys(idx).length){document.getElementById('lista-indices').innerHTML='<div style="font-size:13px;color:var(--t1);padding:12px 0">Ningún activo de esta cartera sigue un índice.</div>';return;}document.getElementById('lista-indices').innerHTML=Object.entries(idx).map(([name,ticks])=>{const d=idxData[name]||{ytd:'—',y1:'—',pe:'—',div:'—',n:'—',desc:'Índice personalizado'};return`<div class="card"><div class="card-header"><span class="card-title">${name}</span><span class="badge b-blue">${ticks.join(', ')}</span></div><div class="dr"><span class="dk">YTD</span><span class="dv pos">${d.ytd}</span></div><div class="dr"><span class="dk">12 meses</span><span class="dv pos">${d.y1}</span></div><div class="dr"><span class="dk">PER</span><span class="dv">${d.pe}</span></div><div class="dr"><span class="dk">Dividendo</span><span class="dv">${d.div}</span></div><div class="dr"><span class="dk">N.º valores</span><span class="dv">${d.n}</span></div><div style="margin-top:7px;font-size:11px;color:var(--t1)">${d.desc}</div></div>`;}).join('');}
 function renderNotif(){document.getElementById('notif-dot').style.display='none';notifs.forEach(n=>n.leida=true);const ic={alerta:'⚠',dca:'📅',info:'✓'},co={alerta:'b-coral',dca:'b-blue',info:'b-teal'};document.getElementById('lista-notif').innerHTML=notifs.map(n=>`<div class="card" id="notif-${n.id}" style="opacity:${n.leida?.85:1}"><div style="display:flex;align-items:flex-start;gap:10px"><span class="badge ${co[n.tipo]}" style="margin-top:1px">${ic[n.tipo]}</span><div style="flex:1"><div style="font-size:13px;color:var(--t0);margin-bottom:3px">${n.texto}</div><div style="font-size:11px;color:var(--t1)">${n.fecha}</div></div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="toggleFavNotif(${n.id})" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px" title="Favorita">${n.favorita?'⭐':'☆'}</button><button onclick="borrarNotif(${n.id})" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--t2);padding:2px" title="Borrar">✕</button></div></div></div>`).join('')||'<div style="font-size:13px;color:var(--t1);padding:12px 0">Sin notificaciones.</div>';}
 function toggleFavNotif(id){const n=notifs.find(x=>x.id===id);if(n){n.favorita=!n.favorita;renderNotif();}}
