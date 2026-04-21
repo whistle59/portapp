@@ -1342,19 +1342,30 @@ function renderGruposCapital(){
 }
 
 // ── RENTABILIDAD EFECTIVO (F5) ────────────────────────────────────────────────
-function setREPeriod(btn,p){document.querySelectorAll('#s-rent-efectivo .period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderRentEfectivo();}
+let rePeriod='1M';
+function setREPeriod(btn,p){document.querySelectorAll('#s-rent-efectivo .period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');rePeriod=p;renderRentEfectivo();}
 function renderRentEfectivo(){
   const C=CC();
-  const ingresos=efectivoData.filter(e=>e.cartera===activeId&&e.importe>0);
+  const cutoff=new Date();
+  const pDays={'1M':30,'3M':90,'6M':180,'1A':365,'Todo':9999}[rePeriod]||30;
+  cutoff.setDate(cutoff.getDate()-pDays);
+  const cutStr=cutoff.toISOString().split('T')[0];
+  const tiposIngreso=['Dividendo','Interés','Staking','Saveback','Cashback','Rendimiento'];
+  const todos=efectivoData.filter(e=>e.cartera===activeId);
+  // Base = total aportaciones de capital (transferencias, no rendimientos)
+  const base=todos.filter(e=>e.importe>0&&!tiposIngreso.includes(e.tipo)).reduce((s,e)=>s+e.importe,0);
+  // Ingresos del período = rendimientos positivos dentro del período
+  const ingresos=todos.filter(e=>e.importe>0&&tiposIngreso.includes(e.tipo)&&(rePeriod==='Todo'||e.fecha>=cutStr));
   const tipoV={};ingresos.forEach(e=>{tipoV[e.tipo]=(tipoV[e.tipo]||0)+e.importe;});
   const brokerV={};ingresos.forEach(e=>{brokerV[e.broker]=(brokerV[e.broker]||0)+e.importe;});
   const total=ingresos.reduce((s,e)=>s+e.importe,0);
-  const saldo=4250;
-  document.getElementById('re-total').textContent=fe(total);
-  document.getElementById('re-pct').textContent='+'+(total/saldo*100).toFixed(1)+'%';
-  document.getElementById('re-por-tipo').innerHTML=Object.entries(tipoV).map(([t,v],i)=>{const p=total>0?v/total*100:0;return pb(p,C[i%C.length],t+' — '+fe(v));}).join('');
-  document.getElementById('re-por-broker').innerHTML=Object.entries(brokerV).map(([b,v],i)=>{const p=total>0?v/total*100:0;return pb(p,C[(i+2)%C.length],b+' — '+fe(v));}).join('');
-  document.getElementById('tb-re').innerHTML=ingresos.map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge b-teal">${e.tipo}</span></td><td>${e.broker}</td><td class="pos"><span class="amt">+€${e.importe.toLocaleString('es-ES')}</span></td></tr>`).join('')||'<tr><td colspan="4" style="color:var(--t1)">Sin ingresos en este período</td></tr>';
+  const pct=base>0?total/base*100:0;
+  document.getElementById('re-total').textContent=fe(total)||'€0';
+  document.getElementById('re-pct').textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';
+  document.getElementById('re-pct').className='mvalue '+(pct>=0?'pos':'neg');
+  document.getElementById('re-por-tipo').innerHTML=Object.entries(tipoV).length?Object.entries(tipoV).map(([t,v],i)=>{const p=total>0?v/total*100:0;return pb(p,C[i%C.length],t+' — '+fe(v));}).join(''):'<div style="font-size:12px;color:var(--t1);padding:6px 0">Sin rendimientos en este período</div>';
+  document.getElementById('re-por-broker').innerHTML=Object.entries(brokerV).length?Object.entries(brokerV).map(([b,v],i)=>{const p=total>0?v/total*100:0;return pb(p,C[(i+2)%C.length],b+' — '+fe(v));}).join(''):'<div style="font-size:12px;color:var(--t1);padding:6px 0">Sin datos</div>';
+  document.getElementById('tb-re').innerHTML=ingresos.map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge b-teal">${e.tipo}</span></td><td>${e.broker}</td><td class="pos"><span class="amt">+€${e.importe.toLocaleString('es-ES')}</span></td></tr>`).join('')||'<tr><td colspan="4" style="color:var(--t1)">Sin rendimientos en este período</td></tr>';
 }
 document.getElementById('op-date').value=new Date().toISOString().split('T')[0];
 </script>
