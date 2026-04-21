@@ -330,7 +330,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <button class="btn" onclick="goTo('s-rentabilidad')" style="font-size:12px">📈 Rentabilidad TWR</button>
         <button class="btn" onclick="goTo('s-grupos')" style="font-size:12px">🗂 Capital por grupos</button>
         <button class="btn" onclick="goTo('s-rent-efectivo')" style="font-size:12px">💰 Rent. efectivo</button>
-        <button class="btn" onclick="goTo('s-perfil')" style="font-size:12px">👤 Mi perfil</button>
+        <button class="btn" onclick="openCompartir()" style="font-size:12px">🔗 Compartir cartera</button>
       </div>
     </div>
 
@@ -833,6 +833,28 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   <div class="fg"><label>Nueva contraseña</label><div style="position:relative"><input type="password" id="pwd-nueva" style="padding-right:38px"><button type="button" onclick="togglePwd('pwd-nueva',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:16px">👁</button></div></div>
   <div class="fg"><label>Repetir nueva contraseña</label><div style="position:relative"><input type="password" id="pwd-rep" style="padding-right:38px"><button type="button" onclick="togglePwd('pwd-rep',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:16px">👁</button></div></div>
   <button class="btn btn-p" onclick="closeModal('m-cambio-pwd')">Guardar contraseña</button>
+</div></div>
+
+<div class="modal-overlay" id="m-compartir"><div class="modal">
+  <div class="mhdr"><span class="mtitle" id="comp-title">Compartir cartera</span><button class="btn-icon" onclick="closeModal('m-compartir')">✕</button></div>
+  <div id="comp-sin-enlace">
+    <div class="fg"><label>Duración del enlace</label>
+      <select id="comp-dur"><option value="perm">Permanente</option><option value="3h">3 horas</option><option value="24h">24 horas</option></select>
+    </div>
+    <div class="fg"><label>Modo de visualización</label>
+      <select id="comp-modo"><option value="full">Valores reales</option><option value="pct">Solo porcentajes</option></select>
+    </div>
+    <button class="btn btn-p" onclick="generarEnlace()">Generar enlace</button>
+  </div>
+  <div id="comp-con-enlace" style="display:none">
+    <div style="font-size:11px;color:var(--t1);margin-bottom:5px">Enlace activo</div>
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+      <input type="text" id="comp-url" readonly style="font-size:11px;color:var(--t1);background:var(--bg1)">
+      <button class="btn btn-sm" onclick="copiarEnlace(this)" style="white-space:nowrap;flex-shrink:0">Copiar</button>
+    </div>
+    <div id="comp-info" style="font-size:11px;color:var(--t2);margin-bottom:12px"></div>
+    <button class="btn" style="color:var(--neg);border-color:var(--neg)" onclick="revocarEnlace()">Revocar enlace</button>
+  </div>
 </div></div>
 
 </div>
@@ -1432,6 +1454,48 @@ function renderGruposCapital(){
 }
 
 // ── RENTABILIDAD EFECTIVO (F5) ────────────────────────────────────────────────
+// ── COMPARTIR CARTERA (F11) ──────────────────────────────────────────────────
+let compartirLinks={};
+function openCompartir(){
+  const c=carteras.find(x=>x.id===activeId);
+  document.getElementById('comp-title').textContent='Compartir · '+c.nombre;
+  const link=compartirLinks[activeId];
+  if(link&&(link.expiry==='perm'||new Date()<new Date(link.expiry))){
+    _showCompEnlace(link);
+  } else {
+    delete compartirLinks[activeId];
+    document.getElementById('comp-sin-enlace').style.display='block';
+    document.getElementById('comp-con-enlace').style.display='none';
+  }
+  openModal('m-compartir');
+}
+function generarEnlace(){
+  const dur=document.getElementById('comp-dur').value;
+  const modo=document.getElementById('comp-modo').value;
+  const token=Math.random().toString(36).slice(2,9).toUpperCase();
+  const expiry=dur==='perm'?'perm':dur==='3h'?new Date(Date.now()+3*3600000).toISOString():new Date(Date.now()+24*3600000).toISOString();
+  compartirLinks[activeId]={url:'https://portapp.app/s/'+token,expiry,modo,token};
+  _showCompEnlace(compartirLinks[activeId]);
+}
+function _showCompEnlace(link){
+  document.getElementById('comp-sin-enlace').style.display='none';
+  document.getElementById('comp-con-enlace').style.display='block';
+  document.getElementById('comp-url').value=link.url;
+  const modoLabel=link.modo==='pct'?'Solo porcentajes':'Valores reales';
+  const expLabel=link.expiry==='perm'?'Permanente':('Expira: '+new Date(link.expiry).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}));
+  document.getElementById('comp-info').textContent=modoLabel+' · '+expLabel;
+}
+function copiarEnlace(btn){
+  const url=document.getElementById('comp-url').value;
+  navigator.clipboard?.writeText(url).catch(()=>{});
+  btn.textContent='✓ Copiado';setTimeout(()=>btn.textContent='Copiar',2000);
+}
+function revocarEnlace(){
+  delete compartirLinks[activeId];
+  document.getElementById('comp-sin-enlace').style.display='block';
+  document.getElementById('comp-con-enlace').style.display='none';
+}
+
 // ── CANALES YOUTUBE (F12) ────────────────────────────────────────────────────
 const CANAL_CAT_COLOR={'ETFs':'b-blue','Value':'b-teal','Cripto':'b-amber','Opciones':'b-purple','Dividendos':'b-green'};
 let canalFiltro='Todos';
