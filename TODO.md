@@ -36,6 +36,7 @@
 ### Bloque 5 — Datos reales + DCA mejorado
 - **S1** — Datos de muestra enriquecidos: +4 activos, +11 ops (cubre 1M/3M/6M), +13 movimientos efectivo en 3 carteras
 - **F6** — Proyección DCA con arrastre anual explícito, métricas de capitalización y toggle simple/detallado (#14)
+- **F11** — Compartir cartera: modal con duración (perm/3h/24h), modo solo porcentajes, copiar y revocar (#19)
 
 ---
 
@@ -44,7 +45,7 @@
 | # | Issue | Descripción | Prioridad |
 |---|---|---|---|
 | ~~F6~~ | ~~#14~~ | ~~Proyección DCA con arrastre automático de saldos anuales~~ | ✅ |
-| F11 | #19 | Compartir cartera: enlace público (permanente o 3h) | Alta |
+| ~~F11~~ | ~~#19~~ | ~~Compartir cartera: enlace público~~ | ✅ |
 | F7 | #15 | Conexión con broker: lanzar sesión desde la app | Media |
 | F8 | #16 | Upload PDF broker: importación automática de movimientos | Media |
 
