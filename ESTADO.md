@@ -1040,7 +1040,278 @@ La realidad es que **el código en sí tiene poco valor estratégico** — lo ve
 
 ---
 
-## 18. Estrategia de agentes IA en portapp
+## 18. Infraestructura de producción
+
+### Visión general
+
+portapp en producción es una aplicación web full-stack con las siguientes capas:
+
+```
+Usuario (móvil/web)
+        ↓ HTTPS
+CDN + Frontend (Next.js) ── Vercel
+        ↓ API calls
+Backend / API (Next.js API routes o Node.js)
+        ↓
+Base de datos (PostgreSQL) ── Supabase / Railway
+        ↓
+Servicios externos:
+  - Auth (email + 2FA)
+  - Pagos (Stripe)
+  - Email transaccional (Resend)
+  - Cotizaciones (API de mercado)
+  - Almacenamiento ficheros (Cloudflare R2)
+  - IA (Anthropic API)
+```
+
+---
+
+### Componente 1 — Frontend y hosting web
+
+| Opción | Pros | Contras | Coste |
+|---|---|---|---|
+| **Vercel** ⭐ | Deploy automático desde GitHub, edge network global, ideal para Next.js (mismo equipo), SSL automático, previews por PR | Vendor lock-in con Next.js | Gratis hasta 100GB bandwidth/mes; Pro 20$/mes para equipos |
+| **Netlify** | Similar a Vercel, agnóstico de framework | Menos optimizado para Next.js | Gratis con límites; Pro 19$/mes |
+| **Cloudflare Pages** | Muy rápido, red global, gratis generoso | Menos maduro para SSR | Gratis; Workers 5$/mes |
+
+**Recomendación: Vercel** — deploy automático desde `main`, previews de cada PR en `dev`, SSL automático, optimizado para Next.js. El plan gratuito cubre el lanzamiento inicial.
+
+---
+
+### Componente 2 — Base de datos
+
+| Opción | Pros | Contras | Coste |
+|---|---|---|---|
+| **Supabase** ⭐ | PostgreSQL gestionado, auth incluida, SDK JS nativo, dashboard visual, backups automáticos, realtime | Vendor lock-in en auth y realtime | Gratis hasta 500MB; Pro 25$/mes (8GB) |
+| **Railway** | Fácil de usar, PostgreSQL estándar, buen DX | Sin auth incluida | ~5–15$/mes según uso |
+| **PlanetScale** | MySQL serverless, muy escalable | No es PostgreSQL | Gratis con límites; Pro 39$/mes |
+| **AWS RDS** | Máximo control y escalabilidad | Complejidad operativa alta, caro | ~50–200$/mes |
+| **Neon** | PostgreSQL serverless, branching de BD | Más nuevo, menos maduro | Gratis; Pro 19$/mes |
+
+**Recomendación: Supabase** — PostgreSQL estándar, auth de calidad incluida, backups automáticos, SDK oficial para JS/TS, excelente dashboard para gestionar datos. El plan gratuito cubre la fase de validación. Migrar es fácil si crece la necesidad porque es PostgreSQL estándar.
+
+**Esquema de base de datos (tablas principales):**
+```sql
+users          -- id, email, nombre, plan, created_at
+carteras       -- id, user_id, nombre, desc, divisa, color
+activos        -- id, cartera_id, ticker, nombre, tipo, broker, grupo...
+operaciones    -- id, cartera_id, ticker, fecha, tipo, qty, precio, fee...
+efectivo       -- id, cartera_id, tipo, fecha, importe, broker...
+anotaciones    -- id, user_id, texto, tag, ctx, fecha
+grupos         -- id, user_id, nombre, color, orden
+cuentas        -- id, user_id, tipo, nombre, iban, bic...
+licencias      -- id, user_id, plan, estado, fecha_inicio, fecha_fin
+```
+
+---
+
+### Componente 3 — Autenticación y sesiones
+
+| Opción | Pros | Contras | Coste |
+|---|---|---|---|
+| **Supabase Auth** ⭐ | Incluida con Supabase, email+password, OTP email, OAuth (Google, Apple), JWT automático | Limitado si se necesita lógica muy custom | Incluida en Supabase |
+| **NextAuth.js** | Open source, flexible, integra con cualquier BD, muchos providers | Más configuración inicial | Gratis (open source) |
+| **Clerk** | UI de auth preconstruida y muy pulida, gestión de sesiones avanzada | Caro a escala | Gratis hasta 10k MAU; Pro 25$/mes |
+| **Auth0** | Muy completo, enterprise-ready | Complejo, caro a escala | Gratis hasta 7.5k MAU; ~23$/mes |
+
+**Recomendación: Supabase Auth** — si ya usamos Supabase para la BD, usar su auth es lo más coherente. Cubre email+password, OTP por email (ya prototipado), OAuth social y JWT. El 2FA por SMS (PR7) se añade con Twilio sobre esta base.
+
+---
+
+### Componente 4 — Pagos
+
+| Opción | Pros | Contras | Coste |
+|---|---|---|---|
+| **Stripe** ⭐ | Estándar del sector, pago único + suscripciones + licencias, SDK excelente, cumplimiento PCI automático, dashboard potente | Comisión 1,4%+0,25€ (tarjetas europeas) | 0$ fijo + comisión por transacción |
+| **Paddle** | Gestiona el IVA europeo automáticamente (Merchant of Record), ideal para productos digitales | Comisión algo mayor (~5%) | 0$ fijo + comisión |
+| **LemonSqueezy** | Similar a Paddle, más moderno | Menos maduro | 0$ fijo + 5% + 0,50$ |
+
+**Recomendación: Paddle** para el lanzamiento europeo — actúa como "Merchant of Record", lo que significa que Paddle gestiona el IVA de cada país de la UE automáticamente. Con Stripe tendrías que registrarte en el OSS (One Stop Shop) de la AEAT para declarar el IVA digital. Para un producto SaaS B2C en Europa, Paddle elimina una complejidad fiscal importante.
+
+**Flujo de pago (sin comisión de tiendas):**
+1. Usuario se registra gratis en portapp.com
+2. Decide comprar → se redirige a Paddle checkout
+3. Paddle procesa el pago y notifica al backend via webhook
+4. Backend actualiza `licencias` tabla → usuario desbloqueado
+5. App detecta licencia activa → funcionalidades premium disponibles
+
+---
+
+### Componente 5 — Email transaccional
+
+| Opción | Pros | Contras | Coste |
+|---|---|---|---|
+| **Resend** ⭐ | API moderna, SDK TS oficial, plantillas React Email, fácil de usar | Más nuevo | Gratis 3.000 emails/mes; Pro 20$/mes |
+| **SendGrid** | Muy establecido, muchas funciones | API más verbosa, UI anticuada | Gratis 100/día; Pro 19,95$/mes |
+| **Postmark** | Excelente entregabilidad, especializado en transaccional | Solo transaccional, sin marketing | 15$/mes (10k emails) |
+
+**Recomendación: Resend** — API limpia, SDK TypeScript oficial, integración con React Email para crear plantillas HTML con componentes React. El plan gratuito cubre el lanzamiento.
+
+**Emails que necesita portapp:**
+- Verificación de cuenta
+- OTP para 2FA
+- Recuperación de contraseña
+- Confirmación de pago
+- Bienvenida al comprar plan personal
+- Alertas de inversión (cuando se implementen)
+- Newsletter/blog (esto con una herramienta separada: Loops, Mailchimp)
+
+---
+
+### Componente 6 — Cotizaciones de mercado (PR1)
+
+| Opción | Pros | Contras | Coste |
+|---|---|---|---|
+| **Yahoo Finance (yfinance)** | Gratis, amplia cobertura global | No oficial, puede romperse, sin SLA | Gratis (no oficial) |
+| **Alpha Vantage** ⭐ | API oficial, acciones + cripto + forex, bien documentada | Límite 25 req/día en gratis | Gratis (25 req/día); Premium 50$/mes (sin límite) |
+| **Polygon.io** | Datos de alta calidad, tiempo real, websocket | Caro para tiempo real | Gratis (datos retrasados); Starter 29$/mes |
+| **Twelve Data** | Buena cobertura global, precios razonables | Menos conocido | Gratis 800 req/día; Pro 29$/mes |
+| **ProRealTime API** | Ya en la app como plataforma, datos profesionales | Solo para clientes PRT | Acuerdo comercial |
+
+**Recomendación para lanzamiento: Alpha Vantage** (plan gratuito para empezar, Premium cuando haya usuarios de pago). Implementar caché agresiva en el backend — las cotizaciones no necesitan actualizarse más de 1 vez cada 15 minutos para la mayoría de usuarios.
+
+**Estrategia de caché:**
+```
+Request de usuario → caché Redis (15 min TTL) → API externa solo si caché expirada
+```
+Esto multiplica por 100 la eficiencia y reduce el coste de la API de cotizaciones.
+
+---
+
+### Componente 7 — Almacenamiento de ficheros
+
+Para el upload de PDFs de broker (F8) y potencialmente avatares de usuario y exportaciones.
+
+| Opción | Pros | Contras | Coste |
+|---|---|---|---|
+| **Cloudflare R2** ⭐ | Sin coste de egress (diferencial enorme vs S3), S3-compatible, muy barato | Más nuevo | 0,015$/GB almacenamiento; 0$ egress |
+| **AWS S3** | Estándar del sector, muy maduro | Coste de egress elevado (0,09$/GB) | 0,023$/GB + egress |
+| **Supabase Storage** | Integrado con Supabase, fácil de usar | Límites en plan gratuito | Incluido en Supabase (1GB gratis) |
+
+**Recomendación: Cloudflare R2** para ficheros grandes (PDFs, exportaciones). Supabase Storage para ficheros pequeños (avatares) aprovechando la integración.
+
+---
+
+### Componente 8 — Caché y rendimiento
+
+| Opción | Pros | Contras | Coste |
+|---|---|---|---|
+| **Upstash Redis** ⭐ | Redis serverless, pago por uso, SDK JS oficial, integra bien con Vercel | Latencia algo mayor que Redis dedicado | Gratis 10k req/día; Pay-as-you-go después |
+| **Redis Cloud** | Redis estándar, muy rápido | Requiere gestión | Gratis 30MB; Flex ~7$/mes |
+| **Vercel KV** | Integrado con Vercel, Redis bajo el capó | Solo funciona bien con Vercel | Gratis con límites; Pro incluido |
+
+**Recomendación: Upstash Redis** — serverless, pago por uso real, sin gestionar instancias. Usar para: caché de cotizaciones, rate limiting de API, sesiones temporales.
+
+---
+
+### Componente 9 — Monitorización y errores
+
+| Herramienta | Función | Coste |
+|---|---|---|
+| **Sentry** ⭐ | Captura de errores JS/backend en tiempo real, stack traces, alertas | Gratis hasta 5k errores/mes |
+| **Posthog** ⭐ | Analítica de producto (eventos, funnels, session replay), open source | Gratis hasta 1M eventos/mes |
+| **Vercel Analytics** | Métricas de rendimiento web (Core Web Vitals) | Incluido en Vercel |
+| **Uptime Robot** | Monitorización de disponibilidad, alertas si cae | Gratis (50 monitores) |
+
+**Recomendación:** Sentry + Posthog + Uptime Robot desde el día 1. Son gratuitos en los volúmenes iniciales y esenciales para entender qué falla y cómo se usa la app.
+
+---
+
+### Componente 10 — CI/CD
+
+**GitHub Actions** (ya tenemos el repo en GitHub) — gratis para repos privados hasta 2.000 minutos/mes.
+
+Pipeline recomendado:
+```yaml
+Push a dev:
+  → Tests automáticos
+  → Build de verificación
+  → Preview deploy en Vercel
+
+PR dev → main:
+  → Tests automáticos
+  → Revisión manual (tú)
+  → Merge → deploy automático a producción
+```
+
+---
+
+### Componente 11 — Dominio y DNS
+
+- **Registro de dominio:** Cloudflare Registrar (precio de coste, sin margen) o Namecheap (~10–15€/año para .com)
+- **DNS:** Cloudflare (gratis, rapidísimo, protección DDoS incluida)
+- **SSL:** automático via Vercel o Cloudflare
+
+**Dominios a registrar:**
+- `portapp.com` — dominio principal ⭐
+- `portapp.es` — para el mercado español
+- `portapp.app` — extensión de app (opcional)
+
+---
+
+### Componente 12 — IA (Anthropic API)
+
+Para el bot de asistencia (PR9) e importación de PDFs (F8).
+
+| Modelo | Uso | Coste orientativo |
+|---|---|---|
+| `claude-sonnet-4-6` | Bot de asistencia (respuestas de calidad) | ~0,003$/pregunta con caching |
+| `claude-haiku-4-5` | Extracción de datos de PDFs (tarea estructurada) | ~0,0005$/PDF |
+
+**Implementación con prompt caching:**
+- El system prompt y las definiciones de herramientas se cachean → reducción de coste ~90% en conversaciones largas
+- Coste estimado para 1.000 preguntas/mes por usuario activo: ~3$/mes
+
+---
+
+### Resumen de costes mensuales estimados
+
+#### Fase de lanzamiento (0–500 usuarios)
+
+| Servicio | Plan | Coste/mes |
+|---|---|---|
+| Vercel | Hobby (gratis) | 0$ |
+| Supabase | Free tier | 0$ |
+| Resend | Free (3k emails) | 0$ |
+| Alpha Vantage | Free (25 req/día) | 0$ |
+| Upstash Redis | Free tier | 0$ |
+| Sentry | Free tier | 0$ |
+| Posthog | Free tier | 0$ |
+| Dominio .com | Anual | ~1$/mes |
+| Anthropic API | Pay-as-you-go | ~5–20$/mes |
+| **Total** | | **~6–21$/mes** |
+
+#### Fase de crecimiento (500–5.000 usuarios)
+
+| Servicio | Plan | Coste/mes |
+|---|---|---|
+| Vercel | Pro | 20$ |
+| Supabase | Pro (8GB) | 25$ |
+| Resend | Pro | 20$ |
+| Alpha Vantage | Premium | 50$ |
+| Upstash Redis | Pay-as-you-go | ~10$ |
+| Cloudflare R2 | Pay-as-you-go | ~5$ |
+| Sentry | Team | 26$ |
+| Dominio(s) | Anual | ~3$/mes |
+| Anthropic API | Pay-as-you-go | ~50–100$/mes |
+| **Total** | | **~209–259$/mes** |
+
+> Con 500 usuarios en plan personal (39€ pago único) = 19.500€ de ingresos. Los costes de infraestructura son marginales frente a los ingresos.
+
+---
+
+### Hoja de ruta de infraestructura
+
+| Fase | Acción |
+|---|---|
+| **Antes de producción** | Registrar dominio · Configurar Supabase (BD + auth) · Configurar Vercel · Configurar Resend · Configurar Stripe/Paddle · Configurar Sentry + Posthog |
+| **Lanzamiento v1** | Todo en plan gratuito · GitHub Actions básico · Cotizaciones con caché |
+| **Post-lanzamiento** | Upgrade Supabase Pro · Alpha Vantage Premium · Cloudflare R2 para PDFs |
+| **Crecimiento** | Redis dedicado · CDN para assets estáticos · Separar backend de frontend si escala |
+
+---
+
+## 19. Estrategia de agentes IA en portapp
 
 ### Cuándo tiene sentido usar agentes y cuándo no
 
