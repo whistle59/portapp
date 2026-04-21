@@ -693,7 +693,108 @@ La recomendación es **Next.js** porque permite tener tanto la app autenticada (
 
 ---
 
-## 16. Certificaciones y cumplimiento legal
+## 16. Estrategia de contenidos y blog
+
+### Por qué el blog es obligatorio
+
+El blog es la principal fuente de tráfico orgánico sin coste de adquisición. Un usuario que llega buscando "cómo calcular la rentabilidad TWR de mi cartera" y encuentra un artículo bien escrito en portapp.com tiene una probabilidad de conversión muy alta — ya tiene el problema que portapp resuelve.
+
+Sin blog, la única forma de crecer es pagando publicidad. Con blog, Google trabaja para ti de forma compuesta: cada artículo nuevo suma, y los artículos antiguos siguen trayendo tráfico años después.
+
+---
+
+### Blog público vs. contenido premium — decisión
+
+**El blog debe ser 100% público y gratuito.** No tiene sentido diferenciar:
+
+- El objetivo del blog es **atraer** usuarios, no monetizarlos. Un muro de pago elimina su función principal.
+- El SEO solo funciona con contenido indexable. El contenido de pago no se indexa en Google.
+- Ya existen mecanismos de monetización más naturales (pago único, suscripción, B2B). El blog no debe ser uno más.
+
+Lo que sí tiene sentido diferenciar es el **formato**, no el acceso:
+
+| Tipo de contenido | Canal | Objetivo |
+|---|---|---|
+| Artículos educativos (ETFs, DCA, TWR, fiscalidad) | Blog público | Tráfico orgánico SEO |
+| Tutoriales de uso de portapp | Blog público | Reducir soporte, onboarding |
+| Análisis de mercado periódicos | Blog público | Fidelización y recurrencia |
+| Guías avanzadas descargables (PDF) | Lead magnet — gratis a cambio de email | Captura de leads |
+| Webinars / sesiones en vivo | Solo usuarios registrados (gratuito o de pago) | Comunidad y conversión |
+| Vídeos con expertos invitados | App (sección Aprende) + blog + YouTube | Autoridad y alcance |
+
+---
+
+### Estrategia de vídeos con personas relevantes
+
+Una de las acciones de mayor impacto a medio plazo es **invitar a personas relevantes del mundo de las finanzas e inversión** para grabar vídeos con consejos útiles para los usuarios de portapp.
+
+**Por qué funciona:**
+- El invitado trae su propia audiencia — cada vídeo es también una acción de marketing hacia sus seguidores
+- Genera contenido de autoridad sin que portapp tenga que ser el experto
+- Crea relaciones con los creadores que luego pueden derivar en acuerdos para la sección "Aprende" (canales YouTube curados)
+- El contenido de vídeo tiene mucha más retención y viralidad que el texto
+
+**Perfiles a invitar:**
+
+| Perfil | Por qué es relevante |
+|---|---|
+| Creadores de YouTube de finanzas en español | Audiencia masiva ya formada, alineación natural con la app |
+| Asesores financieros independientes (EAFIs) | Credibilidad institucional, puerta de entrada al B2B |
+| Bloggers e influencers de inversión en redes | Alcance en Instagram, Twitter/X, TikTok |
+| Gestores de fondos o analistas conocidos | Autoridad máxima, contenido de alto valor percibido |
+| Usuarios power-user de portapp (cuando los haya) | Testimonios reales, máxima credibilidad para conversión |
+
+**Formato sugerido para los vídeos:**
+- Duración: 5–10 minutos (consumible, no un webinar largo)
+- Enfoque práctico: "3 errores que cometen los inversores al calcular su rentabilidad", "Cómo estructurar una cartera DCA desde cero"
+- Grabados remotamente (Riverside, Zencastr) o presencialmente si hay presupuesto
+- Publicados en la sección "Aprende" de la app + canal YouTube propio de portapp + blog
+
+**Primeros pasos concretos:**
+1. Identificar 5–10 creadores hispanohablantes con audiencia afín (inversión indexada, finanzas personales)
+2. Preparar un pitch corto explicando qué es portapp y qué se les ofrece (visibilidad, link en la app, posible acuerdo económico futuro)
+3. Empezar por perfiles medianos (50k–200k seguidores) — más accesibles y con audiencia más comprometida que los megainfluencers
+4. Establecer si el acuerdo es gratuito (visibilidad mutua) o remunerado desde el inicio
+
+---
+
+### Integración blog ↔ app
+
+El blog no debe ser un elemento separado — debe estar conectado con la app:
+
+- La sección **"Aprende"** de la app puede mostrar los últimos artículos del blog y los vídeos más recientes
+- Los artículos sobre funcionalidades de portapp pueden incluir CTAs directos a la app
+- El mismo dominio (`portapp.com/blog`) es clave — un subdominio externo (`blog.portapp.com`) no transfiere autoridad SEO al dominio principal
+
+---
+
+### Stack técnico recomendado para el blog
+
+| Opción | Pros | Contras | Recomendación |
+|---|---|---|---|
+| **Blog en Next.js** (mismo proyecto) | Mismo dominio, mismo diseño, máximo SEO | Requiere desarrollo | ✅ Ideal a largo plazo |
+| **Ghost** (headless) | CMS potente, buen SEO, fácil de escribir | Subdominio o configuración extra para mismo dominio | ✅ Buena opción inicial |
+| **Substack** | Gratis, fácil, newsletter integrada | Dominio propio limitado, diseño muy rígido | 🟡 Solo para empezar muy rápido |
+| **WordPress** | Flexible, miles de plugins | Pesado, mantenimiento, seguridad | ❌ No recomendado para este stack |
+
+**Recomendación:** empezar con **Ghost** en `portapp.com/blog` para publicar rápido, y migrar a Next.js cuando el equipo técnico tenga capacidad.
+
+---
+
+### Hoja de ruta de contenidos
+
+| Fase | Acción |
+|---|---|
+| Pre-lanzamiento | Publicar 5–10 artículos SEO antes de lanzar (da autoridad desde el día 1) |
+| Lanzamiento | Blog activo + primer vídeo con invitado relevante como acción de PR |
+| 1–3 meses | Ritmo de 2–4 artículos/mes + 1 vídeo/mes con invitado |
+| 3–6 meses | Activar newsletter semanal con resumen de mercado |
+| 6–12 meses | Canal YouTube propio de portapp con contenido regular |
+| 12+ meses | Comunidad (Discord o similar) para usuarios avanzados |
+
+---
+
+## 17. Certificaciones y cumplimiento legal
 
 ### Obligatorio antes de lanzar con usuarios reales
 
