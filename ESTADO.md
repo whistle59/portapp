@@ -338,6 +338,7 @@ portapp/
 | M9 | Testing en dispositivos reales: iPhone SE, iPhone 15, iPad, Android gama media | 🟡 Alta |
 | M10 | Publicación en App Store (Apple) y Google Play si se elige app nativa | 🟡 Alta |
 | M11 | PWA: manifest.json, service worker, instalable desde el navegador (alternativa sin tiendas) | 🟢 Media |
+| M13 | **GitHub Pro** — Activar cuando haya tracción validada. Desbloquea: branch protection completa para `main` y `dev` (require PR, require CI pass, prevent direct push), reglas de merge por rama. Coste: 4$/mes. Actualmente solo están activas `restrict deletions` y `block force pushes` en `main` (disponibles en plan gratuito). | 🟡 Cuando haya tracción |
 | M12 | **Protección de pantalla en multitarea** — implementar `FLAG_SECURE` (Android) y `UIWindow.isSecure` (iOS) en la app nativa para impedir que el OS capture contenido financiero en el app switcher y en screenshots. En el prototipo web se enmascaran los valores `.amt` como solución provisional, pero no es posible bloquear la captura del OS desde un navegador. | 🔴 Crítica |
 
 ---
