@@ -505,10 +505,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <div class="chip-row" id="grupos-chips" style="display:none"></div>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Seguridad</div>
       <div class="card">
-        <div class="dr"><span class="dk">Bloqueo al pasar a segundo plano</span><input type="checkbox" checked style="width:auto"></div>
-        <div class="dr"><span class="dk">Tiempo de gracia</span><select style="width:100px;padding:4px"><option>Inmediato</option><option>30 seg</option><option selected>1 min</option><option>5 min</option></select></div>
+        <div class="dr"><span class="dk">Bloqueo al pasar a segundo plano</span><input type="checkbox" id="lock-enabled" checked style="width:auto" onchange="lockSettings.enabled=this.checked"></div>
+        <div class="dr"><span class="dk">Tiempo de gracia</span><select id="lock-grace" style="width:100px;padding:4px" onchange="lockSettings.grace=parseInt(this.value)"><option value="0">Inmediato</option><option value="30">30 seg</option><option value="60" selected>1 min</option><option value="300">5 min</option></select></div>
         <div class="dr"><span class="dk">Agitar para enmascarar cifras</span><input type="checkbox" checked style="width:auto"></div>
       </div>
+      <div style="font-size:11px;color:var(--t2);margin-top:6px;padding:0 2px;line-height:1.5">Si abandonas la app durante más del tiempo de gracia configurado, deberás volver a introducir tu contraseña al regresar.</div>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Interfaz</div>
       <div class="card">
         <div class="dr"><span class="dk">Modo oscuro</span><input type="checkbox" id="dark-chk" style="width:auto" onchange="toggleDark()"></div>
@@ -1034,7 +1035,28 @@ function launchApp(){
 function resetAuth(){clearInterval(tInt);clearInterval(bInt);document.getElementById('app-shell').classList.remove('active');document.getElementById('auth-wrap').style.display='flex';privacyOn=false;document.getElementById('privacy-bar').classList.remove('on');document.getElementById('device').classList.remove('masked');showAuth('as-login');}
 function unlockApp(){const p=document.getElementById('lock-pass').value,e=document.getElementById('lock-err');if(p==='demo1234'){document.getElementById('lock-screen').classList.remove('active');document.getElementById('app-shell').classList.add('active');e.style.display='none';document.getElementById('lock-pass').value='';requestAnimationFrame(()=>requestAnimationFrame(()=>reCharts()));}else{e.style.display='block';e.textContent='Contraseña incorrecta.';}}
 document.querySelectorAll('.otp-in').forEach((inp,i)=>{inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&i>0)document.getElementById('o'+(i-1)).focus();if(e.key==='Enter')verifyOtp();});inp.addEventListener('paste',e=>{const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');if(p.length>=6)for(let j=0;j<6;j++)document.getElementById('o'+j).value=p[j]||'';e.preventDefault();});});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&document.getElementById('app-shell').classList.contains('active')){document.getElementById('app-shell').classList.remove('active');document.getElementById('lock-screen').classList.add('active');}});
+const lockSettings={enabled:true,grace:60};
+let lockTimer=null,hiddenAt=null;
+document.addEventListener('visibilitychange',()=>{
+  const appActive=document.getElementById('app-shell').classList.contains('active');
+  if(document.hidden){
+    if(!lockSettings.enabled||!appActive)return;
+    hiddenAt=Date.now();
+    if(lockSettings.grace===0){
+      document.getElementById('app-shell').classList.remove('active');
+      document.getElementById('lock-screen').classList.add('active');
+    } else {
+      lockTimer=setTimeout(()=>{
+        if(document.getElementById('app-shell').classList.contains('active')){
+          document.getElementById('app-shell').classList.remove('active');
+          document.getElementById('lock-screen').classList.add('active');
+        }
+      },lockSettings.grace*1000);
+    }
+  } else {
+    if(lockTimer){clearTimeout(lockTimer);lockTimer=null;}
+  }
+});
 function togglePrivacy(){privacyOn=!privacyOn;document.getElementById('device').classList.toggle('masked',privacyOn);document.getElementById('privacy-bar').classList.toggle('on',privacyOn);}
 function toggleDark(){document.documentElement.classList.toggle('dark');document.getElementById('dark-chk').checked=document.documentElement.classList.contains('dark');reCharts();}
 function setFontSize(cls){['fs-sm','fs-md','fs-lg','fs-xl'].forEach(c=>document.documentElement.classList.remove(c));document.documentElement.classList.add(cls);}
