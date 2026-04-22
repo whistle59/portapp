@@ -1,6 +1,6 @@
 # portapp — Estado del proyecto
 
-> Última actualización: prototipo v6 — Bloques 3–6 completados  
+> Última actualización: prototipo v6 — Bloques 3–6 completados · Arquitectura local-first en evaluación  
 > Credenciales demo: `usuario@portapp.com` / `demo1234` / 2FA: `123456`
 
 ---
@@ -9,13 +9,15 @@
 
 | Decisión | Valor | Notas |
 |---|---|---|
-| Fase actual | Prototipo HTML | Sin servidor, un solo archivo |
-| Stack producción (propuesto) | React + Tailwind, Next.js, PostgreSQL | Pendiente de confirmar |
+| Fase actual | Prototipo HTML v6 | Sin servidor, un solo archivo. Ver sección 2. |
+| Stack producción | **En evaluación** — ver sección 20 | Dos opciones: cliente-servidor (Next.js) vs local-first (React Native + SQLite) |
 | Auth | Email + contraseña + 2FA (email o SMS) | Biometría WebAuthn en v2 |
-| Divisas | Multi-divisa (EUR, USD y otras) | Tipos de cambio manuales por ahora |
-| Offline / cloud | Pendiente de decidir | — |
-| Plataforma | Pendiente de decidir | Web, iOS, Android o las tres |
+| Divisas | Multi-divisa (EUR, USD y otras) | Tipos de cambio manuales en prototipo, automáticos en producción |
+| Offline / cloud | **Local-first preferido** — ver sección 20 | Datos en dispositivo + sync opcional en nube |
+| Plataforma | **React Native + Expo** si se confirma local-first | iOS + Android + web desde una base de código |
 | Nombre comercial | Pendiente de decidir | Nombre interno: portapp |
+| Repo | GitHub privado (whistle59/portapp) | Branches: `main` (estable) + `dev` (integración) + `feature/*` (trabajo) |
+| CI/CD | GitHub Actions | Validación HTML en cada push a `dev` y PR a `main` |
 
 ---
 
@@ -114,33 +116,35 @@
 
 ---
 
-## 3. Pendientes — próxima iteración
+## 3. Iteraciones de pulido — estado
 
-| # | Descripción |
-|---|---|
-| P1 | Modo oscuro: aumentar contraste de textos secundarios (`--t1`, `--t2`) |
-| P2 | Tamaño de fuente configurable en Ajustes (Pequeño / Normal / Grande / Muy grande) |
-| P3 | Nueva operación: desplegable con activos de la cartera seleccionada + opción "nuevo activo" |
-| P4 | Notificaciones: botón borrar + marcar como favorita ⭐ |
-| P5 | Exposición por Región/Divisa: recalcular al usar filtros de tipo de activo |
+| # | Descripción | Estado |
+|---|---|---|
+| P1 | Modo oscuro: aumentar contraste de textos secundarios (`--t1`, `--t2`) | ✅ v6 |
+| P2 | Tamaño de fuente configurable en Ajustes | ✅ v6 |
+| P3 | Nueva operación: desplegable con activos de la cartera + opción "nuevo activo" | ✅ v6 |
+| P4 | Notificaciones: botón borrar + marcar como favorita ⭐ | ✅ v6 |
+| P5 | Exposición por Región/Divisa: recalcular al usar filtros de tipo de activo | ✅ v6 |
+| P6 | Toggle mostrar/ocultar contraseña en login, lock screen y cambio de contraseña | ✅ v6 |
 
 ---
 
-## 4. Pendientes — funcionalidades nuevas
+## 4. Funcionalidades nuevas — estado
 
-| # | Descripción |
-|---|---|
-| F1 | Pantalla de rentabilidad real por activo y por período (TWR) |
-| F2 | Cuadro de capital por grupos con porcentajes sobre el total |
-| F3 | ~~Módulo de anotaciones global (accesible desde cualquier nivel)~~ ✅ v5 |
-| F4 | Perfil de usuario y gestión de sesión |
-| F5 | Rentabilidad del efectivo en período determinado |
-| F6 | Proyección DCA con arrastre automático de saldos anuales entre años |
-| F7 | Conexión con broker: formulario de credenciales que lanza sesión en URL del broker |
-| F8 | Upload de PDF del broker: lectura e importación automática de movimientos |
-| F9 | ~~Gestión de cuentas bancarias y cuentas broker en Ajustes (IBAN, BIC, titular)~~ ✅ v5 |
-| F10 | ~~Grupos de activos: CRUD completo + drag & drop para reordenar~~ ✅ v5 |
-| F11 | Compartir cartera: enlace público (permanente o 3h), solo lectura, opción solo porcentajes |
+| # | Descripción | Estado |
+|---|---|---|
+| F1 | Pantalla de rentabilidad real por activo y por período | ✅ v6 — TWR real desde ops |
+| F2 | Cuadro de capital por grupos con porcentajes sobre el total | ✅ v6 |
+| F3 | Módulo de anotaciones global | ✅ v5 |
+| F4 | Perfil de usuario y gestión de sesión | ✅ v6 — renderPerfil() dinámico |
+| F5 | Rentabilidad del efectivo en período determinado | ✅ v6 — base real desde efectivoData |
+| F6 | Proyección DCA con arrastre automático de saldos anuales | ✅ v6 — tabla detallada con toggle |
+| F7 | Conexión con broker: lanzar sesión desde la app | 🔄 Pendiente |
+| F8 | Upload de PDF del broker: importación automática | 🔄 Pendiente (requiere backend + IA) |
+| F9 | Gestión de cuentas bancarias y cuentas broker en Ajustes | ✅ v5 |
+| F10 | Grupos de activos: CRUD completo + drag & drop | ✅ v5 |
+| F11 | Compartir cartera: enlace público (permanente/3h/24h), solo porcentajes | ✅ v6 |
+| F12 | Pantalla "Aprende": canales YouTube curados con filtros y favoritos | ✅ v6 |
 
 ---
 
@@ -365,38 +369,11 @@ portapp/
 
 ---
 
-## Actualizaciones puntuales
+## Notas de seguridad adicionales
 
-### Pendientes — próxima iteración (añadidos)
-- **P6** — Campos de contraseña: añadir toggle 👁 "mostrar/ocultar" en login, lock screen y cualquier formulario con contraseña. El campo siempre arranca en modo oculto (`type="password"`).
-
-### Seguridad — Capa 5 Frontend (añadido)
-- **Contraseñas nunca en texto plano** — todos los campos de contraseña usan `type="password"` por defecto. El usuario puede revelarlos explícitamente con un toggle 👁. Nunca autocompletar con `autocomplete="new-password"` en formularios de cambio de contraseña.
-
-
-
----
-
-### Monetización — Links a canales de YouTube (añadido)
-
-**Concepto:** sección de contenido curado dentro de la app con links directos a canales de YouTube de finanzas e inversión. Los canales solo pueden añadirse, editarse o eliminarse desde el panel de administración, garantizando control editorial y permitiendo acuerdos comerciales con creadores.
-
-**Pendientes — funcionalidad (F12):**
-- Pantalla "Aprende" o "Canales" en la app con lista de canales recomendados
-- Cada canal muestra: nombre, avatar, descripción breve, categoría (ETFs, cripto, value investing, opciones, etc.) y link directo a YouTube
-- Posibilidad de marcar canales como favoritos
-- Filtro por categoría
-
-**Pendientes — panel admin (A12):**
-- CRUD completo de canales: añadir, editar, desactivar, eliminar
-- Campos por canal: nombre, URL de YouTube, descripción, categoría, imagen/avatar, orden de aparición, activo/inactivo
-- Estadísticas de clics por canal (para demostrar valor a los creadores en acuerdos comerciales)
-- Posibilidad de marcar un canal como "destacado" (aparece primero o con badge especial)
-
-**Modelo de monetización sugerido:**
-- Acuerdo directo con el creador (fee fijo mensual o por clics)
-- Canal "destacado" con mayor visibilidad como producto premium
-- Posible integración futura con programa de afiliados de YouTube o cursos del creador
+- Todos los campos de contraseña usan `type="password"` por defecto con toggle 👁 para revelar
+- Nunca usar `autocomplete="new-password"` en formularios de cambio de contraseña
+- Panel admin (A12): gestión de canales YouTube con CRUD, estadísticas de clics y badge "Destacado" (ver sección 11)
 
 
 
@@ -692,6 +669,8 @@ Antes de empezar producción hay que decidir si el stack de producción será:
 - **Vue / Svelte** (alternativas válidas pero menor ecosistema para este tipo de app)
 
 La recomendación es **Next.js** porque permite tener tanto la app autenticada (React SPA dentro) como la landing page pública (con SEO) en el mismo proyecto.
+
+> **Nota:** Esta recomendación aplica si se adopta la arquitectura cliente-servidor clásica. Si se adopta local-first (ver sección 20), el stack cambia a React Native + Expo. La decisión está pendiente del Prototipo 2.
 
 ---
 
@@ -1559,3 +1538,118 @@ Importación confirmada por el usuario
 | Producción v1 | Importación PDF de broker (F8) | 🟡 Media |
 | Producción v2 | Alertas inteligentes contextuales | 🟢 Baja |
 | Producción v2 | Resumen semanal automático por email | 🟢 Baja |
+
+---
+
+## 20. Arquitectura local-first — evaluación y plan
+
+### Qué es local-first
+
+Local-first es un modelo de arquitectura donde los datos del usuario viven primariamente en su dispositivo (SQLite local) y se sincronizan opcionalmente con la nube. La fuente de verdad es el dispositivo, no el servidor.
+
+Apps consolidadas con este modelo: **Linear**, **Obsidian**, **Bear**, **Anytype**, **Capacitor**. Es una tendencia creciente precisamente por la privacidad y la fiabilidad offline.
+
+---
+
+### Comparativa de arquitecturas
+
+| Dimensión | Cliente-servidor clásico | Local-first |
+|---|---|---|
+| **Latencia** | Red + servidor (~100-500ms) | Instantánea (local, <1ms) |
+| **Offline** | No funciona | Funciona siempre |
+| **Privacidad** | Datos en servidor del proveedor | Datos en dispositivo del usuario |
+| **Coste infraestructura** | Alto y constante | Mínimo (solo sync + auth) |
+| **Multi-dispositivo** | Sí siempre | Sí con sync activado (opcional) |
+| **Complejidad backend** | Alta (lógica, BD, APIs, auth) | Baja (sync + auth + licencias) |
+| **Backup** | Automático en servidor | Manual o automático con sync |
+| **B2B web desktop** | Sí | Sí via PWA + sync |
+| **IA / bot asistente** | Sí (API externa) | Sí (API externa, igual) |
+| **App Store / Google Play** | App nativa o PWA | App nativa (React Native) |
+| **Argumento de venta** | "Tus datos siempre accesibles" | "Tus datos nunca salen de tu dispositivo" |
+| **Coste mensual estimado (v1)** | ~20-50$/mes | ~3-8$/mes |
+| **Riesgo técnico** | Bajo (tecnología madura) | Medio (sync es complejo) |
+
+---
+
+### Stack técnico local-first para portapp
+
+| Capa | Tecnología | Por qué |
+|---|---|---|
+| App | React Native + Expo | Una base de código iOS + Android + web |
+| BD local | Expo SQLite / WatermelonDB | SQLite en el dispositivo, muy rápido, offline total |
+| Sync | Electric SQL o PowerSync | Sincroniza SQLite local ↔ PostgreSQL en nube |
+| BD nube (opcional) | PostgreSQL (Supabase) | Solo para sync, no como fuente de verdad |
+| Auth | Supabase Auth | Solo necesaria para sync y licencias |
+| Pagos | Paddle | Sin cambios vs. arquitectura clásica |
+| IA | Anthropic API | Sin cambios — llamada externa |
+
+---
+
+### Cómo funciona el sync
+
+```
+Dispositivo A                    Nube (opcional)              Dispositivo B
+SQLite local  ←→  Electric SQL  ←→  PostgreSQL  ←→  Electric SQL  ←→  SQLite local
+```
+
+- Sin conexión: todo funciona en local perfectamente
+- Con conexión: sync automático en segundo plano, transparente al usuario
+- Conflictos: resueltos automáticamente mediante CRDTs (Conflict-free Replicated Data Types)
+- El usuario elige: modo "solo local" (máxima privacidad) o "sincronizar entre dispositivos"
+
+---
+
+### Ventajas específicas para portapp
+
+1. **Privacidad como argumento de venta** — "Tus datos de inversión nunca salen de tu dispositivo" es un diferenciador muy potente en el mercado financiero
+2. **Sin dependencia de conexión** — el usuario puede registrar operaciones en el metro, en el avión, en cualquier lugar
+3. **Costes operativos mínimos** — el backend solo gestiona sync, auth y licencias. No hay lógica de negocio en el servidor
+4. **RGPD simplificado** — si los datos están en el dispositivo, la superficie de exposición de datos personales se reduce drásticamente
+5. **Velocidad percibida** — la app responde instantáneamente, sin esperas de red
+
+---
+
+### Limitaciones y cómo abordarlas
+
+| Limitación | Solución |
+|---|---|
+| Backup si se pierde el teléfono | Sync con nube activable por el usuario + export manual a CSV/JSON |
+| Multi-dispositivo | Sync opcional — el usuario lo activa si lo necesita |
+| B2B desktop | PWA + sync cubre el caso de uso del asesor en desktop |
+| Migraciones de esquema SQLite | Expo SQLite + sistema de migraciones versionadas (igual que en BD clásica) |
+| Complejidad del sync | Electric SQL / PowerSync abstraen la complejidad — no hay que implementar CRDTs a mano |
+
+---
+
+### Plan: Prototipo 2 — validación técnica local-first
+
+El prototipo HTML actual (v6) validó **flujos y UX**. El Prototipo 2 no rehace lo mismo — valida **la arquitectura de datos local y el sync**.
+
+**Objetivo:** demostrar que los datos se guardan en SQLite local, funcionan offline y se sincronizan entre dos dispositivos.
+
+**Alcance mínimo (3-4 pantallas):**
+- Login con Supabase Auth
+- Crear cartera y añadir activo (guardado en SQLite local)
+- Ver activos offline (sin conexión)
+- Sync entre dos dispositivos con la misma cuenta
+
+**Stack:**
+```
+React Native + Expo
+Expo SQLite (bd local)
+PowerSync o Electric SQL (sync)
+Supabase (auth + PostgreSQL para sync)
+```
+
+**Criterio de éxito:** si el sync funciona de forma transparente y los datos persisten offline, la arquitectura está validada y se adopta para producción. Si hay demasiada complejidad operativa, se vuelve al cliente-servidor clásico.
+
+---
+
+### Decisión pendiente
+
+Antes de empezar producción hay que elegir entre las dos arquitecturas. El Prototipo 2 resuelve esta incógnita. **Recomendación: construir el Prototipo 2 en paralelo mientras se recopila feedback del Prototipo 1 con los testers.**
+
+| Arquitectura | Cuándo elegirla |
+|---|---|
+| **Local-first** (recomendada) | Si el Prototipo 2 demuestra que el sync es manejable y el argumento de privacidad resuena con los testers |
+| **Cliente-servidor (Next.js)** | Si el sync resulta demasiado complejo o si el B2B desktop es prioritario desde el inicio |
