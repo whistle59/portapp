@@ -500,9 +500,21 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <!-- SETTINGS -->
     <div class="screen" id="s-settings">
       <div class="screen-title">Ajustes</div>
-      <div class="slabel" style="margin-bottom:7px">Divisas activas</div>
-      <div class="chip-row"><span class="tag selected">EUR</span><span class="tag selected">USD</span><span class="tag">GBP</span><span class="tag">CHF</span><span class="tag">+ Añadir</span></div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+      <div class="slabel" style="margin-bottom:7px">Interfaz</div>
+      <div class="card">
+        <div class="dr"><span class="dk">Modo oscuro</span><input type="checkbox" id="dark-chk" style="width:auto" onchange="toggleDark()"></div>
+        <div class="dr"><span class="dk">Tamaño de fuente</span><select style="width:110px;padding:4px" onchange="setFontSize(this.value)"><option value="fs-sm">Pequeño</option><option value="fs-md" selected>Normal</option><option value="fs-lg">Grande</option><option value="fs-xl">Muy grande</option></select></div>
+        <div class="dr"><span class="dk">Decimales</span><select style="width:70px;padding:4px"><option>2</option><option>4</option></select></div>
+        <div class="dr"><span class="dk">Formato fecha</span><select style="width:115px;padding:4px"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option></select></div>
+      </div>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Seguridad</div>
+      <div class="card">
+        <div class="dr"><span class="dk">Bloqueo al pasar a segundo plano</span><input type="checkbox" id="lock-enabled" checked style="width:auto" onchange="lockSettings.enabled=this.checked"></div>
+        <div class="dr"><span class="dk">Tiempo de gracia</span><select id="lock-grace" style="width:100px;padding:4px" onchange="lockSettings.grace=parseInt(this.value)"><option value="0">Inmediato</option><option value="30">30 seg</option><option value="60" selected>1 min</option><option value="300">5 min</option></select></div>
+        <div class="dr"><span class="dk">Agitar para enmascarar cifras</span><input type="checkbox" checked style="width:auto"></div>
+      </div>
+      <div style="font-size:11px;color:var(--t2);margin-top:6px;padding:0 2px;line-height:1.5">Si abandonas la app durante más del tiempo de gracia configurado, deberás volver a introducir tu contraseña al regresar.</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:7px">
         <div class="slabel" style="margin-bottom:0">Brokers y cuentas</div>
         <button class="btn btn-sm" onclick="openAddCuenta()">+ Añadir</button>
       </div>
@@ -513,31 +525,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       </div>
       <div id="grupos-dnd-list"></div>
       <div class="chip-row" id="grupos-chips" style="display:none"></div>
-      <div class="slabel" style="margin-top:4px;margin-bottom:7px">Seguridad</div>
-      <div class="card">
-        <div class="dr"><span class="dk">Bloqueo al pasar a segundo plano</span><input type="checkbox" id="lock-enabled" checked style="width:auto" onchange="lockSettings.enabled=this.checked"></div>
-        <div class="dr"><span class="dk">Tiempo de gracia</span><select id="lock-grace" style="width:100px;padding:4px" onchange="lockSettings.grace=parseInt(this.value)"><option value="0">Inmediato</option><option value="30">30 seg</option><option value="60" selected>1 min</option><option value="300">5 min</option></select></div>
-        <div class="dr"><span class="dk">Agitar para enmascarar cifras</span><input type="checkbox" checked style="width:auto"></div>
-      </div>
-      <div style="font-size:11px;color:var(--t2);margin-top:6px;padding:0 2px;line-height:1.5">Si abandonas la app durante más del tiempo de gracia configurado, deberás volver a introducir tu contraseña al regresar.</div>
-      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Interfaz</div>
-      <div class="card">
-        <div class="dr"><span class="dk">Modo oscuro</span><input type="checkbox" id="dark-chk" style="width:auto" onchange="toggleDark()"></div>
-        <div class="dr"><span class="dk">Tamaño de fuente</span><select style="width:110px;padding:4px" onchange="setFontSize(this.value)"><option value="fs-sm">Pequeño</option><option value="fs-md" selected>Normal</option><option value="fs-lg">Grande</option><option value="fs-xl">Muy grande</option></select></div>
-        <div class="dr"><span class="dk">Decimales</span><select style="width:70px;padding:4px"><option>2</option><option>4</option></select></div>
-        <div class="dr"><span class="dk">Formato fecha</span><select style="width:115px;padding:4px"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option></select></div>
-      </div>
-      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Datos</div>
-      <div class="card">
-        <div class="dr"><span class="dk">Exportar Excel</span><button class="btn btn-sm">Exportar</button></div>
-        <div class="dr"><span class="dk">Exportar CSV</span><button class="btn btn-sm">Exportar</button></div>
-        <div class="dr"><span class="dk">Importar PDF broker</span><button class="btn btn-sm">Importar</button></div>
-        <div class="dr"><span class="dk">Backup</span><button class="btn btn-sm">Backup</button></div>
-      </div>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Divisas activas</div>
+      <div class="chip-row"><span class="tag selected">EUR</span><span class="tag selected">USD</span><span class="tag">GBP</span><span class="tag">CHF</span><span class="tag">+ Añadir</span></div>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Plataformas externas</div>
       <button class="btn" style="margin-bottom:10px" onclick="goTo('s-plataformas')">Gestionar accesos directos</button>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Contenido</div>
       <button class="btn" style="margin-bottom:10px" onclick="goTo('s-canales')">🎓 Canales recomendados</button>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Datos</div>
+      <button class="btn" style="margin-bottom:10px" onclick="openModal('m-datos')">📤 Exportar · Importar · Backup</button>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Cuenta</div>
       <button class="btn" style="margin-bottom:6px" onclick="goTo('s-perfil')">👤 Mi perfil y sesiones</button>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Soporte y ayuda</div>
@@ -863,6 +858,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   <div class="fg"><label>Nueva contraseña</label><div style="position:relative"><input type="password" id="pwd-nueva" style="padding-right:38px"><button type="button" onclick="togglePwd('pwd-nueva',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:16px">👁</button></div></div>
   <div class="fg"><label>Repetir nueva contraseña</label><div style="position:relative"><input type="password" id="pwd-rep" style="padding-right:38px"><button type="button" onclick="togglePwd('pwd-rep',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:16px">👁</button></div></div>
   <button class="btn btn-p" onclick="closeModal('m-cambio-pwd')">Guardar contraseña</button>
+</div></div>
+
+<div class="modal-overlay" id="m-datos"><div class="modal">
+  <div class="mhdr"><span class="mtitle">Datos</span><button class="btn-icon" onclick="closeModal('m-datos')">✕</button></div>
+  <div class="slabel" style="margin-bottom:8px">Exportar</div>
+  <button class="btn" style="margin-bottom:6px" onclick="showToast('Exportación Excel no disponible en el prototipo')">📊 Exportar Excel</button>
+  <button class="btn" style="margin-bottom:12px" onclick="showToast('Exportación CSV no disponible en el prototipo')">📄 Exportar CSV</button>
+  <div class="slabel" style="margin-bottom:8px">Importar</div>
+  <button class="btn" style="margin-bottom:12px" onclick="showToast('Importación PDF no disponible en el prototipo')">📥 Importar PDF de broker</button>
+  <div class="slabel" style="margin-bottom:8px">Copia de seguridad</div>
+  <button class="btn" onclick="showToast('Backup no disponible en el prototipo')">💾 Hacer backup</button>
 </div></div>
 
 <div class="modal-overlay" id="m-soporte"><div class="modal">
