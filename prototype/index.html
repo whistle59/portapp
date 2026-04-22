@@ -95,6 +95,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 .qbtn:hover{background:var(--bg1);color:var(--t0)}
 .breadcrumb{display:flex;align-items:center;gap:4px;margin-bottom:12px;font-size:12px;color:var(--t1)}
 .bc-link{cursor:pointer;color:var(--ac);background:none;border:none;font-size:13px;font-weight:600;font-family:inherit;padding:0}
+/* ── AYUDA (H1) ─────────────────────────────────── */
+#s-ayuda details{border:.5px solid var(--bd);border-radius:10px;margin-bottom:6px;overflow:hidden}
+#s-ayuda details summary{padding:11px 14px;font-size:13px;font-weight:600;color:var(--t0);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;background:var(--bg1)}
+#s-ayuda details summary::-webkit-details-marker{display:none}
+#s-ayuda details summary::after{content:'›';font-size:18px;color:var(--t1);transition:transform .2s;line-height:1}
+#s-ayuda details[open] summary::after{transform:rotate(90deg)}
+#s-ayuda details .det-body{padding:11px 14px;font-size:13px;color:var(--t1);line-height:1.65;background:var(--bg0)}
+#s-ayuda details .det-body ol{margin:0;padding-left:18px}
+#s-ayuda details .det-body ol li{margin-bottom:6px}
+#s-ayuda .help-step{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;font-size:13px;color:var(--t1);line-height:1.55}
+#s-ayuda .help-step-num{min-width:22px;height:22px;border-radius:50%;background:var(--ac);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
 /* ── DRAG & DROP (F10) ─────────────────────────── */
 .dnd-item{cursor:grab;transition:background .15s,opacity .15s;border-radius:10px}
 .dnd-item.dragging{opacity:.4;cursor:grabbing}
@@ -537,6 +548,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Cuenta</div>
       <button class="btn" style="margin-bottom:6px" onclick="goTo('s-perfil')">👤 Mi perfil y sesiones</button>
       <div class="slabel" style="margin-top:12px;margin-bottom:7px">Soporte y ayuda</div>
+      <button class="btn" style="margin-bottom:6px" onclick="goTo('s-ayuda')">❓ Guía de uso y preguntas frecuentes</button>
       <div class="card">
         <div class="dr"><span class="dk">Email de soporte</span><a href="mailto:soporte@portapp.com" style="font-size:12px;color:var(--ac);text-decoration:none">soporte@portapp.com</a></div>
         <div class="dr"><span class="dk">Versión</span><span class="dv">v6 · prototipo</span></div>
@@ -544,6 +556,59 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <button class="btn" style="margin-top:6px;margin-bottom:10px" onclick="openModal('m-soporte')">✉️ Enviar mensaje al soporte</button>
       <div class="slabel" style="margin-top:4px;margin-bottom:7px">Sesión</div>
       <button class="btn" onclick="resetAuth()" style="color:var(--neg);border-color:var(--neg)">Cerrar sesión</button>
+    </div>
+
+    <!-- AYUDA (H1+H3) -->
+    <div class="screen" id="s-ayuda">
+      <div class="breadcrumb"><button class="bc-link" onclick="goTo('s-settings')">← Ajustes</button></div>
+      <div class="screen-title">Guía de uso</div>
+
+      <div class="slabel" style="margin-bottom:8px">Pantallas</div>
+
+      <details><summary>Global</summary><div class="det-body">Visión consolidada de todas tus carteras. Muestra el valor total de tu patrimonio, la rentabilidad global y cómo está distribuido el capital por tipo de activo.</div></details>
+      <details><summary>Resumen</summary><div class="det-body">Estado detallado de la cartera que tienes seleccionada. Incluye valor actual, dinero invertido, ganancias o pérdidas, y un gráfico con la evolución histórica del valor.</div></details>
+      <details><summary>Cartera</summary><div class="det-body">Lista de todas tus posiciones abiertas: acciones, ETFs y criptomonedas. Filtra por tipo de activo y consulta tu exposición por región y divisa. Toca cualquier activo para ver su detalle completo.</div></details>
+      <details><summary>Efectivo</summary><div class="det-body">Controla el dinero en tus cuentas. Registra entradas y salidas y consulta los saldos desglosados por broker o cuenta bancaria.</div></details>
+      <details><summary>Operaciones</summary><div class="det-body">Historial completo de compras, ventas, dividendos y staking. Para añadir una operación nueva, pulsa el botón <strong>+</strong> que aparece en la barra superior en cualquier pantalla.</div></details>
+      <details><summary>Proyección DCA</summary><div class="det-body">Calculadora de inversión periódica. Indica cuánto quieres aportar, con qué frecuencia y qué rentabilidad esperas, y la app te muestra cómo crecería tu cartera año a año.</div></details>
+      <details><summary>Índices</summary><div class="det-body">Consulta los índices asociados a tus activos: rentabilidad en el año (YTD), últimos 12 meses, PER y dividendo. Solo aparecen índices con activos en tu cartera activa.</div></details>
+      <details><summary>Avisos</summary><div class="det-body">Alertas configurables sobre variaciones de precio y recordatorios de aportación DCA. El icono 🔔 de la barra superior se pone en rojo cuando tienes avisos sin leer.</div></details>
+      <details><summary>Rentabilidad</summary><div class="det-body">Tu rentabilidad real calculada con el método TWR (Time-Weighted Return), que elimina el efecto de las aportaciones y retiradas. Puedes filtrar por período: 1M, 3M, 6M, 1A o todo el historial.</div></details>
+      <details><summary>Grupos</summary><div class="det-body">Muestra cuánto capital tienes en cada grupo de activos (por ejemplo "Acciones", "ETFs", "Cripto") y qué porcentaje representa sobre el total de la cartera.</div></details>
+      <details><summary>Anotaciones</summary><div class="det-body">Espacio libre para apuntar ideas, tesis de inversión o reflexiones sobre tu estrategia. Las anotaciones son globales y no están vinculadas a ninguna cartera concreta.</div></details>
+      <details><summary>Aprende</summary><div class="det-body">Canales de YouTube curados sobre inversión, organizados por categoría. Marca tus favoritos con ⭐ para acceder a ellos rápidamente.</div></details>
+
+      <div class="slabel" style="margin-top:18px;margin-bottom:8px">Preguntas frecuentes</div>
+
+      <details><summary>¿Cómo añado una operación?</summary><div class="det-body">Pulsa el botón <strong>+</strong> que aparece en la barra superior. Puedes hacerlo desde cualquier pantalla. Rellena los datos (fecha, ticker, tipo, precio…) y guarda.</div></details>
+      <details><summary>¿Cómo cambio de cartera?</summary><div class="det-body">Toca el nombre de la cartera activa en la barra superior. Se abre el selector de carteras. Pulsa sobre la que quieras activar.</div></details>
+      <details><summary>¿Cómo creo una cartera nueva?</summary><div class="det-body">Toca el nombre de la cartera en la barra superior y pulsa <strong>"+ Nueva cartera"</strong> en la parte inferior del selector.</div></details>
+      <details><summary>¿Qué es el método TWR?</summary><div class="det-body">TWR (Time-Weighted Return) es la forma estándar de medir la rentabilidad real de una cartera. Elimina el efecto de cuándo hiciste cada aportación o retirada, por lo que refleja únicamente el rendimiento de las inversiones. Es el método que usan los fondos de inversión para publicar su rentabilidad.</div></details>
+      <details><summary>¿Cómo oculto las cifras si alguien ve mi pantalla?</summary><div class="det-body">Pulsa el icono <strong>👁</strong> de la barra superior. Todas las cifras de la app se enmascaran con ••••. Tócalo de nuevo para desactivarlo, o pulsa la barra que aparece en la parte superior de la pantalla.</div></details>
+      <details><summary>¿Cómo activo el modo oscuro?</summary><div class="det-body">Ve a <strong>Ajustes &gt; Interfaz</strong> y activa el interruptor de modo oscuro.</div></details>
+      <details><summary>¿Mis datos se envían a algún servidor?</summary><div class="det-body">No. El prototipo funciona completamente en tu navegador, sin enviar ningún dato a servidores externos. En la versión de producción, los datos se guardarán en tu dispositivo y solo se sincronizarán con la nube si tú lo activas expresamente.</div></details>
+      <details><summary>¿Qué pasa si cierro el navegador?</summary><div class="det-body">En el prototipo actual los datos de la sesión no se guardan — al cerrar y volver a abrir la app, los datos vuelven al estado inicial de demo. En la versión de producción los datos quedarán guardados permanentemente en tu dispositivo.</div></details>
+
+      <div class="slabel" style="margin-top:18px;margin-bottom:8px">Copia de seguridad</div>
+
+      <details><summary>Cómo hacer un backup</summary><div class="det-body">
+        <div class="help-step"><div class="help-step-num">1</div><div>Ve a <strong>Ajustes &gt; Datos</strong> y pulsa <strong>"📤 Exportar · Importar · Backup"</strong>.</div></div>
+        <div class="help-step"><div class="help-step-num">2</div><div>En el panel que se abre, baja hasta la sección <strong>Copia de seguridad</strong>.</div></div>
+        <div class="help-step"><div class="help-step-num">3</div><div>Pulsa <strong>"💾 Hacer backup"</strong>. Se descargará un archivo con todos tus datos.</div></div>
+        <div class="help-step"><div class="help-step-num">4</div><div>Guarda ese archivo en un lugar seguro: iCloud, Google Drive, una carpeta de tu ordenador, etc.</div></div>
+        <div style="margin-top:4px;font-size:12px;color:var(--t2)">⚠️ Cada backup sobreescribe el anterior. Guarda el archivo descargado antes de hacer uno nuevo si quieres conservar el histórico.</div>
+      </div></details>
+
+      <details><summary>Cómo restaurar un backup</summary><div class="det-body">
+        <div style="background:var(--neg-bg,#fff0f0);border-left:3px solid var(--neg);padding:9px 12px;border-radius:6px;font-size:12px;color:var(--t1);margin-bottom:12px;line-height:1.55">⚠️ <strong>Atención:</strong> restaurar un backup reemplaza todos los datos actuales de la app por los del backup. Las operaciones registradas después de esa fecha se perderán.</div>
+        <div class="help-step"><div class="help-step-num">1</div><div>Ve a <strong>Ajustes &gt; Datos</strong> y pulsa <strong>"📤 Exportar · Importar · Backup"</strong>.</div></div>
+        <div class="help-step"><div class="help-step-num">2</div><div>Pulsa <strong>"📥 Restaurar backup"</strong> y selecciona el archivo de backup que quieres usar.</div></div>
+        <div class="help-step"><div class="help-step-num">3</div><div>La app te mostrará la fecha del backup y te pedirá confirmación. Lee el aviso con calma antes de continuar.</div></div>
+        <div class="help-step"><div class="help-step-num">4</div><div>Antes de restaurar, la app guarda automáticamente una copia de tu estado actual, por si necesitas recuperarlo.</div></div>
+        <div class="help-step"><div class="help-step-num">5</div><div>Confirma la restauración. Al terminar verás un resumen con el número de carteras, activos y operaciones restauradas.</div></div>
+        <div style="margin-top:4px;font-size:12px;color:var(--t2)">💡 Si te equivocas al restaurar, puedes volver al estado anterior usando la copia automática que la app guardó en el paso 4.</div>
+      </div></details>
+
     </div>
 
     <!-- RENTABILIDAD (F1) -->
@@ -1086,8 +1151,8 @@ function toggleDark(){document.documentElement.classList.toggle('dark');document
 function setFontSize(cls){['fs-sm','fs-md','fs-lg','fs-xl'].forEach(c=>document.documentElement.classList.remove(c));document.documentElement.classList.add(cls);}
 function togglePwd(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.style.opacity=el.type==='text'?'1':'0.5';}
 function reCharts(){const a=id=>document.getElementById(id).classList.contains('active');if(a('s-global'))requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));if(a('s-resumen'))requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));if(a('s-rentabilidad'))requestAnimationFrame(()=>requestAnimationFrame(renderRentabilidad));if(a('s-grupos'))requestAnimationFrame(()=>requestAnimationFrame(renderGruposCapital));}
-const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones','s-canales'];
-const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas','s-canales':'Aprende'};
+const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones','s-canales','s-ayuda'];
+const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas','s-canales':'Aprende','s-ayuda':'Ayuda'};
 const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
 function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;
   if(sid==='s-global'){requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));}
@@ -1105,9 +1170,11 @@ function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.r
   else if(sid==='s-anotaciones')renderAnotaciones();
   else if(sid==='s-perfil')renderPerfil();
   else if(sid==='s-canales')renderCanales();
+  else if(sid==='s-ayuda')renderAyuda();
   else if(sid==='s-proyeccion'){const el=document.getElementById('dca-base-display');if(el)el.textContent=fe(cV(activeId)||0);}
 }
-function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones','canales'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
+function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones','canales'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil'&&id!=='s-ayuda').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
+function renderAyuda(){}
 function openModal(id){document.getElementById(id).classList.add('open');if(id==='m-portfolios')renderPortList();if(id==='m-op'||id==='m-efectivo')fillCS();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function closeAllModals(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));}
