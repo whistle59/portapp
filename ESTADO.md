@@ -1674,3 +1674,27 @@ El restore es la operación más delicada — sobreescribe datos locales que pue
 4. **Resultado:** mostrar resumen de lo restaurado (nº de carteras, operaciones, activos).
 
 **Por qué el backup automático previo al restore es crítico:** convierte una operación irreversible en reversible — el usuario siempre tiene un punto de retorno aunque se equivoque.
+
+---
+
+#### Asistente guiado paso a paso (wizard)
+
+El flujo de backup y especialmente el de restore deben implementarse como un **asistente paso a paso** (wizard), no como una pantalla única con un botón. El usuario no técnico necesita ser guiado, no informado.
+
+**Principios del wizard:**
+- Una sola acción por pantalla — nunca mostrar todo el proceso a la vez.
+- Botones claros: **"Siguiente →"** y **"← Atrás"** (excepto en el último paso).
+- El usuario no puede avanzar sin haber leído y confirmado el paso actual.
+- En pasos destructivos o irreversibles, el botón de avance cambia de estilo (rojo / destructivo) para reforzar la gravedad de la acción.
+
+**Estructura propuesta para el wizard de Restore:**
+
+| Paso | Contenido |
+|---|---|
+| 1 — Selección | "¿Qué archivo de backup quieres restaurar?" — selector de archivo con fecha visible |
+| 2 — Aviso de riesgo | Explicar en lenguaje llano qué datos se perderán y desde cuándo |
+| 3 — Backup de seguridad | "Vamos a guardar una copia de tu estado actual antes de continuar" — ejecutar y confirmar |
+| 4 — Confirmación final | Botón rojo "Sí, restaurar backup" — último punto de retorno |
+| 5 — Resultado | Resumen: nº carteras, activos y operaciones restauradas. Botón "Ir a inicio" |
+
+**Por qué wizard y no pantalla única:** en una pantalla única el usuario escanea en diagonal y pulsa el botón sin leer. El wizard obliga a procesar cada paso de forma consciente, reduce errores y genera confianza en usuarios no técnicos.
