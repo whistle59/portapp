@@ -93,7 +93,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 .qbtn{padding:3px 8px;border:.5px solid var(--bd2);border-radius:5px;background:none;font-size:11px;color:var(--t1);cursor:pointer;font-family:inherit}
 .qbtn:hover{background:var(--bg1);color:var(--t0)}
 .breadcrumb{display:flex;align-items:center;gap:4px;margin-bottom:12px;font-size:12px;color:var(--t1)}
-.bc-link{cursor:pointer;color:var(--ac);background:none;border:none;font-size:12px;font-family:inherit;padding:0}
+.bc-link{cursor:pointer;color:var(--ac);background:none;border:none;font-size:13px;font-weight:600;font-family:inherit;padding:0}
 /* ── DRAG & DROP (F10) ─────────────────────────── */
 .dnd-item{cursor:grab;transition:background .15s,opacity .15s;border-radius:10px}
 .dnd-item.dragging{opacity:.4;cursor:grabbing}
@@ -414,7 +414,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       </div>
       <div id="panel-detalle" style="display:none">
         <div class="breadcrumb">
-          <button class="bc-link" onclick="backOps()">Operaciones</button>
+          <button class="bc-link" onclick="backOps()">← Operaciones</button>
           <span>/</span><span id="d-titulo" style="font-weight:600;color:var(--t0)">Activo</span>
         </div>
         <div class="metric-grid">
