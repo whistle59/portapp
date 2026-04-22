@@ -1653,3 +1653,24 @@ Antes de empezar producción hay que elegir entre las dos arquitecturas. El Prot
 |---|---|
 | **Local-first** (recomendada) | Si el Prototipo 2 demuestra que el sync es manejable y el argumento de privacidad resuena con los testers |
 | **Cliente-servidor (Next.js)** | Si el sync resulta demasiado complejo o si el B2B desktop es prioritario desde el inicio |
+
+---
+
+### Requisitos de UX para backup y restore (local-first)
+
+#### Backup
+
+- Antes de ejecutar el backup, mostrar aviso explícito: **"Esto sobreescribirá tu backup anterior. Los datos del backup existente se perderán. ¿Continuar?"** — pedir confirmación obligatoria.
+- El backup debe incluir fecha y hora en el nombre del archivo para que el usuario sepa cuándo se hizo.
+
+#### Restore
+
+El restore es la operación más delicada — sobreescribe datos locales que pueden ser **más recientes que el backup**. El usuario no técnico no intuye este riesgo.
+
+**Flujo obligatorio:**
+1. **Aviso inicial:** "Vas a restaurar un backup del [fecha]. Todos los datos actuales de la app serán reemplazados por los del backup. Las operaciones registradas desde esa fecha se perderán."
+2. **Backup automático de seguridad:** antes de ejecutar el restore, la app hace automáticamente un backup del estado actual. Mensaje: "Hemos guardado una copia de tu estado actual por si necesitas recuperarlo."
+3. **Confirmación final:** "¿Confirmas que quieres restaurar el backup del [fecha]? Esta acción no se puede deshacer."
+4. **Resultado:** mostrar resumen de lo restaurado (nº de carteras, operaciones, activos).
+
+**Por qué el backup automático previo al restore es crítico:** convierte una operación irreversible en reversible — el usuario siempre tiene un punto de retorno aunque se equivoque.
