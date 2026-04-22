@@ -1,6 +1,6 @@
 # portapp — TODO & Tracking
 
-> Última actualización: 2026-04-21 · Prototipo v6
+> Última actualización: 2026-04-22 · Prototipo v6
 
 ---
 
@@ -19,68 +19,80 @@
 - **F10** — Grupos de activos: CRUD + drag & drop (#18)
 
 ### Bloque 3 — Pulido + Datos reales
-- **P1** — Contraste modo oscuro (`--t1`, `--t2`) (#3)
-- **P2** — Tamaño de fuente configurable en Ajustes (#4)
-- **P3** — Dropdown de activos en nueva operación (#5)
-- **P4** — Notificaciones: borrar + favorita (#6)
-- **P5** — Exposición Región/Divisa recalcula al filtrar (#7)
-- **P6** — Toggle mostrar/ocultar contraseña (#8)
-- **F1** — Rentabilidad TWR real (sin Math.random) (#9)
+- **P1–P6** — Contraste oscuro, fuente, dropdown activos, notificaciones, exposición, toggle pwd (#3–8)
+- **F1** — Rentabilidad TWR real (#9)
 - **F2** — Capital por grupos con porcentajes (#10)
-- **F5** — Rentabilidad del efectivo real (sin saldo hardcodeado) (#13)
+- **F5** — Rentabilidad del efectivo real (#13)
 
 ### Bloque 4 — Perfil + Canales
-- **F4** — Perfil de usuario dinámico (renderPerfil, savePerfil, sesiones) (#12)
-- **F12** — Pantalla "Aprende": canales YouTube curados con filtros y favoritos (#20)
+- **F4** — Perfil de usuario dinámico (#12)
+- **F12** — Pantalla "Aprende": canales YouTube curados (#20)
 
 ### Bloque 5 — Datos reales + DCA mejorado
-- **S1** — Datos de muestra enriquecidos: +4 activos, +11 ops (cubre 1M/3M/6M), +13 movimientos efectivo en 3 carteras
-- **F6** — Proyección DCA con arrastre anual explícito, métricas de capitalización y toggle simple/detallado (#14)
-- **F11** — Compartir cartera: modal con duración (perm/3h/24h), modo solo porcentajes, copiar y revocar (#19)
+- **S1** — Datos de muestra enriquecidos (3 carteras, ops 1M/3M/6M, dividendos, staking)
+- **F6** — Proyección DCA con arrastre anual + métricas capitalización (#14)
+- **F11** — Compartir cartera: modal perm/3h/24h, solo porcentajes (#19)
 
 ### Bloque 6 — UX y accesibilidad
-- **S7** — Onboarding: modal 3 pasos al entrar sin carteras
-- **S8** — Tooltips ⓘ en TWR, Exposición Región y Divisa
-- **S9** — Validación en nueva operación + fix ticker desde select existente
-- **S10** — Confirm al borrar anotaciones
-- **S11** — Toast de feedback en guardar op, cartera y perfil
-- **S12** — Estado vacío en Cartera y Operaciones
-- **S13** — Nav: "Proy." → "DCA", "Índices" → "Mercado"
-- **S14** — Valor de cartera activa visible en la topbar
+- **S7** — Onboarding modal 3 pasos
+- **S8** — Tooltips ⓘ en métricas técnicas
+- **S9** — Validación en nueva operación + fix ticker
+- **S10/S11** — Confirm al borrar + toasts de feedback
+- **S12** — Estados vacíos en Cartera y Operaciones
+- **S13/S14** — Labels nav bar + valor cartera en topbar
+
+### Bloque 7 — Bugs, pulido y arquitectura
+- Métricas pantalla Global hardcodeadas → calculadas desde datos reales
+- Brokers selects en formularios → poblados dinámicamente desde `cuentas[]`
+- Lock screen: timer → elapsed time (fiable en segundo plano móvil)
+- Escudo de privacidad en multitarea (mask + shield overlay)
+- `addCartera()` → auto-selecciona la nueva cartera al crearla
+- Filtro "Rendimiento" en Operaciones → añadidos ops de dividendos y staking
+- Nav bar fija al hacer scroll (min-height → height 100dvh)
+- Ajustes reordenados por frecuencia de uso (Interfaz primero)
+- Datos: 4 botones → modal único "📤 Exportar · Importar · Backup"
+- Breadcrumbs: más visibles (13px, negrita) + flecha añadida donde faltaba
+- Breadcrumb Rent. efectivo → apunta a Resumen (no Efectivo)
+- Nav bar activo → fondo `--ac-bg` para mayor distinción
+- Formulario soporte en Ajustes (email + dropdown de asunto)
+- TWR y labels técnicos → lenguaje accesible para usuario no técnico
+- Título versión → v6
+- Copyright notice en index.html
+- CI/CD GitHub Actions configurado (validación HTML en PR a main)
+- Flujo de ramas: `main` ← `dev` ← `feature/*`
 
 ---
 
 ## 🔄 Prototipo — Pendiente
 
-| # | Issue | Descripción | Prioridad |
-|---|---|---|---|
-| ~~F6~~ | ~~#14~~ | ~~Proyección DCA con arrastre automático de saldos anuales~~ | ✅ |
-| ~~F11~~ | ~~#19~~ | ~~Compartir cartera: enlace público~~ | ✅ |
-| F7 | #15 | Conexión con broker: lanzar sesión desde la app | Media |
-| F8 | #16 | Upload PDF broker: importación automática de movimientos | Media |
+| # | Descripción | Prioridad |
+|---|---|---|
+| F7 | Conexión con broker: lanzar sesión desde la app | Media |
+| F8 | Upload PDF broker: importación automática (requiere backend + IA) | Media |
+| S2 | Estado vacío en pantalla Global si no hay carteras | Baja |
+| S4 | Búsqueda/filtro en Operaciones por ticker o fecha | Baja |
 
 ---
 
-## 💡 Sugerencias (no en backlog todavía)
+## 📋 Próxima PR — Pendiente de implementar
 
-Estas son mejoras que surgen al revisar el código actual y que aportarían valor antes de pasar a producción:
+| # | Descripción |
+|---|---|
+| H1 | Pantalla `s-ayuda`: guía de uso por pantalla + FAQ respondidas |
+| H2 | Mostrar fecha y hora del último backup en Ajustes > Datos |
+| H3 | Documentar UX backup/restore en la pantalla de ayuda (ya en ESTADO.md sec 20) |
 
-| # | Descripción | Por qué |
-|---|---|---|
-| ~~S1~~ | ~~**Datos de muestra más ricos**~~ | ✅ Hecho en bloque 5 |
-| ~~S7~~ | ~~Onboarding~~ | ✅ |
-| ~~S8~~ | ~~Tooltips ⓘ~~ | ✅ |
-| ~~S9~~ | ~~Validación formularios~~ | ✅ |
-| ~~S10~~ | ~~Confirm al borrar~~ | ✅ |
-| ~~S11~~ | ~~Toast feedback~~ | ✅ |
-| ~~S12~~ | ~~Estados vacíos~~ | ✅ |
-| ~~S13~~ | ~~Labels nav bar~~ | ✅ |
-| ~~S14~~ | ~~Valor cartera en topbar~~ | ✅ |
-| S2 | **Estado vacío en pantalla Global** — mensaje si no hay carteras | Robustez básica |
-| S3 | **Validación en formularios** — nueva op, nuevo movimiento, nueva cartera | Actualmente aceptan campos vacíos sin aviso |
-| S4 | **Búsqueda/filtro en Operaciones** — filtrar por ticker o fecha además del tipo | Usabilidad cuando hay muchas ops |
-| S5 | **Pantalla de bienvenida (onboarding)** — primera vez que se entra sin carteras | Necesario antes del lanzamiento |
-| S6 | **ESTADO.md actualizado** — refleja v5 pero no los cambios del bloque 3 y 4 | Mantener documentación sincronizada |
+---
+
+## 🔭 Prototipo 2 — Local-first (pendiente de decidir)
+
+| # | Descripción |
+|---|---|
+| LF1 | Validar arquitectura: React Native + Expo SQLite + PowerSync/Electric SQL |
+| LF2 | Alcance mínimo: login, crear cartera + activo, offline, sync entre 2 dispositivos |
+| LF3 | Criterio: si sync funciona bien → adoptar local-first para producción |
+
+> Ver sección 20 de ESTADO.md para detalle completo.
 
 ---
 
@@ -90,10 +102,10 @@ Estas son mejoras que surgen al revisar el código actual y que aportarían valo
 |---|---|---|
 | PR1 | #21 | API de cotizaciones en tiempo real |
 | PR2 | #22 | Autenticación biométrica WebAuthn |
-| PR3 | #23 | Backend con base de datos persistente |
+| PR3 | #23 | Backend / SQLite local (según arquitectura elegida) |
 | PR4 | #24 | Exportación real Excel/CSV |
 | PR5 | #25 | Importación CSV desde brokers |
-| PR6 | #26 | Tipos de cambio automáticos (ECB/Fixer) |
+| PR6 | #26 | Tipos de cambio automáticos |
 | PR7 | #27 | SMS 2FA con Twilio |
 | PR8 | #28 | Email 2FA con Resend/SendGrid |
 | PR9 | #29 | Bot de asistencia (API de Claude) |
@@ -111,6 +123,7 @@ Estas son mejoras que surgen al revisar el código actual y que aportarían valo
 | SEC | #34 | Cifrado de campos sensibles en BD (AES-256) |
 | SEC | #35 | Cabeceras de seguridad HTTP (CSP, CORS, X-Frame) |
 | SEC | #36 | Aislamiento total entre usuarios |
+| M12 | — | FLAG_SECURE en app nativa (protección pantalla en multitarea) |
 
 ---
 
@@ -118,10 +131,11 @@ Estas son mejoras que surgen al revisar el código actual y que aportarían valo
 
 | # | Issue | Descripción |
 |---|---|---|
-| M1 | #37 | Definir estrategia: React Native vs PWA vs web |
-| M2 | #38 | Safe areas iOS y Android (notch, home indicator) |
+| M1 | #37 | Definir estrategia final: local-first (React Native) vs cliente-servidor (Next.js) |
+| M2 | #38 | Safe areas iOS y Android |
 | M3 | #39 | Touch targets mínimos 44×44px |
-| M4 | #40 | Navegación adaptativa móvil/tablet/escritorio |
+| M4 | #40 | Navegación adaptativa móvil/tablet/desktop |
+| M13 | — | GitHub Pro: branch protection completa (cuando haya tracción) |
 
 ---
 
@@ -129,7 +143,7 @@ Estas son mejoras que surgen al revisar el código actual y que aportarían valo
 
 | # | Issue | Descripción |
 |---|---|---|
-| A1 | #41 | Panel completo de backoffice (auth, usuarios, logs, stats) |
+| A1 | #41 | Panel completo de backoffice (auth, usuarios, logs, stats, canales YouTube) |
 
 ---
 
