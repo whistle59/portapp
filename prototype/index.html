@@ -300,6 +300,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     </div>
     <button class="tb-btn" onclick="openModal('m-op')">+ Op.</button>
     <button class="tb-btn" onclick="togglePrivacy()" title="Modo privado" style="font-size:15px;padding:5px 8px">👁</button>
+    <button class="tb-btn" onclick="goTo('s-ayuda')" title="Ayuda" style="font-size:15px;padding:5px 8px">❓</button>
     <div style="position:relative">
       <button class="tb-btn" onclick="goTo('s-anotaciones')" style="font-size:15px;padding:5px 8px" title="Anotaciones">📝</button>
       <div class="notif-dot" id="notas-dot" style="display:none"></div>
@@ -936,6 +937,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   <div class="slabel" style="margin-bottom:8px">Copia de seguridad</div>
   <button class="btn" onclick="doBackup()">💾 Hacer backup</button>
   <div id="backup-last" style="font-size:12px;color:var(--t1);margin-top:8px;text-align:center">Sin backup registrado</div>
+  <button class="note-add" style="margin-top:6px" onclick="closeModal('m-datos');goTo('s-ayuda')">¿Cómo funciona el backup? →</button>
 </div></div>
 
 <div class="modal-overlay" id="m-soporte"><div class="modal">
