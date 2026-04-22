@@ -1,6 +1,6 @@
 # portapp — Estado del proyecto
 
-> Última actualización: prototipo v6 — Bloques 3–6 completados · Arquitectura local-first en evaluación  
+> Última actualización: prototipo v6 — Bloques 3–8 completados · Arquitectura local-first en evaluación  
 > Credenciales demo: `usuario@portapp.com` / `demo1234` / 2FA: `123456`
 
 ---

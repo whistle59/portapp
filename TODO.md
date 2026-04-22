@@ -61,6 +61,13 @@
 - CI/CD GitHub Actions configurado (validación HTML en PR a main)
 - Flujo de ramas: `main` ← `dev` ← `feature/*`
 
+### Bloque 8 — Ayuda y accesibilidad
+- **H1** — Pantalla `s-ayuda`: guía de uso por pantalla + FAQ (acordeón nativo)
+- **H2** — Fecha y hora del último backup en Ajustes > Datos
+- **H3** — Guía backup/restore paso a paso en `s-ayuda` (usuario no técnico, local-first)
+- Botón ❓ en topbar → acceso directo a `s-ayuda` desde cualquier pantalla
+- Enlace contextual "¿Cómo funciona el backup?" en modal de Datos
+
 ---
 
 ## 🔄 Prototipo — Pendiente
@@ -76,11 +83,7 @@
 
 ## 📋 Próxima PR — Pendiente de implementar
 
-| # | Descripción |
-|---|---|
-| H1 | Pantalla `s-ayuda`: guía de uso por pantalla + FAQ respondidas |
-| H2 | Mostrar fecha y hora del último backup en Ajustes > Datos |
-| H3 | Documentar UX backup/restore en la pantalla de ayuda (ya en ESTADO.md sec 20) |
+*(vacío — sin items pendientes)*
 
 ---
 
