@@ -1753,4 +1753,178 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 | **Modelo normalizado (3FN)** | Tablas relacionales estándar. Más sencillo de mantener. | Sí para el modelo operacional (operaciones, carteras, activos) |
 | **Híbrido** | Modelo 3FN para datos operacionales + tablas de agregados para métricas históricas | Recomendado: separa escritura (operaciones) de lectura (dashboards) |
 
-**Recomendación provisional:** modelo normalizado 3FN para las entidades operacionales (carteras, activos, operaciones, efectivo) + tablas de snapshots periódicos para el historial de valor de cartera (necesario para el gráfico de evolución y el cálculo TWR). Decidir antes de diseñar el esquema de producción.
+**Decisión tomada (2026-04-23):** se usará **modelo Kimball** para el esquema de producción. Ver sección 23 para el detalle del modelo de datos en progreso.
+
+---
+
+## 23. Modelo de datos — Kimball (trabajo en progreso)
+
+> Diseño iniciado el 2026-04-23. Las tablas marcadas como ✅ están acordadas. Las marcadas como 📋 son propuesta de referencia pendiente de revisión.
+
+### Enfoque
+
+- **Kimball** para métricas, historial y analytics (fact tables + dimensiones SCD)
+- **3FN** para datos operacionales transaccionales (carteras, activos, operaciones)
+- Plataforma: **PostgreSQL en Supabase** (ver sección 24)
+
+---
+
+### ✅ Tablas acordadas
+
+#### `users`
+| Campo | Tipo | Notas |
+|---|---|---|
+| user_id | uuid PK | |
+| user_first_name | string | |
+| user_last_name | string | |
+| user_alias | string | |
+| user_main_email | string | |
+| user_secondary_email | string | Recuperación de cuenta |
+| user_mobile_number | string | SMS 2FA |
+| user_pwd | string | Hash bcrypt/argon2 — nunca en claro |
+| email_verified | boolean | |
+| 2fa_method | string | email\|sms\|totp |
+| plan | string | free\|personal\|pro |
+| open_account_date | timestamp | |
+| close_account_date | timestamp | Soft delete |
+
+#### `subscription_plan` *(SCD2 — historial de precios a lo largo del tiempo)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| subscription_plan_id | uuid PK | |
+| subscription_plan_name | string | |
+| subscription_plan_type | string | one_time\|recurring_annual\|recurring_monthly |
+| subscription_price | decimal(10,2) | |
+| valid_from | timestamp | SCD2 |
+| valid_to | timestamp | null = registro activo |
+| is_current | boolean | SCD2 |
+
+#### `user_subscription` *(un usuario puede tener N planes activos simultáneos)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| user_subscription_id | uuid PK | |
+| user_id | uuid FK → users | |
+| subscription_plan_id | uuid FK → subscription_plan | |
+| start_date | timestamp | |
+| end_date | timestamp | null = activo |
+| status | string | active\|cancelled\|expired |
+| payment_ref | string | Referencia externa Paddle |
+
+#### `payments` *(fact table — inmutable)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| payment_id | uuid PK | |
+| user_id | uuid FK → users | |
+| user_subscription_id | uuid FK → user_subscription | |
+| amount | decimal(10,2) | |
+| currency | string | |
+| payment_method | string | card\|transfer\|paypal… |
+| payment_status | string | completed\|failed\|refunded |
+| payment_date | timestamp | |
+| payment_ref | string | Referencia procesador (Paddle) |
+
+#### `app_usage` *(snapshot diaria — fact table)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| usage_id | uuid PK | |
+| user_id | uuid FK → users | |
+| usage_date | date | |
+| platform | string | ios\|android\|web |
+| total_sessions | int | |
+| total_duration_min | int | |
+| screens_visited | int | |
+| operations_added | int | |
+| last_active_at | timestamp | |
+| | | UNIQUE (user_id, usage_date, platform) |
+
+---
+
+### 📋 Propuesta de esquema operacional (referencia — pendiente de revisión)
+
+> Propuesta inicial para las entidades del núcleo de la app. A revisar y acordar en sesiones siguientes.
+
+#### `carteras`
+`id · user_id → users · nombre · descripcion · divisa_base · color · created_at · deleted_at`
+
+#### `grupos` *(globales por usuario)*
+`id · user_id → users · nombre · color · orden`
+
+#### `cuentas` *(brokers y cuentas bancarias)*
+`id · user_id → users · nombre · tipo (broker|banco) · iban · bic · created_at · deleted_at`
+
+#### `activos` *(posiciones — estado actual cacheado)*
+`id · cartera_id → carteras · ticker · nombre · isin · tipo (accion|etf|cripto|fondo) · mercado · bolsa · divisa · region_json · grupo_id → grupos · cuenta_id → cuentas · qty · precio_medio · cotizacion · cotizacion_fecha · created_at · deleted_at`
+
+#### `operaciones` *(log inmutable — nunca se edita)*
+`id · cartera_id → carteras · activo_id → activos · ticker* · tipo (compra|venta|dividendo|staking|split) · fecha · qty · precio · comision · divisa · cuenta_id → cuentas · nota · created_at`
+*ticker denormalizado para conservar integridad histórica*
+
+#### `efectivo`
+`id · cartera_id → carteras · cuenta_id → cuentas · tipo · importe · divisa · fecha · origen (manual|operacion) · operacion_id → operaciones · nota · created_at`
+
+#### `cotizaciones` *(histórico de precios)*
+`id · ticker · bolsa · divisa · precio · fecha · fuente (manual|yahoo|alphavantage)`
+
+#### `snapshots_cartera` *(para gráfico TWR e historial de valor)*
+`id · cartera_id → carteras · fecha · valor_total · invertido_total`
+
+#### `anotaciones`
+`id · user_id → users · texto · created_at · updated_at`
+
+#### `notas_activo`
+`id · activo_id → activos · texto · created_at`
+
+#### `notificaciones`
+`id · user_id → users · tipo · titulo · cuerpo · leida · favorita · created_at`
+
+#### `plataformas`
+`id · user_id → users · nombre · url · icono · orden`
+
+#### `tipos_cambio`
+`id · divisa_origen · divisa_destino · tasa · fecha · fuente`
+
+---
+
+### Reglas de integridad referencial (borrado)
+
+| Entidad | Regla |
+|---|---|
+| cartera | Soft delete — bloquear si tiene activos u operaciones |
+| activo | Soft delete — bloquear si tiene operaciones |
+| cuenta | Soft delete — bloquear si tiene operaciones o efectivo |
+| grupo | SET NULL en activos al borrar — no bloquear |
+| operacion | Nunca se borra — solo se anula con operación inversa |
+
+---
+
+## 24. Supabase como backend de portapp
+
+**Decisión (2026-04-23):** usar Supabase como plataforma de backend para portapp, tanto en arquitectura local-first (sync) como en cliente-servidor si se descarta local-first.
+
+### Usos previstos
+
+| Servicio Supabase | Uso en portapp |
+|---|---|
+| **PostgreSQL** | Base de datos principal — esquema Kimball (sec 23) |
+| **Auth** | Login, registro, sesiones, JWT, OAuth (Google/Apple), WebAuthn/biométrico — elimina gestión propia de auth |
+| **Realtime / Sync** | Integración con PowerSync o Electric SQL para sincronizar SQLite local ↔ PostgreSQL |
+| **Storage** | Archivos de backup del usuario, exports CSV/Excel, PDFs de broker para importación |
+| **Edge Functions** | Llamadas a APIs de cotizaciones, procesado de PDFs, envío de emails/SMS, notificaciones push |
+| **Row Level Security** | Garantía a nivel de BD de que cada usuario solo accede a sus datos — crítico para RGPD |
+
+### Administración
+- Dashboard web en `app.supabase.com` — editor SQL, visor de tablas, gestión de usuarios, logs
+- Connection string estándar PostgreSQL — compatible con DBeaver, TablePlus, pgAdmin
+- CLI para migraciones y despliegues
+
+### Plan gratuito
+Suficiente para Prototipo 2 y primeros meses de producción (500 MB BD, 5 GB egress, 50k usuarios auth). Limitación principal: proyectos se pausan tras 7 días sin actividad — acceptable en desarrollo, no en producción.
+
+---
+
+## 25. Requisitos funcionales — Actualización de cotizaciones
+
+- Botón manual para actualizar la cotización de todos los valores de todas las carteras — el usuario decide cuándo.
+- Cotización en tiempo real → **función premium**. Sin premium, el usuario actualiza manualmente.
+- Mostrar junto a cada valor la **fecha de la cotización**, o si no hay espacio, **hace cuántos días** no se actualiza.
+- La cotización es crítica para calcular el rendimiento de los activos — sin datos frescos el P&L no es fiable.

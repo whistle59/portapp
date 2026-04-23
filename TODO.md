@@ -116,7 +116,11 @@
 | PR11 | — | Selección de bolsa y divisa al comprar si el valor cotiza en varios mercados — ver ESTADO.md sec 21 |
 | PR12 | — | Verificación de fondos suficientes antes de confirmar compra — ver ESTADO.md sec 21 |
 | PR13 | — | Integridad referencial: modelo de entidades + reglas de borrado — ver ESTADO.md sec 22 |
-| PR14 | — | Decisión de modelado de datos: Kimball vs. 3FN vs. híbrido — ver ESTADO.md sec 22 |
+| PR14 | — | ~~Decisión de modelado de datos~~ → **Kimball adoptado** (ver ESTADO.md sec 23) |
+| PR15 | — | Completar esquema Kimball: tablas operacionales pendientes de revisión — ver ESTADO.md sec 23 |
+| PR16 | — | Botón actualización manual de cotizaciones + indicador de antigüedad — ver ESTADO.md sec 25 |
+| PR17 | — | Cotización en tiempo real como función premium — ver ESTADO.md sec 25 |
+| PR18 | — | Configurar Supabase como backend: Auth, Storage, RLS, Edge Functions — ver ESTADO.md sec 24 |
 
 ---
 
