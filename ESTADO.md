@@ -1698,3 +1698,59 @@ El flujo de backup y especialmente el de restore deben implementarse como un **a
 | 5 — Resultado | Resumen: nº carteras, activos y operaciones restauradas. Botón "Ir a inicio" |
 
 **Por qué wizard y no pantalla única:** en una pantalla única el usuario escanea en diagonal y pulsa el botón sin leer. El wizard obliga a procesar cada paso de forma consciente, reduce errores y genera confianza en usuarios no técnicos.
+
+---
+
+## 21. Requisitos funcionales — Compra de valores (producción)
+
+### Validación de ticker
+
+Antes de registrar una compra, la app debe verificar que el ticker introducido existe realmente, conectando con una plataforma de datos (Yahoo Finance, Alpha Vantage, ProRealTime u otra).
+
+### Selección de bolsa
+
+Si el ticker cotiza en más de una bolsa (p. ej. MSFT en NASDAQ y en bolsas europeas), se mostrará al usuario una lista para que elija en cuál desea ejecutar la compra. No se puede asumir la bolsa por defecto.
+
+### Selección de divisa
+
+Si en la bolsa elegida el valor cotiza en más de una divisa, se mostrará al usuario una lista para que elija la divisa de la operación. Relevante en bolsas europeas donde el mismo valor puede cotizar en EUR y GBP, por ejemplo.
+
+### Verificación de fondos
+
+Antes de confirmar la compra, la app debe comprobar que el broker seleccionado tiene saldo de efectivo suficiente para cubrir el importe de la operación (precio × cantidad + comisión estimada). Si no hay fondos suficientes, mostrar aviso claro y bloquear la confirmación.
+
+### Flujo completo propuesto
+
+```
+Introducir ticker
+  → Verificar existencia (API)
+    → Si cotiza en varias bolsas → elegir bolsa
+      → Si cotiza en varias divisas en esa bolsa → elegir divisa
+        → Verificar fondos en broker seleccionado
+          → Confirmar compra
+```
+
+---
+
+## 22. Modelo de datos — Decisiones pendientes (producción)
+
+### Integridad referencial
+
+Cualquier operación de borrado (cartera, broker, grupo, activo) debe verificar si existen registros dependientes antes de ejecutarse. Se requiere:
+
+- Definir el modelo de entidades y sus relaciones con claves foráneas explícitas.
+- Establecer reglas de cascada o bloqueo por entidad: p. ej. no se puede borrar un broker si tiene operaciones asociadas; no se puede borrar una cartera si tiene activos.
+- Validar estas restricciones tanto en el cliente (UX: avisos antes del borrado) como en la capa de datos (SQLite con `PRAGMA foreign_keys = ON` en local-first, o constraints en PostgreSQL en cliente-servidor).
+- Definir el comportamiento ante borrados en cascada vs. borrados bloqueados para cada relación.
+
+### Modelo dimensional — Kimball vs. otros enfoques
+
+Decisión pendiente sobre el enfoque de modelado de datos para las métricas y el historial:
+
+| Opción | Descripción | Adecuado para portapp |
+|---|---|---|
+| **Kimball (estrella/copo de nieve)** | Tablas de hechos + dimensiones. Optimizado para consultas analíticas. | Sí, si se prevén consultas complejas de rentabilidad, comparativas y reporting |
+| **Modelo normalizado (3FN)** | Tablas relacionales estándar. Más sencillo de mantener. | Sí para el modelo operacional (operaciones, carteras, activos) |
+| **Híbrido** | Modelo 3FN para datos operacionales + tablas de agregados para métricas históricas | Recomendado: separa escritura (operaciones) de lectura (dashboards) |
+
+**Recomendación provisional:** modelo normalizado 3FN para las entidades operacionales (carteras, activos, operaciones, efectivo) + tablas de snapshots periódicos para el historial de valor de cartera (necesario para el gráfico de evolución y el cálculo TWR). Decidir antes de diseñar el esquema de producción.
