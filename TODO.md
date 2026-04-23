@@ -112,6 +112,11 @@
 | PR7 | #27 | SMS 2FA con Twilio |
 | PR8 | #28 | Email 2FA con Resend/SendGrid |
 | PR9 | #29 | Bot de asistencia (API de Claude) |
+| PR10 | — | Validación de ticker al comprar (verificar existencia vía API) — ver ESTADO.md sec 21 |
+| PR11 | — | Selección de bolsa y divisa al comprar si el valor cotiza en varios mercados — ver ESTADO.md sec 21 |
+| PR12 | — | Verificación de fondos suficientes antes de confirmar compra — ver ESTADO.md sec 21 |
+| PR13 | — | Integridad referencial: modelo de entidades + reglas de borrado — ver ESTADO.md sec 22 |
+| PR14 | — | Decisión de modelado de datos: Kimball vs. 3FN vs. híbrido — ver ESTADO.md sec 22 |
 
 ---
 
