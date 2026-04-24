@@ -10,11 +10,11 @@
 | Decisión | Valor | Notas |
 |---|---|---|
 | Fase actual | Prototipo HTML v6 | Sin servidor, un solo archivo. Ver sección 2. |
-| Stack producción | **En evaluación** — ver sección 20 | Dos opciones: cliente-servidor (Next.js) vs local-first (React Native + SQLite) |
-| Auth | Email + contraseña + 2FA (email o SMS) | Biometría WebAuthn en v2 |
+| Stack producción | **Híbrido local-first + Supabase** — ver sección 20 | Datos del usuario en local con sync; cotizaciones, auth y pagos en servidor |
+| Auth | Email + contraseña + 2FA (email o SMS) | Biometría WebAuthn en v2 — gestionado por Supabase Auth |
 | Divisas | Multi-divisa (EUR, USD y otras) | Tipos de cambio manuales en prototipo, automáticos en producción |
-| Offline / cloud | **Local-first preferido** — ver sección 20 | Datos en dispositivo + sync opcional en nube |
-| Plataforma | **React Native + Expo** si se confirma local-first | iOS + Android + web desde una base de código |
+| Offline / cloud | **Híbrido** — ver sección 20 | Datos operacionales local-first + sync; resto en Supabase |
+| Plataforma | **React Native + Expo + web** | iOS + Android + web — las tres plataformas desde una base de código |
 | Nombre comercial | Pendiente de decidir | Nombre interno: portapp |
 | Repo | GitHub privado (whistle59/portapp) | Branches: `main` (estable) + `dev` (integración) + `feature/*` (trabajo) |
 | CI/CD | GitHub Actions | Validación HTML en cada push a `dev` y PR a `main` |
@@ -1541,13 +1541,36 @@ Importación confirmada por el usuario
 
 ---
 
-## 20. Arquitectura local-first — evaluación y plan
+## 20. Arquitectura híbrida — DECISIÓN TOMADA (2026-04-24)
 
-### Qué es local-first
+> **Decisión final:** arquitectura híbrida — local-first para datos del usuario + Supabase para servicios de sistema. La app estará disponible en **iOS, Android y web** desde una única base de código (React Native + Expo).
 
-Local-first es un modelo de arquitectura donde los datos del usuario viven primariamente en su dispositivo (SQLite local) y se sincronizan opcionalmente con la nube. La fuente de verdad es el dispositivo, no el servidor.
+### Modelo híbrido adoptado
 
-Apps consolidadas con este modelo: **Linear**, **Obsidian**, **Bear**, **Anytype**, **Capacitor**. Es una tendencia creciente precisamente por la privacidad y la fiabilidad offline.
+| Capa | Dónde vive | Motivo |
+|---|---|---|
+| Datos operacionales (carteras, activos, ops, efectivo) | SQLite local + sync Supabase | Offline total, respuesta instantánea, privacidad |
+| Cotizaciones | Solo Supabase | Se actualizan desde APIs externas — no aplica local |
+| Auth y sesiones | Supabase Auth | No hay ventaja en tenerlo local |
+| Pagos y suscripciones | Supabase + Paddle | Requieren servidor obligatoriamente |
+| Analytics / app_usage | Solo Supabase | Datos del sistema, no del usuario |
+
+**Argumento de venta:** "Tus datos financieros nunca salen de tu dispositivo — la app funciona sin conexión y se sincroniza cuando quieres."
+
+### Plataformas objetivo
+- **iOS** — App Store (React Native + Expo)
+- **Android** — Google Play (React Native + Expo)
+- **Web** — PWA o web app (Expo Web / React Native Web)
+
+Las tres plataformas comparten la misma base de código. El sync entre dispositivos (móvil ↔ web ↔ otro móvil) funciona via Supabase Realtime / PowerSync.
+
+---
+
+### Contexto — por qué se evaluó local-first puro
+
+Local-first es un modelo donde los datos del usuario viven primariamente en su dispositivo (SQLite local) y se sincronizan opcionalmente con la nube.
+
+Apps consolidadas con este modelo: **Linear**, **Obsidian**, **Bear**, **Anytype**. Es una tendencia creciente por la privacidad y la fiabilidad offline. El modelo híbrido adoptado toma lo mejor de este enfoque sin sacrificar la viabilidad de servicios que requieren servidor (cotizaciones, pagos, analytics).
 
 ---
 
@@ -1787,6 +1810,7 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 | plan | string | free\|personal\|pro |
 | open_account_date | timestamp | |
 | close_account_date | timestamp | Soft delete |
+| paddle_customer_id | string | ID del cliente en Paddle — nunca guardar datos de tarjeta |
 
 #### `subscription_plan` *(SCD2 — historial de precios a lo largo del tiempo)*
 | Campo | Tipo | Notas |
@@ -1809,6 +1833,7 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 | end_date | timestamp | null = activo |
 | status | string | active\|cancelled\|expired |
 | payment_ref | string | Referencia externa Paddle |
+| paddle_subscription_id | string | ID de suscripción recurrente en Paddle |
 
 #### `payments` *(fact table — inmutable)*
 | Campo | Tipo | Notas |
