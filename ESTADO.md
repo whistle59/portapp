@@ -1780,19 +1780,20 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 
 ---
 
-## 23. Modelo de datos — Kimball (trabajo en progreso)
+## 23. Modelo de datos — Kimball (CERRADO 2026-04-24)
 
-> Diseño iniciado el 2026-04-23. Las tablas marcadas como ✅ están acordadas. Las marcadas como 📋 son propuesta de referencia pendiente de revisión.
+> Modelo cerrado el 2026-04-24. Todas las tablas están acordadas. Pendiente: diagrama Mermaid en `docs/DATA_MODEL.md`.
 
 ### Enfoque
 
 - **Kimball** para métricas, historial y analytics (fact tables + dimensiones SCD)
-- **3FN** para datos operacionales transaccionales (carteras, activos, operaciones)
+- **3FN** para datos operacionales transaccionales
 - Plataforma: **PostgreSQL en Supabase** (ver sección 24)
+- Pagos: **Paddle** como Merchant of Record — nunca se guardan datos de tarjeta en BD
 
 ---
 
-### ✅ Tablas acordadas
+### Tablas acordadas
 
 #### `users`
 | Campo | Tipo | Notas |
@@ -1810,9 +1811,9 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 | plan | string | free\|personal\|pro |
 | open_account_date | timestamp | |
 | close_account_date | timestamp | Soft delete |
-| paddle_customer_id | string | ID del cliente en Paddle — nunca guardar datos de tarjeta |
+| paddle_customer_id | string | ID del cliente en Paddle |
 
-#### `subscription_plan` *(SCD2 — historial de precios a lo largo del tiempo)*
+#### `subscription_plan` *(SCD2)*
 | Campo | Tipo | Notas |
 |---|---|---|
 | subscription_plan_id | uuid PK | |
@@ -1823,7 +1824,7 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 | valid_to | timestamp | null = registro activo |
 | is_current | boolean | SCD2 |
 
-#### `user_subscription` *(un usuario puede tener N planes activos simultáneos)*
+#### `user_subscription` *(N planes activos por usuario)*
 | Campo | Tipo | Notas |
 |---|---|---|
 | user_subscription_id | uuid PK | |
@@ -1833,7 +1834,7 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 | end_date | timestamp | null = activo |
 | status | string | active\|cancelled\|expired |
 | payment_ref | string | Referencia externa Paddle |
-| paddle_subscription_id | string | ID de suscripción recurrente en Paddle |
+| paddle_subscription_id | string | ID suscripción recurrente en Paddle |
 
 #### `payments` *(fact table — inmutable)*
 | Campo | Tipo | Notas |
@@ -1862,51 +1863,189 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 | last_active_at | timestamp | |
 | | | UNIQUE (user_id, usage_date, platform) |
 
----
+#### `portfolio`
+| Campo | Tipo | Notas |
+|---|---|---|
+| portfolio_id | uuid PK | |
+| portfolio_name | string | |
+| portfolio_description | string | |
+| portfolio_main_currency | string | EUR\|USD\|GBP… |
+| portfolio_colour | string | Hex color |
+| portfolio_created_at | timestamp | |
+| portfolio_deleted_at | timestamp | Soft delete — bloquear si tiene activos activos |
 
-### 📋 Propuesta de esquema operacional (referencia — pendiente de revisión)
+#### `portfolio_members` *(N:M usuarios-carteras con permisos)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | uuid PK | |
+| portfolio_id | uuid FK → portfolio | |
+| user_id | uuid FK → users | |
+| role | string | owner\|editor\|viewer |
+| invited_by | uuid FK → users | |
+| joined_at | timestamp | |
+| status | string | active\|pending\|revoked |
 
-> Propuesta inicial para las entidades del núcleo de la app. A revisar y acordar en sesiones siguientes.
+#### `groups` *(globales por usuario)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| group_id | uuid PK | |
+| user_id | uuid FK → users | |
+| group_name | string | |
+| group_colour | string | Hex color |
+| group_order | int | Para drag & drop |
+| group_created_at | timestamp | |
 
-#### `carteras`
-`id · user_id → users · nombre · descripcion · divisa_base · color · created_at · deleted_at`
+#### `accounts` *(brokers, bancos y exchanges)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| account_id | uuid PK | |
+| user_id | uuid FK → users | |
+| account_name | string | |
+| account_type | string | broker\|bank\|crypto_exchange\|other |
+| account_iban | string | nullable |
+| account_bic | string | nullable |
+| account_created_at | timestamp | |
+| account_deleted_at | timestamp | Soft delete — bloquear si tiene operaciones o efectivo |
 
-#### `grupos` *(globales por usuario)*
-`id · user_id → users · nombre · color · orden`
+#### `assets` *(posiciones — estado actual cacheado)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| asset_id | uuid PK | |
+| portfolio_id | uuid FK → portfolio | |
+| group_id | uuid FK → groups | nullable — SET NULL si se borra el grupo |
+| account_id | uuid FK → accounts | Broker principal |
+| asset_ticker | string | Verificado vía API antes de insertar |
+| asset_name | string | |
+| asset_isin | string | nullable |
+| asset_type | string | stock\|etf\|crypto\|fund\|other |
+| asset_market | string | NASDAQ\|XETRA\|Crypto… |
+| asset_exchange | string | Código de bolsa elegido por el usuario |
+| asset_currency | string | Divisa elegida por el usuario |
+| asset_region_json | json | Distribución geográfica |
+| asset_index | string | nullable |
+| asset_qty | decimal | Cache — recalculado desde operations |
+| asset_avg_price | decimal | Cache — recalculado desde operations |
+| asset_last_price | decimal | Cotización actual |
+| asset_prev_price | decimal | Cotización día anterior — para variación diaria |
+| asset_price_date | timestamp | Fecha de la última cotización |
+| asset_created_at | timestamp | |
+| asset_deleted_at | timestamp | Soft delete — bloquear si tiene operaciones |
 
-#### `cuentas` *(brokers y cuentas bancarias)*
-`id · user_id → users · nombre · tipo (broker|banco) · iban · bic · created_at · deleted_at`
+#### `operations` *(fact table — inmutable, nunca se edita)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| operation_id | uuid PK | |
+| portfolio_id | uuid FK → portfolio | |
+| asset_id | uuid FK → assets | |
+| asset_ticker | string | Denormalizado — integridad histórica |
+| account_id | uuid FK → accounts | |
+| operation_type | string | buy\|sell\|dividend\|staking\|split\|other |
+| operation_date | date | |
+| operation_qty | decimal | |
+| operation_price | decimal | |
+| operation_fee | decimal | |
+| operation_currency | string | |
+| operation_note | string | nullable |
+| operation_created_at | timestamp | |
 
-#### `activos` *(posiciones — estado actual cacheado)*
-`id · cartera_id → carteras · ticker · nombre · isin · tipo (accion|etf|cripto|fondo) · mercado · bolsa · divisa · region_json · grupo_id → grupos · cuenta_id → cuentas · qty · precio_medio · cotizacion · cotizacion_fecha · created_at · deleted_at`
+#### `cash` *(movimientos de efectivo)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| cash_id | uuid PK | |
+| portfolio_id | uuid FK → portfolio | |
+| account_id | uuid FK → accounts | |
+| operation_id | uuid FK → operations | nullable |
+| cash_type | string | deposit\|withdrawal\|dividend\|staking\|fee\|interest\|other |
+| cash_amount | decimal | |
+| cash_currency | string | |
+| cash_date | date | |
+| cash_origin | string | manual\|operation |
+| cash_note | string | nullable |
+| cash_created_at | timestamp | |
 
-#### `operaciones` *(log inmutable — nunca se edita)*
-`id · cartera_id → carteras · activo_id → activos · ticker* · tipo (compra|venta|dividendo|staking|split) · fecha · qty · precio · comision · divisa · cuenta_id → cuentas · nota · created_at`
-*ticker denormalizado para conservar integridad histórica*
+#### `stock_prices` *(histórico de cotizaciones)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| price_id | uuid PK | |
+| asset_id | uuid FK → assets | nullable — permite precargar precios antes de tener el activo |
+| price_ticker | string | Denormalizado — integridad histórica |
+| price_exchange | string | Diferencia mismo ticker en distintos mercados |
+| price_currency | string | |
+| price_open | decimal | nullable |
+| price_close | decimal | |
+| price_high | decimal | nullable |
+| price_low | decimal | nullable |
+| price_volume | int | nullable |
+| price_date | date | |
+| price_source | string | manual\|yahoo\|alphavantage\|other |
+| price_created_at | timestamp | |
+| | | UNIQUE (price_ticker, price_exchange, price_date) |
 
-#### `efectivo`
-`id · cartera_id → carteras · cuenta_id → cuentas · tipo · importe · divisa · fecha · origen (manual|operacion) · operacion_id → operaciones · nota · created_at`
+#### `portfolio_snapshots` *(snapshot diaria — fact table)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| snapshot_id | uuid PK | |
+| portfolio_id | uuid FK → portfolio | |
+| snapshot_date | date | |
+| snapshot_total_value | decimal | Valor total de la cartera |
+| snapshot_total_invested | decimal | Capital invertido acumulado |
+| snapshot_cash_balance | decimal | Saldo de efectivo |
+| snapshot_currency | string | De portfolio_main_currency |
+| snapshot_created_at | timestamp | |
+| | | UNIQUE (portfolio_id, snapshot_date) |
 
-#### `cotizaciones` *(histórico de precios)*
-`id · ticker · bolsa · divisa · precio · fecha · fuente (manual|yahoo|alphavantage)`
+#### `annotations` *(anotaciones globales del usuario)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| annotation_id | uuid PK | |
+| user_id | uuid FK → users | |
+| annotation_text | text | |
+| annotation_created_at | timestamp | |
+| annotation_updated_at | timestamp | |
 
-#### `snapshots_cartera` *(para gráfico TWR e historial de valor)*
-`id · cartera_id → carteras · fecha · valor_total · invertido_total`
+#### `asset_notes` *(notas específicas de un activo)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| asset_note_id | uuid PK | |
+| asset_id | uuid FK → assets | |
+| user_id | uuid FK → users | |
+| asset_note_text | text | |
+| asset_note_created_at | timestamp | |
+| asset_note_updated_at | timestamp | |
 
-#### `anotaciones`
-`id · user_id → users · texto · created_at · updated_at`
+#### `notifications`
+| Campo | Tipo | Notas |
+|---|---|---|
+| notification_id | uuid PK | |
+| user_id | uuid FK → users | |
+| notification_type | string | alert\|dca\|info |
+| notification_title | string | |
+| notification_body | text | |
+| notification_read | boolean | |
+| notification_favourite | boolean | |
+| notification_created_at | timestamp | |
 
-#### `notas_activo`
-`id · activo_id → activos · texto · created_at`
+#### `platforms` *(accesos directos externos)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| platform_id | uuid PK | |
+| user_id | uuid FK → users | |
+| platform_name | string | |
+| platform_url | string | |
+| platform_icon | string | |
+| platform_order | int | |
+| platform_created_at | timestamp | |
 
-#### `notificaciones`
-`id · user_id → users · tipo · titulo · cuerpo · leida · favorita · created_at`
-
-#### `plataformas`
-`id · user_id → users · nombre · url · icono · orden`
-
-#### `tipos_cambio`
-`id · divisa_origen · divisa_destino · tasa · fecha · fuente`
+#### `exchange_rates` *(tipos de cambio)*
+| Campo | Tipo | Notas |
+|---|---|---|
+| rate_id | uuid PK | |
+| rate_currency_from | string | |
+| rate_currency_to | string | |
+| rate_value | decimal(10,6) | |
+| rate_date | date | |
+| rate_source | string | manual\|ecb\|fixer |
+| rate_created_at | timestamp | |
 
 ---
 
@@ -1914,11 +2053,19 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 
 | Entidad | Regla |
 |---|---|
-| cartera | Soft delete — bloquear si tiene activos u operaciones |
-| activo | Soft delete — bloquear si tiene operaciones |
-| cuenta | Soft delete — bloquear si tiene operaciones o efectivo |
-| grupo | SET NULL en activos al borrar — no bloquear |
-| operacion | Nunca se borra — solo se anula con operación inversa |
+| portfolio | Soft delete — bloquear si tiene assets u operations |
+| assets | Soft delete — bloquear si tiene operations |
+| accounts | Soft delete — bloquear si tiene operations o cash |
+| groups | SET NULL en assets.group_id al borrar — no bloquear |
+| operations | Nunca se borra — solo se anula con operación inversa |
+| annotations / asset_notes | Borrado físico — sin implicaciones de integridad |
+
+---
+
+### Pendiente
+
+- Diagrama Mermaid completo → `docs/DATA_MODEL.md`
+- Exports y reports en PDF → pendiente de diseñar contenido y formato (ver sección 26)
 
 ---
 
@@ -1953,3 +2100,23 @@ Suficiente para Prototipo 2 y primeros meses de producción (500 MB BD, 5 GB egr
 - Cotización en tiempo real → **función premium**. Sin premium, el usuario actualiza manualmente.
 - Mostrar junto a cada valor la **fecha de la cotización**, o si no hay espacio, **hace cuántos días** no se actualiza.
 - La cotización es crítica para calcular el rendimiento de los activos — sin datos frescos el P&L no es fiable.
+
+---
+
+## 26. Exports y reports — Pendiente de diseñar
+
+### Exports de datos (CSV / Excel)
+Pendiente de decidir qué información incluyen los exports: qué tablas, qué campos, qué filtros disponibles (por cartera, por período, por tipo de activo, por broker…).
+
+### Reports en PDF
+Pendiente de diseñar tanto el contenido como el formato visual. Posibles reports de alto valor para el usuario:
+
+| Report | Contenido |
+|---|---|
+| Resumen anual de cartera | Valor, rentabilidad, dividendos cobrados, capital aportado en el año |
+| Informe de operaciones por período | Lista de compras/ventas/dividendos con totales |
+| Ganancias y pérdidas | P&L realizado y no realizado — útil para la declaración de la renta |
+| Informe por broker | Posiciones y operaciones agrupadas por broker |
+| Informe de rentabilidad TWR | Rentabilidad real por cartera y por activo con gráfico |
+
+> Pendiente: definir campos exactos, filtros, aspecto visual y formato de cada report antes de implementar.
