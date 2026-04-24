@@ -125,6 +125,10 @@
 | PR20 | — | Diseñar y generar reports PDF (resumen anual, P&L, por broker, TWR) — ver ESTADO.md sec 26 |
 | PR21 | — | Crear docs/DATA_MODEL.md con diagrama Mermaid del modelo completo |
 | PR22 | — | Crear docs/ARCHITECTURE.md, docs/DECISIONS.md y docs/CONTRIBUTING.md |
+| PR23 | — | Confirmación por email para cambios críticos de perfil (email, pwd, 2FA) — ver ESTADO.md sec 27 |
+| PR24 | — | Flujo de eliminación de cuenta: solo owner, email, período de gracia — ver ESTADO.md sec 27 |
+| PR25 | — | Cierre de sesión automático por inactividad (30d móvil, 24h web) — ver ESTADO.md sec 27 |
+| PR26 | — | Backup gestionado en servidor como Tier 2+ — ver ESTADO.md sec 28 |
 
 ---
 

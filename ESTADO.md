@@ -2120,3 +2120,79 @@ Pendiente de diseñar tanto el contenido como el formato visual. Posibles report
 | Informe de rentabilidad TWR | Rentabilidad real por cartera y por activo con gráfico |
 
 > Pendiente: definir campos exactos, filtros, aspecto visual y formato de cada report antes de implementar.
+
+---
+
+## 27. Seguridad — Perfil de usuario y gestión de cuenta
+
+### Confirmación por email para cambios críticos
+
+Los cambios en datos sensibles del perfil no se aplican de forma inmediata — requieren confirmación por email para proteger al usuario ante accesos no autorizados.
+
+**Requieren confirmación por email:**
+- Cambio de email principal — podría bloquear el acceso a la cuenta
+- Cambio de contraseña
+- Cambio de método 2FA
+- Desactivación del 2FA
+
+**No requieren confirmación:**
+- Nombre, apellidos, alias
+- Teléfono secundario (salvo que sea el método 2FA activo)
+- Preferencias de idioma o zona horaria
+
+**Flujo:** usuario solicita cambio → aviso en app → email con enlace/código (caduca en 15–30 min) → usuario confirma → cambio efectivo.
+
+**Nota técnica:** Supabase Auth gestiona este flujo de forma nativa para cambio de email y contraseña — no hay que implementarlo desde cero.
+
+---
+
+### Eliminación de cuenta
+
+- Solo puede ejecutarla el **owner** de la cuenta. Ningún editor ni viewer de carteras compartidas puede eliminar la cuenta del propietario.
+- Requiere confirmación por email — igual que los cambios críticos de perfil.
+
+**Flujo:**
+1. Usuario solicita eliminar cuenta
+2. Aviso explícito de consecuencias: datos eliminados, carteras compartidas huérfanas, suscripción cancelada
+3. Email de confirmación con enlace (caduca en 15–30 min)
+4. Confirmación final en app
+5. Eliminación efectiva
+
+**Período de gracia:** marcar la cuenta como "pendiente de eliminar" durante X días antes del borrado físico — permite recuperación si fue un error o un acceso no autorizado.
+
+**Pendiente de decidir:** qué ocurre con las carteras compartidas cuando se elimina la cuenta del owner — tres opciones: (a) se eliminan todas, (b) se transfiere la propiedad al miembro más antiguo, (c) se bloquean hasta que otro miembro reclame la propiedad.
+
+---
+
+### Cierre de sesión automático por inactividad
+
+Dos niveles diferenciados:
+
+**Nivel 1 — Bloqueo de pantalla** *(ya prototipado)*
+La app se bloquea y pide PIN/biométrico al volver al primer plano tras el tiempo de gracia. El usuario sigue autenticado — solo hay que desbloquear la pantalla.
+
+**Nivel 2 — Cierre de sesión completo** *(producción)*
+
+| Evento | Acción |
+|---|---|
+| Sin actividad > 30 días | Cierre de sesión completo — requiere login + 2FA |
+| Sesión web sin actividad > 24h | Cierre de sesión completo |
+| Token JWT caducado sin actividad | Cierre de sesión — no se renueva automáticamente |
+| Token JWT caducado con actividad reciente | Refresh automático transparente |
+
+El tiempo de inactividad para cierre completo será configurable por el usuario en **Ajustes > Seguridad**. Supabase Auth gestiona la caducidad de tokens de forma nativa.
+
+---
+
+## 28. Backup gestionado — Tier 2+
+
+El modelo de backup de portapp ofrece dos opciones coexistentes, dirigidas a perfiles de usuario distintos:
+
+| Opción | Para quién | Cómo funciona |
+|---|---|---|
+| **Backup manual** | Usuario técnico que quiere control total | El usuario descarga el archivo y lo guarda donde prefiera |
+| **Backup gestionado** *(Tier 2+)* | Usuario no técnico que prefiere delegar | Con un botón, portapp guarda una copia cifrada en nuestros servidores |
+
+**Mensaje clave para el usuario:** *"Ambas opciones son seguras. El backup manual te da el control total de tus datos. El backup gestionado añade comodidad y un nivel extra de respaldo técnico — nosotros nos encargamos de que tu copia esté siempre disponible."*
+
+El backup gestionado forma parte del **Tier 2+ (suscripción anual de servicios)** junto con cotizaciones en tiempo real y sync multi-dispositivo — todos servicios con coste de infraestructura real que justifican el cobro recurrente.
