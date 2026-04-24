@@ -3,6 +3,7 @@
 > Versión 1.0 · Cerrado 2026-04-24  
 > Enfoque: Kimball para analytics + 3FN para datos operacionales  
 > Plataforma: PostgreSQL en Supabase
+> **Este documento es la especificación del modelo de datos de producción — no describe el estado actual del prototipo HTML v6, que usa datos hardcodeados en variables JS.**
 
 ---
 
