@@ -201,3 +201,26 @@ Una vez tengas las 3 sesiones:
 2. **Distingue "no lo encontró"** (problema de navegación/UX) de **"lo encontró pero no lo entendió"** (problema de terminología o diseño).
 3. **No implementes todo lo que pidan** — los usuarios describen síntomas, no soluciones. "No entiendo qué es TWR" puede significar "añade un tooltip" o puede significar "renombra la pantalla".
 4. Trae los resultados aquí y los priorizamos juntos antes de hacer cambios.
+
+---
+
+## Checklist de tamaño de fuente XL (beta)
+
+Antes de cada release, verificar las siguientes pantallas con el tamaño de fuente configurado en **XL** (Ajustes > Interfaz > Tamaño de fuente > Muy grande):
+
+**Elementos de riesgo a revisar:**
+- [ ] Números financieros largos (ej. `€123.456,78`) — que no se partan ni desborden
+- [ ] Labels de la barra de navegación inferior — que no se solapen ni corten
+- [ ] Textos en celdas de tabla (Cartera, Operaciones, Efectivo) — que no se desborden
+- [ ] Botones con texto — que el texto quepa dentro del botón
+- [ ] Métricas en tarjetas (Resumen, Global) — que no se solapan entre sí
+- [ ] Títulos de pantalla — que no se corten
+
+**Pantallas prioritarias:**
+- [ ] Global — métricas y lista de carteras
+- [ ] Resumen — métrica grid y actividad reciente
+- [ ] Cartera — tabla de posiciones
+- [ ] Operaciones — tabla de operaciones
+- [ ] Efectivo — tabla de movimientos
+- [ ] Rentabilidad — tabla TWR
+- [ ] Ajustes — todos los labels y controles
