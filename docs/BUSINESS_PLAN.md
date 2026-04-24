@@ -1,6 +1,6 @@
 # portapp — Documento de negocio para inversores
 
-> Versión 1.1 · Abril 2026 · Confidencial
+> Versión 1.2 · Abril 2026 · Confidencial
 
 ---
 
@@ -43,13 +43,21 @@ portapp es una aplicación iOS, Android y web que permite al inversor minorista:
 - **Controlar** su liquidez con el módulo de gestión de efectivo por broker y cuenta bancaria
 - **Compartir** carteras de forma segura con asesores o familiares con permisos granulares
 
+**Acceso a todos los mercados mundiales**
+
+Aunque el producto está diseñado para el inversor hispanohablante, soporta todos los mercados financieros globales — NASDAQ, NYSE, XETRA, Londres, Tokio, mercados emergentes y criptomonedas. El inversor hispanohablante opera en los mismos mercados internacionales que cualquier otro inversor: portapp no limita su acceso a ninguno de ellos.
+
 **El diferenciador clave: privacidad por diseño**
 
-Los datos financieros del usuario viven en el dispositivo (SQLite local). La sincronización con la nube es opcional y reversible. El argumento de venta — *"tus datos de inversión nunca salen de tu dispositivo"* — es único en el mercado hispanohablante y directamente relevante en el contexto regulatorio y cultural actual.
+Los datos financieros del usuario viven en su dispositivo. La sincronización con la nube es opcional y reversible. El argumento de venta — *"tus datos de inversión nunca salen de tu dispositivo"* — es único en el mercado hispanohablante y directamente relevante en el contexto regulatorio y cultural actual.
 
 **En español, desde el primer día**
 
 La app está diseñada y desarrollada en español. No es una traducción — es un producto pensado para el inversor hispanohablante, con la terminología financiera correcta en español y adaptado a la fiscalidad y los instrumentos de inversión más comunes en España y Latinoamérica.
+
+**Ecosistema educativo integrado**
+
+portapp no es solo una herramienta de seguimiento — es una plataforma de educación financiera. La app incluye acceso a canales de YouTube curados sobre inversión, y la estrategia de contenido se extiende fuera de la app con un **blog especializado** y **webinars periódicos** sobre estrategias de inversión, fiscalidad y gestión patrimonial. Este ecosistema educativo cumple tres funciones simultáneas: genera tráfico orgánico (SEO), crea comunidad y aumenta la retención — el usuario que aprende con portapp no tiene razón para irse a la competencia.
 
 ---
 
@@ -206,7 +214,27 @@ El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un proto
 
 ---
 
-## 8. Uso de los fondos
+## 8. Economic Moat — Barreras de entrada sostenibles
+
+Un moat económico es la ventaja competitiva duradera que protege a una empresa de la competencia a largo plazo. portapp tiene la capacidad de construir un moat sólido basado en cuatro fuentes combinadas:
+
+**8.1 Switching costs — el moat más fuerte**
+Cuando un usuario lleva 12-24 meses registrando operaciones en portapp, ha acumulado un historial financiero completo e irreemplazable: compras, ventas, dividendos, rentabilidades, anotaciones. Migrar ese historial a otra app es costoso en tiempo y propenso a errores. Cuanto más tiempo usa el producto, más difícil es abandonarlo — exactamente lo contrario a la mayoría de apps de consumo.
+
+**8.2 Content moat — comunidad como barrera**
+El blog, los webinars y los canales curados crean un ecosistema de contenido propio que los competidores no pueden replicar con dinero a corto plazo. Una comunidad activa de inversores hispanohablantes que asocia su formación financiera con portapp genera referidos orgánicos, reduce el coste de adquisición y aumenta la retención. Este moat crece con el tiempo y es muy difícil de copiar.
+
+**8.3 Moat arquitectónico — privacidad irrepetible**
+La arquitectura local-first no es una característica que se añade a un producto existente — requiere rediseñar el producto desde cero. Los competidores establecidos (Sharesight, Snowball) tienen millones de usuarios en arquitecturas cloud y no pueden migrar sin romper su negocio actual. Este moat es especialmente defensivo porque convierte la fortaleza de portapp en la debilidad estructural de sus competidores.
+
+**8.4 Network effects parciales**
+Las carteras compartidas, las comparativas anónimas entre usuarios y el contenido comunitario crean efectos de red moderados: cuantos más usuarios, más valor genera la plataforma para cada usuario individual. No es el network effect de una red social, pero sí un efecto de comunidad que se refuerza con el crecimiento.
+
+**Conclusión:** portapp no tiene un moat único y dominante como Google o Visa, pero sí una combinación de switching costs + content + arquitectura que lo hace estructuralmente defensible. En el mercado hispanohablante, donde no existe ningún competidor establecido, construir ese moat antes que nadie es el objetivo central de los primeros 24 meses.
+
+---
+
+## 9. Uso de los fondos
 
 *(Indicativo — a detallar con el inversor)*
 
