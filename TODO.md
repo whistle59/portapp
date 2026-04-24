@@ -117,10 +117,14 @@
 | PR12 | — | Verificación de fondos suficientes antes de confirmar compra — ver ESTADO.md sec 21 |
 | PR13 | — | Integridad referencial: modelo de entidades + reglas de borrado — ver ESTADO.md sec 22 |
 | PR14 | — | ~~Decisión de modelado de datos~~ → **Kimball adoptado** (ver ESTADO.md sec 23) |
-| PR15 | — | Completar esquema Kimball: tablas operacionales pendientes de revisión — ver ESTADO.md sec 23 |
+| PR15 | — | ~~Completar esquema Kimball~~ → **Modelo cerrado** (ver ESTADO.md sec 23) |
 | PR16 | — | Botón actualización manual de cotizaciones + indicador de antigüedad — ver ESTADO.md sec 25 |
 | PR17 | — | Cotización en tiempo real como función premium — ver ESTADO.md sec 25 |
 | PR18 | — | Configurar Supabase como backend: Auth, Storage, RLS, Edge Functions — ver ESTADO.md sec 24 |
+| PR19 | — | Diseñar contenido y formato de exports CSV/Excel — ver ESTADO.md sec 26 |
+| PR20 | — | Diseñar y generar reports PDF (resumen anual, P&L, por broker, TWR) — ver ESTADO.md sec 26 |
+| PR21 | — | Crear docs/DATA_MODEL.md con diagrama Mermaid del modelo completo |
+| PR22 | — | Crear docs/ARCHITECTURE.md, docs/DECISIONS.md y docs/CONTRIBUTING.md |
 
 ---
 
