@@ -331,7 +331,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       </div>
       <div class="card">
         <div class="card-title" style="margin-bottom:9px">Exposición por Divisa (global)</div>
-        <div id="exp-div-global"></div>
+        <div id="leg-global-div" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+        <div style="position:relative;height:165px"><canvas id="cGlobalDiv" role="img" aria-label="Exposición por divisa"></canvas></div>
       </div>
     </div>
 
@@ -1085,7 +1086,7 @@ const canales=[
   {id:'ch6',nombre:'ETF Insider',ini:'EI',color:'#c8552a',cat:'ETFs',desc:'Comparativas de ETFs, TER, tracking error y carteras modelo.',url:'#',fav:false,dest:false},
 ];
 let perfil={nombre:'Usuario Demo',email:'usuario@portapp.com',tel:'+34 *** *** 421',plan:'Personal',planEstado:'Activo',twofa:'Email',ultimoAcceso:'Hoy 09:02 · Chrome/Mac',sesiones:[{id:'s1',device:'📱 iPhone · Safari',actual:true},{id:'s2',device:'💻 MacBook · Chrome',actual:false}]};
-let chG=null,chR=null,chH=null,chP=null;
+let chG=null,chGD=null,chR=null,chH=null,chP=null;
 const DEMO='123456';
 let intentos=3,tSec=587,bSec=899,tInt=null,bInt=null,curM='email';
 
@@ -1214,8 +1215,10 @@ function renderGlobal(){
   const C=CC(),gV={};activos.forEach(a=>{gV[a.grupo]=(gV[a.grupo]||0)+a.qty*a.cot;});const ls=Object.keys(gV),dt=Object.values(gV),tot=dt.reduce((s,v)=>s+v,0);
   document.getElementById('leg-global').innerHTML=ls.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1)"><div style="width:9px;height:9px;border-radius:2px;background:${C[i%C.length]}"></div>${l} ${tot>0?(dt[i]/tot*100).toFixed(0)+'%':''}</div>`).join('');
   if(chG)chG.destroy();chG=new Chart(document.getElementById('cGlobal'),{type:'doughnut',data:{labels:ls,datasets:[{data:dt,backgroundColor:C.slice(0,ls.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});
-  const dT={};let td=0;activos.forEach(a=>{const v=a.qty*a.cot;td+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});
-  document.getElementById('exp-div-global').innerHTML=Object.entries(dT).map(([d,v])=>{const p=td>0?v/td*100:0;return pb(p,C[0],d);}).join('');
+  const dT={};activos.forEach(a=>{const v=a.qty*a.cot;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});
+  const dls=Object.keys(dT),ddt=Object.values(dT),dtot=ddt.reduce((s,v)=>s+v,0);
+  document.getElementById('leg-global-div').innerHTML=dls.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1)"><div style="width:9px;height:9px;border-radius:2px;background:${C[i%C.length]}"></div>${l} ${dtot>0?(ddt[i]/dtot*100).toFixed(0)+'%':''}</div>`).join('');
+  if(chGD)chGD.destroy();chGD=new Chart(document.getElementById('cGlobalDiv'),{type:'doughnut',data:{labels:dls,datasets:[{data:ddt,backgroundColor:C.slice(0,dls.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});
 }
 function renderPortList(){document.getElementById('port-list').innerHTML=carteras.map(c=>{const v=cV(c.id),i=cI(c.id),p=i>0?(v-i)/i*100:0;return`<div class="port-card${c.id===activeId?' active-card':''}" onclick="selectCartera('${c.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="width:9px;height:9px;border-radius:50%;background:${c.color}"></div><span style="font-weight:700;font-size:13px;flex:1;color:var(--t0)">${c.nombre}</span>${c.id===activeId?'<span class="badge b-blue">Activa</span>':''}</div><div style="font-size:11px;color:var(--t1);margin-bottom:5px">${c.desc}</div><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:700;color:var(--t0)" class="amt">${fe(v)}</span><span class="${p>=0?'pos':'neg'}">${fp(p)}</span></div></div>`;}).join('');}
 function selectCartera(cid){activeId=cid;const c=carteras.find(x=>x.id===cid);document.getElementById('active-name').textContent=c.nombre;document.getElementById('active-dot').style.background=c.color;document.getElementById('active-value').textContent=fe(cV(cid));closeAllModals();goTo('s-resumen');}
