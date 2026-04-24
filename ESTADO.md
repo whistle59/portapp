@@ -114,6 +114,32 @@
 - CSS variables redefinidas con clase `.dark` en `<html>`
 - Gráficos se rerrenderizan con paleta oscura al cambiar
 
+### Rentabilidad TWR (v6)
+- Pantalla `s-rentabilidad` con cálculo TWR real desde operaciones
+- Filtros por período: 1M / 3M / 6M / 1A / Todo
+- Tabla por activo con rentabilidad individual
+
+### Capital por grupos (v6)
+- Pantalla `s-grupos` con distribución porcentual por grupo y gráfico donut
+
+### Perfil de usuario (v6)
+- Pantalla `s-perfil` con datos del usuario y botón de cierre de sesión funcional
+
+### Rentabilidad del efectivo (v6)
+- Pantalla `s-rent-efectivo` con cálculo de rendimiento sobre saldos de efectivo
+
+### Anotaciones globales (v5)
+- Pantalla `s-anotaciones` con lista de notas libres y formulario para añadir/borrar
+
+### Aprende — Canales YouTube (v6)
+- Pantalla `s-canales` con canales curados por categoría y marcado de favoritos ⭐
+
+### Ayuda (v6)
+- Pantalla `s-ayuda` accesible desde topbar (❓) y Ajustes > Soporte y ayuda
+- Guía de uso por pantalla (acordeón), FAQ y guía backup/restore paso a paso
+
+> **Nota sobre datos del prototipo:** cotizaciones, tipos de cambio y parte del historial de efectivo son datos hardcodeados en variables JS. No hay integración con APIs externas. El código OTP `123456` es simulado — no valida contra un backend real.
+
 ---
 
 ## 3. Iteraciones de pulido — estado

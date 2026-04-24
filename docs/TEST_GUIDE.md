@@ -1,6 +1,6 @@
 # portapp — Guión de pruebas con usuarios
 
-> Credenciales demo: `usuario@portapp.com` / `demo1234` / OTP: `123456`
+> Credenciales demo: `usuario@portapp.com` / `demo1234` / OTP: `123456` *(simulado — no valida contra backend real)*
 > URL del prototipo: compartir via Netlify Drop
 
 ---
