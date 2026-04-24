@@ -1,0 +1,261 @@
+// portapp — Modelo de datos
+// Versión 1.0 · Cerrado 2026-04-24
+// Pegar en https://dbdiagram.io
+
+Table users {
+  user_id uuid [pk]
+  user_first_name string
+  user_last_name string
+  user_alias string
+  user_main_email string
+  user_secondary_email string
+  user_mobile_number string
+  user_pwd string [note: 'Hash bcrypt/argon2 — nunca en claro']
+  email_verified boolean
+  two_fa_method string [note: 'email|sms|totp']
+  plan string [note: 'free|personal|pro']
+  paddle_customer_id string [note: 'Nunca guardar datos de tarjeta']
+  open_account_date timestamp
+  close_account_date timestamp [note: 'Soft delete']
+}
+
+Table subscription_plan {
+  subscription_plan_id uuid [pk]
+  subscription_plan_name string
+  subscription_plan_type string [note: 'one_time|recurring_annual|recurring_monthly']
+  subscription_price decimal
+  valid_from timestamp [note: 'SCD2']
+  valid_to timestamp [note: 'null = registro activo']
+  is_current boolean [note: 'SCD2']
+}
+
+Table user_subscription {
+  user_subscription_id uuid [pk]
+  user_id uuid [ref: > users.user_id]
+  subscription_plan_id uuid [ref: > subscription_plan.subscription_plan_id]
+  start_date timestamp
+  end_date timestamp [note: 'null = activo']
+  status string [note: 'active|cancelled|expired']
+  payment_ref string
+  paddle_subscription_id string
+}
+
+Table payments {
+  payment_id uuid [pk]
+  user_id uuid [ref: > users.user_id]
+  user_subscription_id uuid [ref: > user_subscription.user_subscription_id]
+  amount decimal
+  currency string
+  payment_method string [note: 'card|transfer|paypal']
+  payment_status string [note: 'completed|failed|refunded']
+  payment_date timestamp
+  payment_ref string
+
+  Note: 'Fact table — inmutable'
+}
+
+Table app_usage {
+  usage_id uuid [pk]
+  user_id uuid [ref: > users.user_id]
+  usage_date date
+  platform string [note: 'ios|android|web']
+  total_sessions int
+  total_duration_min int
+  screens_visited int
+  operations_added int
+  last_active_at timestamp
+
+  indexes {
+    (user_id, usage_date, platform) [unique]
+  }
+
+  Note: 'Snapshot diaria — fact table'
+}
+
+Table portfolio {
+  portfolio_id uuid [pk]
+  portfolio_name string
+  portfolio_description string
+  portfolio_main_currency string
+  portfolio_colour string
+  portfolio_created_at timestamp
+  portfolio_deleted_at timestamp [note: 'Soft delete — bloquear si tiene assets u operations']
+}
+
+Table portfolio_members {
+  id uuid [pk]
+  portfolio_id uuid [ref: > portfolio.portfolio_id]
+  user_id uuid [ref: > users.user_id]
+  role string [note: 'owner|editor|viewer']
+  invited_by uuid [ref: > users.user_id]
+  joined_at timestamp
+  status string [note: 'active|pending|revoked']
+
+  Note: 'Relación N:M usuarios-carteras con permisos'
+}
+
+Table groups {
+  group_id uuid [pk]
+  user_id uuid [ref: > users.user_id]
+  group_name string
+  group_colour string
+  group_order int
+  group_created_at timestamp
+
+  Note: 'Globales por usuario — SET NULL en assets al borrar'
+}
+
+Table accounts {
+  account_id uuid [pk]
+  user_id uuid [ref: > users.user_id]
+  account_name string
+  account_type string [note: 'broker|bank|crypto_exchange|other']
+  account_iban string
+  account_bic string
+  account_created_at timestamp
+  account_deleted_at timestamp [note: 'Soft delete — bloquear si tiene operations o cash']
+}
+
+Table assets {
+  asset_id uuid [pk]
+  portfolio_id uuid [ref: > portfolio.portfolio_id]
+  group_id uuid [ref: > groups.group_id, note: 'nullable — SET NULL si se borra el grupo']
+  account_id uuid [ref: > accounts.account_id]
+  asset_ticker string [note: 'Verificado vía API antes de insertar']
+  asset_name string
+  asset_isin string
+  asset_type string [note: 'stock|etf|crypto|fund|other']
+  asset_market string
+  asset_exchange string [note: 'Elegido por el usuario']
+  asset_currency string [note: 'Elegida por el usuario']
+  asset_region_json json
+  asset_index string
+  asset_qty decimal [note: 'Cache — recalculado desde operations']
+  asset_avg_price decimal [note: 'Cache — recalculado desde operations']
+  asset_last_price decimal [note: 'Cache de stock_prices']
+  asset_prev_price decimal [note: 'Cache cotización día anterior']
+  asset_price_date timestamp
+  asset_created_at timestamp
+  asset_deleted_at timestamp [note: 'Soft delete — bloquear si tiene operations']
+}
+
+Table operations {
+  operation_id uuid [pk]
+  portfolio_id uuid [ref: > portfolio.portfolio_id]
+  asset_id uuid [ref: > assets.asset_id]
+  account_id uuid [ref: > accounts.account_id]
+  asset_ticker string [note: 'Denormalizado — integridad histórica']
+  operation_type string [note: 'buy|sell|dividend|staking|split|other']
+  operation_date date
+  operation_qty decimal
+  operation_price decimal
+  operation_fee decimal
+  operation_currency string
+  operation_note string
+  operation_created_at timestamp
+
+  Note: 'Fact table — inmutable. Nunca se edita ni se borra'
+}
+
+Table cash {
+  cash_id uuid [pk]
+  portfolio_id uuid [ref: > portfolio.portfolio_id]
+  account_id uuid [ref: > accounts.account_id]
+  operation_id uuid [ref: > operations.operation_id, note: 'nullable']
+  cash_type string [note: 'deposit|withdrawal|dividend|staking|fee|interest|other']
+  cash_amount decimal
+  cash_currency string
+  cash_date date
+  cash_origin string [note: 'manual|operation']
+  cash_note string
+  cash_created_at timestamp
+}
+
+Table stock_prices {
+  price_id uuid [pk]
+  asset_id uuid [ref: > assets.asset_id, note: 'nullable']
+  price_ticker string [note: 'Denormalizado — integridad histórica']
+  price_exchange string
+  price_currency string
+  price_open decimal
+  price_close decimal
+  price_high decimal
+  price_low decimal
+  price_volume int
+  price_date date
+  price_source string [note: 'manual|yahoo|alphavantage|other']
+  price_created_at timestamp
+
+  indexes {
+    (price_ticker, price_exchange, price_date) [unique]
+  }
+}
+
+Table portfolio_snapshots {
+  snapshot_id uuid [pk]
+  portfolio_id uuid [ref: > portfolio.portfolio_id]
+  snapshot_date date
+  snapshot_total_value decimal
+  snapshot_total_invested decimal
+  snapshot_cash_balance decimal
+  snapshot_currency string
+  snapshot_created_at timestamp
+
+  indexes {
+    (portfolio_id, snapshot_date) [unique]
+  }
+
+  Note: 'Snapshot diaria — fact table. Base para TWR y gráficos'
+}
+
+Table annotations {
+  annotation_id uuid [pk]
+  user_id uuid [ref: > users.user_id]
+  annotation_text text
+  annotation_created_at timestamp
+  annotation_updated_at timestamp
+
+  Note: 'Borrado físico'
+}
+
+Table asset_notes {
+  asset_note_id uuid [pk]
+  asset_id uuid [ref: > assets.asset_id]
+  user_id uuid [ref: > users.user_id]
+  asset_note_text text
+  asset_note_created_at timestamp
+  asset_note_updated_at timestamp
+
+  Note: 'Borrado físico'
+}
+
+Table notifications {
+  notification_id uuid [pk]
+  user_id uuid [ref: > users.user_id]
+  notification_type string [note: 'alert|dca|info']
+  notification_title string
+  notification_body text
+  notification_read boolean
+  notification_favourite boolean
+  notification_created_at timestamp
+}
+
+Table platforms {
+  platform_id uuid [pk]
+  user_id uuid [ref: > users.user_id]
+  platform_name string
+  platform_url string
+  platform_icon string
+  platform_order int
+  platform_created_at timestamp
+}
+
+Table exchange_rates {
+  rate_id uuid [pk]
+  rate_currency_from string
+  rate_currency_to string
+  rate_value decimal
+  rate_date date
+  rate_source string [note: 'manual|ecb|fixer']
+  rate_created_at timestamp
+}
