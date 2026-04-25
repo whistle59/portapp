@@ -1,6 +1,6 @@
 # portapp — Documento de negocio para inversores
 
-> Versión 1.3 · Abril 2026 · Confidencial
+> Versión 1.4 · Abril 2026 · Confidencial
 
 ---
 
@@ -252,7 +252,70 @@ portapp captura desde el primer día métricas detalladas de comportamiento: qu�
 
 ---
 
-## 9. Por qué ahora
+## 10. Financiación pública disponible
+
+> La existencia de programas públicos de financiación no es un detalle administrativo — es un argumento de negocio. Para el inversor privado significa que una parte del capital necesario puede obtenerse sin dilución adicional, reduciendo el riesgo de la inversión y extendiendo la runway. Para el proyecto significa que existe un ecosistema institucional que valida y apoya exactamente este tipo de startup. Las ayudas descritas a continuación son compatibles entre sí y con la inversión privada, y varias de ellas tienen convocatorias abiertas o previstas para 2026.
+
+### Cataluña — ACCIÓ Startup Capital
+
+Subvención a **fondo perdido** de hasta **75.000€** gestionada por la Agencia para la Competitividad Empresarial de la Generalitat de Catalunya. En la convocatoria 2026 cubre el **100% del coste del proyecto** (mejora respecto al 80% de años anteriores). Dirigida específicamente a startups tecnológicas catalanas en fase inicial que necesitan validar su modelo de negocio.
+
+- Presupuesto convocatoria 2026: **7 millones de euros**
+- Compatible con ayudas estatales y europeas
+
+### España — NEOTEC (CDTI)
+
+Subvención a **fondo perdido** de hasta **250.000€** (o 325.000€ si se contrata personal investigador) del Centro para el Desarrollo Tecnológico y la Innovación. Es el programa estrella para startups de base tecnológica en España.
+
+- Requisitos clave: empresa < 3 años, modelo de negocio basado en tecnología propia
+- Presupuesto anual: **20 millones de euros** (5M reservados para empresas lideradas por mujeres)
+- Financia hasta el 70% del presupuesto presentado
+- **Compatible con ACCIÓ Startup Capital**
+
+### España — ENISA (préstamos participativos)
+
+Préstamos participativos de **25.000€ a 75.000€** sin garantías personales, con hasta 9 años de devolución y 2 años de carencia. El tipo de interés está ligado a los beneficios — si la empresa no genera beneficios, el coste financiero es mínimo.
+
+### España — Ley Startup (Ley 28/2022)
+
+No es una subvención sino un **marco fiscal muy favorable** que aplica automáticamente a startups certificadas:
+
+| Beneficio | Detalle |
+|---|---|
+| Impuesto de Sociedades reducido | 15% (vs 25% general) durante los primeros 4 años rentables |
+| Aplazamiento de impuestos | Sin intereses los dos primeros años con base imponible positiva |
+| Stock options | Exentas hasta **50.000€/año** por empleado — clave para atraer talento |
+| Régimen de impatriados | Tributación al 24% para talento extranjero contratado |
+
+### Europa — EIC Accelerator (Consejo Europeo de Innovación)
+
+El programa de financiación más potente de Europa para startups innovadoras. Combina subvención y equity:
+
+- **Subvención:** hasta **2,5 millones de euros** a fondo perdido
+- **Equity:** entre 0,5M€ y **10 millones de euros** del Fondo EIC
+- Presupuesto 2026: **414 millones de euros**
+- Convocatorias bimestrales (6 al año)
+
+Es altamente competitivo (~5% de éxito) y adecuado para cuando portapp tenga tracción demostrada — horizonte realista: **12–18 meses desde el lanzamiento**.
+
+### Estrategia de financiación combinada
+
+La combinación óptima para portapp en su fase actual:
+
+```
+Fase 1 (ahora):        ACCIÓ Startup Capital (75.000€ fondo perdido)
+                     + NEOTEC CDTI (hasta 250.000€ fondo perdido)
+                     + Ley Startup (ahorro fiscal automático)
+
+Fase 2 (post-lanzamiento): ENISA (préstamo sin garantías)
+                          + EIC Accelerator (si hay tracción)
+```
+
+Esta combinación puede aportar hasta **325.000€ en subvenciones no reembolsables** antes de tocar la inversión privada, reduciendo significativamente la dilución para todos los accionistas.
+
+---
+
+## 11. Por qué ahora
 
 Tres tendencias convergen en este momento:
 
