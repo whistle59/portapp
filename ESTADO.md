@@ -2222,3 +2222,108 @@ El modelo de backup de portapp ofrece dos opciones coexistentes, dirigidas a per
 **Mensaje clave para el usuario:** *"Ambas opciones son seguras. El backup manual te da el control total de tus datos. El backup gestionado añade comodidad y un nivel extra de respaldo técnico — nosotros nos encargamos de que tu copia esté siempre disponible."*
 
 El backup gestionado forma parte del **Tier 2+ (suscripción anual de servicios)** junto con cotizaciones en tiempo real y sync multi-dispositivo — todos servicios con coste de infraestructura real que justifican el cobro recurrente.
+
+---
+
+## 29. Product Analytics — Stack de métricas y DWH
+
+### Objetivo
+
+Capturar métricas de uso de la app para alimentar decisiones de producto y marketing. Inspirado en el modelo de analytics de juegos móviles — los dispositivos móviles generan una cantidad enorme de información de comportamiento que bien estructurada es una ventaja competitiva.
+
+### Arquitectura del stack
+
+```
+App (eventos de usuario)
+        ↓
+Supabase PostgreSQL (datos operacionales)
+        ↓
+Edge Function / webhook (ingesta)
+        ↓
+BigQuery (Data Warehouse analítico)
+        ↓
+dbt Core (transformaciones + DAG)
+        ↓
+Looker / Looker Studio (dashboards)
+```
+
+> **Nota clave:** BigQuery tiene conexión **nativa** con Looker — Google adquirió Looker en 2020 y es el BI recomendado para BigQuery. Looker Studio (anteriormente Data Studio) es gratuito y también conecta nativamente. Esta integración elimina pipelines adicionales para visualización.
+
+### Separación operacional / analítico
+
+| Capa | Sistema | Contenido |
+|---|---|---|
+| Operacional | Supabase PostgreSQL | Datos del usuario: carteras, activos, operaciones, efectivo |
+| Analítico | BigQuery | Eventos de comportamiento, métricas agregadas, KPIs |
+
+Los dos sistemas son independientes — el DWH no interfiere con el rendimiento de la app.
+
+### Métricas previstas
+
+#### Usuarios
+- DAU / WAU / MAU (activos diarios, semanales, mensuales)
+- Retención por cohorte: día 1, día 7, día 30 — indicador clave de si el producto engancha
+- Churn rate por plan
+- Tiempo medio hasta conversión free → pago
+- LTV (lifetime value) por segmento y región
+
+#### Producto
+- Funnel de onboarding — dónde abandona el usuario nuevo
+- Pantallas más visitadas y tiempo medio por pantalla
+- Features más usadas por tipo de plan
+- Tasa de uso de backup manual vs gestionado
+- Activos más registrados (acciones vs ETFs vs cripto) por región
+
+#### Negocio
+- MRR / ARR por plan y región geográfica
+- Conversión free → Personal → Tier 2+
+- Tipo de suscripción por país
+- CAC por canal de adquisición (cuando haya campañas activas)
+- NPS implícito: usuarios que comparten cartera = señal de satisfacción
+
+#### Geográfico
+- Distribución España vs LatAm vs otros
+- Activos más populares por región (útil para marketing localizado)
+- Tipo de suscripción por país
+
+### Esquema de eventos (pendiente de diseñar)
+
+Cada acción relevante del usuario genera un evento con estructura:
+
+```json
+{
+  "event_name": "screen_view",
+  "user_id": "uuid",
+  "session_id": "uuid",
+  "timestamp": "ISO8601",
+  "platform": "ios|android|web",
+  "plan": "free|personal|pro",
+  "properties": { ... }
+}
+```
+
+**Eventos a capturar (lista inicial):**
+
+| Evento | Descripción |
+|---|---|
+| `session_start` | Inicio de sesión en la app |
+| `session_end` | Cierre de sesión (con duración) |
+| `screen_view` | Cada pantalla visitada |
+| `feature_used` | Uso de funcionalidad específica |
+| `operation_added` | Nueva operación registrada |
+| `backup_triggered` | Backup ejecutado (manual o gestionado) |
+| `subscription_changed` | Cambio de plan |
+| `share_created` | Cartera compartida |
+| `onboarding_step` | Paso del onboarding completado |
+
+Pendiente: definir `properties` específicas por evento y diseñar los modelos dbt.
+
+### Stack tecnológico
+
+| Componente | Tecnología | Coste inicial |
+|---|---|---|
+| DWH | BigQuery (Google Cloud) | Gratis hasta 10GB + 1TB queries/mes |
+| Transformaciones | dbt Core (open source) | Gratis |
+| Ingesta | Supabase Edge Functions → BigQuery API | Incluido en Supabase |
+| Visualización | Looker Studio (conexión nativa BigQuery) | Gratis |
+| Visualización avanzada | Looker (cuando haya escala) | De pago |
