@@ -1,6 +1,6 @@
 # portapp — Documento de negocio para inversores
 
-> Versión 1.2 · Abril 2026 · Confidencial
+> Versión 1.3 · Abril 2026 · Confidencial
 
 ---
 
@@ -168,6 +168,7 @@ El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un proto
 - **Backend:** Supabase (PostgreSQL, Auth, Storage, Edge Functions, RLS)
 - **Pagos:** Paddle (Merchant of Record — gestiona IVA y facturación)
 - **Cotizaciones:** Yahoo Finance API / Alpha Vantage
+- **Analytics:** BigQuery (DWH) + dbt Core (transformaciones) + Looker Studio (dashboards) — integración nativa BigQuery ↔ Looker gracias a la adquisición de Looker por Google. Stack separado del operacional para no afectar rendimiento de la app.
 
 ---
 
@@ -230,7 +231,10 @@ La arquitectura local-first no es una característica que se añade a un product
 **8.4 Network effects parciales**
 Las carteras compartidas, las comparativas anónimas entre usuarios y el contenido comunitario crean efectos de red moderados: cuantos más usuarios, más valor genera la plataforma para cada usuario individual. No es el network effect de una red social, pero sí un efecto de comunidad que se refuerza con el crecimiento.
 
-**Conclusión:** portapp no tiene un moat único y dominante como Google o Visa, pero sí una combinación de switching costs + content + arquitectura que lo hace estructuralmente defensible. En el mercado hispanohablante, donde no existe ningún competidor establecido, construir ese moat antes que nadie es el objetivo central de los primeros 24 meses.
+**8.5 Data moat — inteligencia acumulada**
+portapp captura desde el primer día métricas detalladas de comportamiento: qué pantallas usa cada tipo de usuario, qué activos registra, cómo navega, dónde abandona. Esta capa de analytics — inspirada en el modelo de instrumentación de los juegos móviles — genera una ventaja competitiva creciente: cada mes de operación añade señales que permiten optimizar el producto, personalizar la experiencia y afinar el marketing con una precisión que un competidor nuevo no puede replicar. Los datos acumulados son, en sí mismos, un activo que crece con el tiempo.
+
+**Conclusión:** portapp no tiene un moat único y dominante como Google o Visa, pero sí una combinación de switching costs + content + arquitectura + datos que lo hace estructuralmente defensible. En el mercado hispanohablante, donde no existe ningún competidor establecido, construir ese moat antes que nadie es el objetivo central de los primeros 24 meses.
 
 ---
 
