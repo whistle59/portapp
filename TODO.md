@@ -129,6 +129,10 @@
 | PR24 | — | Flujo de eliminación de cuenta: solo owner, email, período de gracia — ver ESTADO.md sec 27 |
 | PR25 | — | Cierre de sesión automático por inactividad (30d móvil, 24h web) — ver ESTADO.md sec 27 |
 | PR26 | — | Backup gestionado en servidor como Tier 2+ — ver ESTADO.md sec 28 |
+| PR27 | — | Diseñar esquema de eventos para product analytics — ver ESTADO.md sec 29 |
+| PR28 | — | Configurar BigQuery + dbt Core + Looker Studio — ver ESTADO.md sec 29 |
+| PR29 | — | Implementar ingesta de eventos: Supabase Edge Functions → BigQuery — ver ESTADO.md sec 29 |
+| PR30 | — | Diseñar modelos dbt: retención, funnel onboarding, métricas negocio — ver ESTADO.md sec 29 |
 
 ---
 
