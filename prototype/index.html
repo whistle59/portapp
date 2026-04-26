@@ -290,7 +290,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 <!-- APP -->
 <div class="app-shell" id="app-shell">
   <div class="topbar">
-    <div class="port-sel" onclick="openModal('m-portfolios')">
+    <div class="port-sel" id="port-sel" onclick="openModal('m-portfolios')">
       <div class="port-dot" id="active-dot"></div>
       <div style="flex:1;min-width:0">
         <div id="active-name" style="font-size:13px;font-weight:500;color:var(--t0);line-height:1.3">Cartera Principal</div>
@@ -322,6 +322,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <div class="metric"><div class="mlabel">Total invertido</div><div class="mvalue"><span class="amt" id="g-invertido"></span></div></div>
         <div class="metric"><div class="mlabel">Ganancia total</div><div class="mvalue" id="g-ganancia"></div></div>
       </div>
+      <div class="slabel">Mis carteras</div>
+      <div id="lista-carteras"></div>
       <div class="card">
         <div class="card-title" style="margin-bottom:9px">Distribución global por grupo</div>
         <div id="leg-global" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
@@ -1157,7 +1159,7 @@ function reCharts(){const a=id=>document.getElementById(id).classList.contains('
 const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones','s-canales','s-ayuda'];
 const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas','s-canales':'Aprende','s-ayuda':'Ayuda'};
 const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
-function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;
+function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;const ps=document.getElementById('port-sel');if(ps)ps.style.display=sid==='s-global'?'none':'flex';
   if(sid==='s-global'){requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));}
   else if(sid==='s-resumen'){renderResumen();requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));}
   else if(sid==='s-cartera')renderCartera();
