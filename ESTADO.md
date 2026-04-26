@@ -2258,20 +2258,103 @@ Capturar métricas de uso de la app para alimentar decisiones de producto y mark
 ### Arquitectura del stack
 
 ```
-App (eventos de usuario)
-        ↓
-Supabase PostgreSQL (datos operacionales)
-        ↓
-Edge Function / webhook (ingesta)
-        ↓
-BigQuery (Data Warehouse analítico)
-        ↓
-dbt Core (transformaciones + DAG)
-        ↓
-Looker / Looker Studio (dashboards)
+App (React Native)
+  → eventos en SQLite local (offline-safe)
+    → PowerSync sync
+      → Supabase PostgreSQL
+        → Edge Function (cron)
+          → BigQuery
+            → dbt Core
+              → Looker Studio
 ```
 
-> **Nota clave:** BigQuery tiene conexión **nativa** con Looker — Google adquirió Looker en 2020 y es el BI recomendado para BigQuery. Looker Studio (anteriormente Data Studio) es gratuito y también conecta nativamente. Esta integración elimina pipelines adicionales para visualización.
+> **Nota clave:** BigQuery tiene conexión **nativa** con Looker — Google adquirió Looker en 2020. Looker Studio es gratuito y conecta nativamente. Esta integración elimina pipelines adicionales para visualización.
+
+---
+
+### Captura de eventos — estrategia por fases
+
+#### Fase 1 — Prototipo 2: PostHog
+
+Para el Prototipo 2 se usará **PostHog** como solución de event tracking. Razones:
+
+- SDK oficial para React Native — integración en horas
+- Buffering offline incluido — guarda eventos localmente y los envía cuando hay conexión
+- Plan gratuito hasta **1 millón de eventos/mes**
+- Exportación nativa a BigQuery con un clic
+- Dashboard propio inmediato — sin necesidad de configurar dbt desde el primer día
+- Open source — se puede auto-hostear si la privacidad lo requiere en el futuro
+
+**Instalación en React Native:**
+```bash
+npm install posthog-react-native
+```
+
+**Uso en la app:**
+```typescript
+import PostHog from 'posthog-react-native'
+
+// Inicializar una vez al arrancar la app
+const posthog = new PostHog('API_KEY', { host: 'https://eu.posthog.com' })
+
+// Capturar evento
+posthog.capture('screen_view', { screen: 'global', plan: 'personal' })
+posthog.capture('operation_added', { type: 'buy', asset_type: 'etf' })
+```
+
+> **Nota de privacidad:** PostHog tiene servidores en la UE (`eu.posthog.com`) — compatible con RGPD. Los datos de comportamiento van a PostHog, no a nuestros servidores. Esto es aceptable para el Prototipo 2 (validación), pero en producción se evaluará migrar a la Opción C (DIY).
+
+#### Fase 2 — Producción: DIY con Supabase (cuando el volumen lo justifique)
+
+En producción, si el argumento de privacidad es central, se migra a un pipeline propio que reutiliza toda la infraestructura ya planificada:
+
+```
+App (React Native)
+  → tabla events[] en SQLite local   ← mismo patrón que datos operacionales
+    → PowerSync sync automático
+      → Supabase PostgreSQL (tabla events)
+        → Edge Function Supabase (cron cada hora)
+          → BigQuery API
+```
+
+**Ventajas de la migración:**
+- Cero terceros adicionales — los eventos viajan por la misma infraestructura que los datos del usuario
+- Offline garantizado — PowerSync ya gestiona el sync
+- Control total del esquema de eventos
+- El argumento "tus datos nunca salen de tu dispositivo" se extiende también a los metadatos de comportamiento
+
+**Cuándo migrar:** cuando PostHog acerque al límite de 1M eventos/mes o cuando el equipo tenga capacidad de mantener el pipeline DIY.
+
+#### Instrumentación — cómo capturar eventos en React Native
+
+La instrumentación se hace en dos niveles:
+
+**1. Navegación (automático):**
+React Navigation tiene un listener de eventos que captura cada cambio de pantalla sin código extra por pantalla:
+
+```typescript
+<NavigationContainer
+  onStateChange={() => posthog.capture('screen_view', {
+    screen: navigationRef.current?.getCurrentRoute()?.name
+  })}
+>
+```
+
+**2. Acciones específicas (manual):**
+Se añade `posthog.capture()` en los handlers de las acciones relevantes:
+
+```typescript
+// Al registrar una operación
+const handleAddOperation = (op) => {
+  posthog.capture('operation_added', {
+    type: op.type,           // buy | sell | dividend
+    asset_type: op.assetType // stock | etf | crypto
+  })
+  saveOperation(op)
+}
+```
+
+**Regla de oro:** capturar el **qué** y el **contexto mínimo necesario**, nunca datos financieros del usuario (importes, tickers, cantidades).
 
 ### Separación operacional / analítico
 
