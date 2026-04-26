@@ -1,8 +1,7 @@
 name: Sync dev with main
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch: # deshabilitado — dev protegida por ruleset, sync manual
 
 permissions:
   contents: write
