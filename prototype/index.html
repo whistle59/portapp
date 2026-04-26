@@ -1047,6 +1047,14 @@ let ops=[
   {id:20,fecha:'2026-01-20',ticker:'ETH',tipo:'Cripto',broker:'Coinbase',op:'Staking',qty:2,precio:34,fee:0,divisa:'USD',grupo:'Cripto',nota:'Recompensa staking enero',cartera:'c3'},
   {id:21,fecha:'2026-04-01',ticker:'ETH',tipo:'Cripto',broker:'Coinbase',op:'Staking',qty:2,precio:36,fee:0,divisa:'USD',grupo:'Cripto',nota:'Recompensa staking abril',cartera:'c3'},
   {id:22,fecha:'2025-10-05',ticker:'IWDA',tipo:'ETF',broker:'DEGIRO',op:'Dividendo',qty:30,precio:0.12,fee:0,divisa:'EUR',grupo:'Core',nota:'Dividendo semestral',cartera:'c2'},
+  {id:23,fecha:'2024-11-18',ticker:'AMZN',tipo:'Acción',broker:'IB',op:'Venta',qty:1,precio:165,fee:2,divisa:'USD',grupo:'AI/Tech',nota:'Reducción posición — pérdida asumida',cartera:'c1'},
+  {id:24,fecha:'2025-02-10',ticker:'EIMI',tipo:'ETF',broker:'DEGIRO',op:'Venta',qty:15,precio:29,fee:0.5,divisa:'USD',grupo:'Core ampliado',nota:'Emergentes débiles — recorte posición',cartera:'c1'},
+  {id:25,fecha:'2025-05-20',ticker:'AAPL',tipo:'Acción',broker:'IB',op:'Venta',qty:3,precio:210,fee:2,divisa:'USD',grupo:'AI/Tech',nota:'Toma de beneficios parcial',cartera:'c1'},
+  {id:26,fecha:'2025-07-14',ticker:'VUSA',tipo:'ETF',broker:'DEGIRO',op:'Venta',qty:8,precio:82,fee:0.5,divisa:'USD',grupo:'Core',nota:'Rebalanceo — pérdida por corrección S&P',cartera:'c2'},
+  {id:27,fecha:'2026-01-30',ticker:'IWDA',tipo:'ETF',broker:'DEGIRO',op:'Venta',qty:5,precio:99,fee:0.5,divisa:'EUR',grupo:'Core',nota:'Toma parcial de beneficios DCA',cartera:'c2'},
+  {id:28,fecha:'2025-03-01',ticker:'NVDA',tipo:'Acción',broker:'DEGIRO',op:'Venta',qty:3,precio:108,fee:1,divisa:'USD',grupo:'AI/Tech',nota:'Stop loss — caída post resultados',cartera:'c3'},
+  {id:29,fecha:'2025-08-22',ticker:'BTC',tipo:'Cripto',broker:'Coinbase',op:'Venta',qty:0.2,precio:51000,fee:12,divisa:'USD',grupo:'Cripto',nota:'Liquidez — venta con pérdida',cartera:'c3'},
+  {id:30,fecha:'2026-02-28',ticker:'ETH',tipo:'Cripto',broker:'Coinbase',op:'Venta',qty:0.5,precio:3400,fee:8,divisa:'USD',grupo:'Cripto',nota:'Toma de beneficios staking acumulado',cartera:'c3'},
 ];
 const efectivoData=[
   {fecha:'2024-01-05',tipo:'Transferencia entrada',origen:'cuenta',broker:'IB',importe:5000,divisa:'EUR',cartera:'c1'},
@@ -1080,7 +1088,7 @@ const plats=[
   {nombre:'Coinbase',url:'https://www.coinbase.com',cat:'Cripto',color:'#0052ff',icon:'CB'},
 ];
 const idxData={'FTSE All-World':{ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},'MSCI World':{ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados'},'S&P 500':{ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'}};
-let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=25,privacyOn=false,opsFilter='todas',lastBackupDate=null;
+let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=31,privacyOn=false,opsFilter='todas',lastBackupDate=null;
 const canales=[
   {id:'ch1',nombre:'Fondos Indexados',ini:'FI',color:'#4a7fa5',cat:'ETFs',desc:'Inversión pasiva en índices globales, ETFs y estrategias de largo plazo.',url:'#',fav:false,dest:true},
   {id:'ch2',nombre:'Value School',ini:'VS',color:'#4a8c6f',cat:'Value',desc:'Value investing, análisis fundamental y filosofía de inversión a largo plazo.',url:'#',fav:true,dest:false},
