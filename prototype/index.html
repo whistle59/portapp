@@ -42,7 +42,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .screen.active{display:block}
 .nav-bar{display:flex;border-top:.5px solid var(--bd);background:var(--bg0);padding:5px 0 env(safe-area-inset-bottom,5px);flex-shrink:0}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 0;border:none;background:none;border-radius:8px;transition:background .15s}
-.nav-item.active{background:var(--ac-bg)}
+.nav-item.active{background:var(--ac-bg);border-bottom:2px solid var(--ac)}
 .nav-label{font-size:9px;color:var(--t2);font-family:inherit}
 .nav-item.active .nav-label{color:var(--ac);font-weight:600}
 .ni-svg *{stroke:var(--t2)}
@@ -302,7 +302,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <button class="tb-btn" onclick="togglePrivacy()" title="Modo privado" style="font-size:15px;padding:5px 8px">👁</button>
     <button class="tb-btn" onclick="goTo('s-ayuda')" title="Ayuda" style="font-size:15px;padding:5px 8px">❓</button>
     <div style="position:relative">
-      <button class="tb-btn" onclick="goTo('s-anotaciones')" style="font-size:15px;padding:5px 8px" title="Anotaciones">📝</button>
+      <button class="tb-btn" onclick="goTo('s-anotaciones')" style="font-size:15px;padding:5px 8px" title="Notas">📝</button>
       <div class="notif-dot" id="notas-dot" style="display:none"></div>
     </div>
     <div style="position:relative">
@@ -740,7 +740,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <div class="screen" id="s-anotaciones">
       <div class="qnav" id="qn-anotaciones"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;margin-top:8px">
-        <div class="screen-title" style="margin-bottom:0">Anotaciones</div>
+        <div class="screen-title" style="margin-bottom:0">Notas</div>
         <button class="btn btn-sm" onclick="openAddNota()">+ Nueva</button>
       </div>
       <!-- Filtros por etiqueta -->
@@ -1211,7 +1211,7 @@ function renderGlobal(){
   document.getElementById('g-n-carteras').textContent=carteras.length;
   document.getElementById('g-invertido').textContent=fe(totI).replace('€','');
   document.getElementById('g-ganancia').innerHTML=`<span class="amt ${totG>=0?'pos':'neg'}">${(totG>=0?'+':'')+fe(Math.abs(totG))}</span>`;
-  document.getElementById('lista-carteras').innerHTML=carteras.map(c=>{const v=cV(c.id),i=cI(c.id),p=i>0?(v-i)/i*100:0;return`<div class="port-card" onclick="selectCartera('${c.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="width:9px;height:9px;border-radius:50%;background:${c.color}"></div><span style="font-weight:700;font-size:13px;flex:1;color:var(--t0)">${c.nombre}</span><span style="font-size:13px;font-weight:700;color:var(--t0)" class="amt">${fe(v)}</span></div><div style="font-size:11px;color:var(--t1);margin-bottom:6px">${c.desc}</div><div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--t1)">Invertido: <span class="amt">${fe(i)}</span></span><span style="font-size:12px" class="${p>=0?'pos':'neg'}">${fp(p)}</span></div><div class="pbar" style="margin-top:6px"><div class="pfill" style="width:${Math.min(100,Math.abs(p)*3+40)}%;background:${c.color};opacity:.65"></div></div></div>`;}).join('');
+  document.getElementById('lista-carteras').innerHTML=carteras.map(c=>{const v=cV(c.id),i=cI(c.id),p=i>0?(v-i)/i*100:0;return`<div class="port-card" onclick="selectCartera('${c.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="font-weight:700;font-size:13px;flex:1;color:var(--t0)">${c.nombre}</span><span style="font-size:13px;font-weight:700;color:var(--t0)" class="amt">${fe(v)}</span></div><div style="font-size:11px;color:var(--t1);margin-bottom:6px">${c.desc}</div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--t1)">Invertido: <span class="amt">${fe(i)}</span></span><span style="font-size:12px" class="${p>=0?'pos':'neg'}">${fp(p)}</span></div><div style="font-size:11px;color:var(--ac);text-align:right;margin-top:5px">Ver detalle →</div></div>`;}).join('');
   const C=CC(),gV={};activos.forEach(a=>{gV[a.grupo]=(gV[a.grupo]||0)+a.qty*a.cot;});const ls=Object.keys(gV),dt=Object.values(gV),tot=dt.reduce((s,v)=>s+v,0);
   document.getElementById('leg-global').innerHTML=ls.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1)"><div style="width:9px;height:9px;border-radius:2px;background:${C[i%C.length]}"></div>${l} ${tot>0?(dt[i]/tot*100).toFixed(0)+'%':''}</div>`).join('');
   if(chG)chG.destroy();chG=new Chart(document.getElementById('cGlobal'),{type:'doughnut',data:{labels:ls,datasets:[{data:dt,backgroundColor:C.slice(0,ls.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});
