@@ -1972,7 +1972,31 @@ Decisión pendiente sobre el enfoque de modelado de datos para las métricas y e
 | operation_fee | decimal | |
 | operation_currency | string | |
 | operation_note | string | nullable |
+| operation_status | string | active\|cancelled — nunca se borra físicamente |
+| cancelled_by_id | uuid FK → operations | nullable — apunta a la operación inversa |
+| cancelled_at | timestamp | nullable |
 | operation_created_at | timestamp | |
+
+**Patrón de inmutabilidad — cómo funciona el "borrado":**
+
+Las operaciones nunca se eliminan de la base de datos. Cuando el usuario quiere anular una operación, la app genera automáticamente una **operación inversa** con los mismos valores (precio, tipo de cambio, qty) y marca ambas como canceladas entre sí. El impacto neto en qty y precio medio es cero, y el historial financiero queda íntegro.
+
+```
+Operación original:   buy  · 10 AAPL · 170 USD · 2024-03-10 · status: cancelled
+Operación inversa:    sell · 10 AAPL · 170 USD · 2026-04-26 · status: cancelled
+                      cancelled_by_id → [original] ↔ [inversa]
+```
+
+**Por qué el mismo precio:** usar el precio original garantiza que el impacto en precio medio y P/L es exactamente cero. No se distorsiona ninguna métrica histórica.
+
+**UX — qué ve el usuario:**
+- **Vista normal:** solo operaciones con `status = 'active'`. Las anuladas están ocultas por defecto.
+- **Vista de auditoría:** toggle "Mostrar anuladas" revela ambas operaciones (original + inversa) con estilo tachado/gris y fecha de anulación visible.
+
+**Impacto en cascada al anular:**
+- `assets.qty` y `assets.avg_price` — se recalculan desde operaciones activas
+- `cash` — los movimientos de efectivo vinculados también se marcan como cancelados
+- `portfolio_snapshots` — los snapshots pasados **no se modifican** (son inmutables por diseño); el impacto solo afecta a snapshots futuros
 
 #### `cash` *(movimientos de efectivo)*
 | Campo | Tipo | Notas |
@@ -2317,6 +2341,34 @@ Cada acción relevante del usuario genera un evento con estructura:
 | `onboarding_step` | Paso del onboarding completado |
 
 Pendiente: definir `properties` específicas por evento y diseñar los modelos dbt.
+
+### Tratamiento de operaciones canceladas en el DWH
+
+Las operaciones canceladas tienen un tratamiento específico en cada capa del stack analítico:
+
+**Capa raw (BigQuery — tabla de hechos):**
+Todas las operaciones se replican en BigQuery, incluyendo las canceladas. La tabla raw contiene el historial completo sin filtros — es la fuente de verdad para auditoría.
+
+**Capa staging (dbt):**
+Los modelos de staging exponen todas las operaciones con su `operation_status`. Nunca filtran — solo limpian y tipan los datos.
+
+**Capa marts (dbt — modelos analíticos):**
+Aquí es donde se aplica el filtro. Todos los modelos analíticos de negocio (volumen operado, activos más populares, retención por comportamiento de trading) filtran por `operation_status = 'active'`.
+
+```sql
+-- Ejemplo en dbt: model marts/operations_active.sql
+select * from {{ ref('stg_operations') }}
+where operation_status = 'active'
+```
+
+**Modelo de rentabilidad TWR:**
+Usa exclusivamente `operation_status = 'active'`. Las operaciones canceladas no afectan al cálculo de rentabilidad — el par original+inversa se anula exactamente y nunca debería llegar al modelo TWR, pero el filtro por status es la salvaguarda.
+
+**Métricas de producto afectadas:**
+- `operations_added` en `app_usage` cuenta inserciones brutas (incluye cancelaciones) — refleja actividad real del usuario
+- Las métricas de negocio (volumen, diversificación) solo cuentan operaciones activas
+
+---
 
 ### Stack tecnológico
 
