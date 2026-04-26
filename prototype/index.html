@@ -196,7 +196,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <div class="fg"><label>Email</label><input type="email" id="lemail" value="usuario@portapp.com"></div>
     <div class="fg"><label>Contraseña</label><div style="position:relative"><input type="password" id="lpass" value="demo1234" style="padding-right:38px"><button type="button" onclick="togglePwd('lpass',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:16px;padding:2px">👁</button></div></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-      <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:var(--t1)"><input type="checkbox" style="width:auto;margin:0"> Recordarme</label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:var(--t1)"><input type="checkbox" id="remember-me" style="width:auto;margin:0"> Recordarme en este dispositivo (hasta medianoche)</label>
       <button class="btn-ghost" style="font-size:12px" onclick="showAuth('as-forgot')">¿Olvidaste la contraseña?</button>
     </div>
     <button class="btn btn-p" onclick="doLogin()">Entrar</button>
@@ -1091,7 +1091,7 @@ const DEMO='123456';
 let intentos=3,tSec=587,bSec=899,tInt=null,bInt=null,curM='email';
 
 function showAuth(id){document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
-function doLogin(){const p=document.getElementById('lpass').value,e=document.getElementById('lerr');if(p.length<6){e.style.display='block';return;}e.style.display='none';showAuth('as-2fa');}
+function doLogin(){const p=document.getElementById('lpass').value,e=document.getElementById('lerr');if(p.length<6){e.style.display='block';return;}e.style.display='none';const rem=document.getElementById('remember-me');if(rem&&rem.checked)showToast('Sesión guardada hasta medianoche');showAuth('as-2fa');}
 function selMethod(m){curM=m;document.getElementById('mb-email').classList.toggle('selected',m==='email');document.getElementById('mb-sms').classList.toggle('selected',m==='sms');document.getElementById('mdest').innerHTML=m==='email'?'Se enviará a <strong>us***@portapp.com</strong>':'Se enviará a <strong>+34 *** *** 421</strong>';}
 function sendCode(){document.getElementById('osub').innerHTML=curM==='email'?'Enviado a <strong>us***@portapp.com</strong>':'Enviado por SMS a <strong>+34 *** *** 421</strong>';for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('oerr').style.display='none';document.getElementById('ook').style.display='none';intentos=3;tSec=587;clearInterval(tInt);tInt=setInterval(()=>{tSec--;if(tSec<=0){clearInterval(tInt);document.getElementById('tval').textContent='Expirado';return;}const m=Math.floor(tSec/60),s=tSec%60;document.getElementById('tval').textContent=m+':'+(s<10?'0':'')+s;},1000);showAuth('as-otp');setTimeout(()=>document.getElementById('o0').focus(),100);}
 function otpMove(i){if(document.getElementById('o'+i).value&&i<5)document.getElementById('o'+(i+1)).focus();}
