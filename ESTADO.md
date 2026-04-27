@@ -2421,6 +2421,8 @@ Todos los eventos comparten estos campos. No se repiten en `properties`.
   "user_role":    "owner_only | shared_owner | shared_member",
   "country":      "ES | MX | AR | ...",
   "locale":       "es-ES | es-MX | es-AR | ...",
+  "age_range":    "18-24 | 25-34 | 35-44 | 45-54 | 55+ | null",
+  "gender":       "male | female | other | prefer_not_to_say | null",
   "properties":   { ... }
 }
 ```
@@ -2429,8 +2431,11 @@ Todos los eventos comparten estos campos. No se repiten en `properties`.
 - `user_role` — `owner_only`: usa la app en solitario · `shared_owner`: tiene carteras compartidas con otros · `shared_member`: accede a carteras de otro usuario.
 - `country` — inferido de IP en PostHog (Fase 1) o de Supabase en Fase 2. Clave para segmentación geográfica y estrategia de expansión LatAm.
 - `locale` — idioma del dispositivo. Útil para adaptar marketing por variante de español.
+- `age_range` / `gender` — datos demográficos opcionales, recogidos con consentimiento explícito durante el onboarding. `null` si el usuario no los proporcionó. Almacenados en el operacional (`user_demographics`) y propagados a los eventos para segmentación. **Nunca se vinculan a la identidad del usuario en el DWH** — se tratan como atributos estadísticos anónimos. Sujetos a RGPD: el usuario puede modificarlos o eliminarlos en cualquier momento desde Ajustes.
 
 > **Regla de oro:** ningún evento incluye tickers, importes ni cantidades. Solo el *qué* y el *contexto mínimo necesario*.
+
+> **Nota legal — datos demográficos:** `age_range` y `gender` son datos personales bajo RGPD aunque estén anonimizados. Su recogida requiere consentimiento explícito, informado y revocable. El texto de consentimiento en el onboarding debe especificar: finalidad estadística, anonimización, ausencia de vinculación con la cuenta, y derecho de supresión.
 
 ---
 
