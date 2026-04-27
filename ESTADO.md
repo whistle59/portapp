@@ -2431,11 +2431,29 @@ Todos los eventos comparten estos campos. No se repiten en `properties`.
 - `user_role` — `owner_only`: usa la app en solitario · `shared_owner`: tiene carteras compartidas con otros · `shared_member`: accede a carteras de otro usuario.
 - `country` — inferido de IP en PostHog (Fase 1) o de Supabase en Fase 2. Clave para segmentación geográfica y estrategia de expansión LatAm.
 - `locale` — idioma del dispositivo. Útil para adaptar marketing por variante de español.
-- `age_range` / `gender` — datos demográficos opcionales, recogidos con consentimiento explícito durante el onboarding. `null` si el usuario no los proporcionó. Almacenados en el operacional (`user_demographics`) y propagados a los eventos para segmentación. **Nunca se vinculan a la identidad del usuario en el DWH** — se tratan como atributos estadísticos anónimos. Sujetos a RGPD: el usuario puede modificarlos o eliminarlos en cualquier momento desde Ajustes.
+- `age_range` / `gender` — datos demográficos opcionales recogidos con consentimiento explícito. `null` si el usuario no los proporcionó. Almacenados en el operacional (`user_demographics`) y propagados a los eventos para segmentación. **Nunca se vinculan a la identidad del usuario en el DWH** — se tratan como atributos estadísticos anónimos. Sujetos a RGPD: el usuario puede modificarlos o eliminarlos en cualquier momento desde Ajustes.
 
 > **Regla de oro:** ningún evento incluye tickers, importes ni cantidades. Solo el *qué* y el *contexto mínimo necesario*.
 
-> **Nota legal — datos demográficos:** `age_range` y `gender` son datos personales bajo RGPD aunque estén anonimizados. Su recogida requiere consentimiento explícito, informado y revocable. El texto de consentimiento en el onboarding debe especificar: finalidad estadística, anonimización, ausencia de vinculación con la cuenta, y derecho de supresión.
+> **Nota legal — datos demográficos:** `age_range` y `gender` son datos personales bajo RGPD aunque estén anonimizados. Su recogida requiere consentimiento explícito, informado y revocable. El texto de consentimiento debe especificar: finalidad estadística, anonimización, ausencia de vinculación con la cuenta, y derecho de supresión.
+
+#### Estrategia de solicitud de datos demográficos (progressive profiling)
+
+No se piden en el onboarding — el usuario aún no conoce ni aprecia la app y la tasa de rechazo sería alta. Se solicitan después de una señal clara de valor percibido:
+
+- Tras registrar la 5ª operación
+- Tras la primera semana activa con al menos 3 sesiones
+- Tras visualizar su primera rentabilidad calculada
+
+**Lógica de reintento:**
+
+| Respuesta del usuario | Acción |
+|---|---|
+| Completa el formulario | No volver a preguntar |
+| Cierra sin responder | Reintentar a los 90 días |
+| Responde "prefiero no decirlo" en algún campo | No volver a preguntar nunca — es un no definitivo |
+
+El estado de la solicitud (`demographics_asked_at`, `demographics_declined_permanently`) se almacena en `user_demographics` para controlar cuándo y si se vuelve a mostrar.
 
 ---
 
