@@ -1094,23 +1094,23 @@ let ops=[
   {id:30,fecha:'2026-02-28',ticker:'ETH',tipo:'Cripto',broker:'Coinbase',op:'Venta',qty:0.5,precio:3400,fee:8,divisa:'USD',grupo:'Cripto',nota:'Toma de beneficios staking acumulado',cartera:'c3',status:'active',cancelledWith:null},
 ];
 const efectivoData=[
-  {fecha:'2024-01-05',tipo:'Transferencia entrada',origen:'cuenta',broker:'IB',importe:5000,divisa:'EUR',cartera:'c1'},
-  {fecha:'2024-03-01',tipo:'Bizum',origen:'cuenta',broker:'DEGIRO',importe:300,divisa:'EUR',cartera:'c1'},
-  {fecha:'2024-04-15',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:18.4,divisa:'USD',cartera:'c1'},
-  {fecha:'2024-09-15',tipo:'Compra activo',origen:'op',broker:'DEGIRO',importe:-2100.5,divisa:'EUR',cartera:'c1'},
-  {fecha:'2025-01-10',tipo:'Transferencia entrada',origen:'cuenta',broker:'DEGIRO',importe:3000,divisa:'EUR',cartera:'c2'},
-  {fecha:'2025-05-01',tipo:'Transferencia entrada',origen:'cuenta',broker:'Coinbase',importe:2000,divisa:'EUR',cartera:'c3'},
-  {fecha:'2025-06-20',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:22.5,divisa:'USD',cartera:'c1'},
-  {fecha:'2025-07-10',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:55,divisa:'USD',cartera:'c3'},
-  {fecha:'2025-09-10',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:24,divisa:'USD',cartera:'c1'},
-  {fecha:'2025-10-05',tipo:'Interés',origen:'cuenta',broker:'IB',importe:35,divisa:'EUR',cartera:'c1'},
-  {fecha:'2025-11-20',tipo:'Dividendo',origen:'cuenta',broker:'DEGIRO',importe:12,divisa:'EUR',cartera:'c2'},
-  {fecha:'2026-01-15',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:25.5,divisa:'USD',cartera:'c1'},
-  {fecha:'2026-01-20',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:68,divisa:'USD',cartera:'c3'},
-  {fecha:'2026-02-18',tipo:'Dividendo',origen:'cuenta',broker:'DEGIRO',importe:14.5,divisa:'EUR',cartera:'c2'},
-  {fecha:'2026-03-20',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:23,divisa:'USD',cartera:'c1'},
-  {fecha:'2026-04-01',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:72,divisa:'USD',cartera:'c3'},
-  {fecha:'2026-04-10',tipo:'Interés',origen:'cuenta',broker:'IB',importe:40,divisa:'EUR',cartera:'c1'},
+  {fecha:'2024-01-05',tipo:'Transferencia entrada',origen:'cuenta',broker:'IB',importe:5000,divisa:'EUR',cartera:'c1',status:'active'},
+  {fecha:'2024-03-01',tipo:'Bizum',origen:'cuenta',broker:'DEGIRO',importe:300,divisa:'EUR',cartera:'c1',status:'active'},
+  {fecha:'2024-04-15',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:18.4,divisa:'USD',cartera:'c1',status:'active'},
+  {fecha:'2024-09-15',tipo:'Compra activo',origen:'op',broker:'DEGIRO',importe:-2100.5,divisa:'EUR',cartera:'c1',status:'active'},
+  {fecha:'2025-01-10',tipo:'Transferencia entrada',origen:'cuenta',broker:'DEGIRO',importe:3000,divisa:'EUR',cartera:'c2',status:'active'},
+  {fecha:'2025-05-01',tipo:'Transferencia entrada',origen:'cuenta',broker:'Coinbase',importe:2000,divisa:'EUR',cartera:'c3',status:'active'},
+  {fecha:'2025-06-20',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:22.5,divisa:'USD',cartera:'c1',status:'active'},
+  {fecha:'2025-07-10',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:55,divisa:'USD',cartera:'c3',status:'active'},
+  {fecha:'2025-09-10',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:24,divisa:'USD',cartera:'c1',status:'active'},
+  {fecha:'2025-10-05',tipo:'Interés',origen:'cuenta',broker:'IB',importe:35,divisa:'EUR',cartera:'c1',status:'active'},
+  {fecha:'2025-11-20',tipo:'Dividendo',origen:'cuenta',broker:'DEGIRO',importe:12,divisa:'EUR',cartera:'c2',status:'active'},
+  {fecha:'2026-01-15',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:25.5,divisa:'USD',cartera:'c1',status:'active'},
+  {fecha:'2026-01-20',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:68,divisa:'USD',cartera:'c3',status:'active'},
+  {fecha:'2026-02-18',tipo:'Dividendo',origen:'cuenta',broker:'DEGIRO',importe:14.5,divisa:'EUR',cartera:'c2',status:'active'},
+  {fecha:'2026-03-20',tipo:'Dividendo',origen:'cuenta',broker:'IB',importe:23,divisa:'USD',cartera:'c1',status:'active'},
+  {fecha:'2026-04-01',tipo:'Staking',origen:'cuenta',broker:'Coinbase',importe:72,divisa:'USD',cartera:'c3',status:'active'},
+  {fecha:'2026-04-10',tipo:'Interés',origen:'cuenta',broker:'IB',importe:40,divisa:'EUR',cartera:'c1',status:'active'},
 ];
 const notifs=[
   {id:1,tipo:'alerta',texto:'NVDA bajó un 5,2% hoy',fecha:'Hoy 09:14',leida:false,favorita:false},
@@ -1213,7 +1213,7 @@ function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.r
   else if(sid==='s-resumen'){renderResumen();requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));}
   else if(sid==='s-cartera')renderCartera();
   else if(sid==='s-efectivo')renderEfectivo();
-  else if(sid==='s-ops'){renderOps();document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}
+  else if(sid==='s-ops'){document.querySelectorAll('#ops-chips .tag').forEach(t=>t.classList.remove('selected'));document.querySelector('#ops-chips .tag').classList.add('selected');document.querySelectorAll('#ops-limit-chips .tag').forEach(t=>t.classList.remove('selected'));document.querySelector('#ops-limit-chips .tag').classList.add('selected');renderOps();document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}
   else if(sid==='s-indices')renderIndices();
   else if(sid==='s-notif')renderNotif();
   else if(sid==='s-plataformas')renderPlats();
@@ -1270,9 +1270,9 @@ function renderGlobal(){
   if(chGD)chGD.destroy();chGD=new Chart(document.getElementById('cGlobalDiv'),{type:'doughnut',data:{labels:dls,datasets:[{data:ddt,backgroundColor:C.slice(0,dls.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});
 }
 function renderPortList(){document.getElementById('port-list').innerHTML=carteras.map(c=>{const v=cV(c.id),i=cI(c.id),p=i>0?(v-i)/i*100:0;return`<div class="port-card${c.id===activeId?' active-card':''}" onclick="selectCartera('${c.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="width:9px;height:9px;border-radius:50%;background:${c.color}"></div><span style="font-weight:700;font-size:13px;flex:1;color:var(--t0)">${c.nombre}</span>${c.id===activeId?'<span class="badge b-blue">Activa</span>':''}</div><div style="font-size:11px;color:var(--t1);margin-bottom:5px">${c.desc}</div><div style="display:flex;justify-content:space-between"><span style="font-size:13px;font-weight:700;color:var(--t0)" class="amt">${fe(v)}</span><span class="${p>=0?'pos':'neg'}">${fp(p)}</span></div></div>`;}).join('');}
-function selectCartera(cid){activeId=cid;const c=carteras.find(x=>x.id===cid);document.getElementById('active-name').textContent=c.nombre;document.getElementById('active-dot').style.background=c.color;document.getElementById('active-value').textContent=fe(cV(cid));closeAllModals();goTo('s-resumen');}
+function selectCartera(cid){activeId=cid;const c=carteras.find(x=>x.id===cid);document.getElementById('active-name').textContent=c.nombre;document.getElementById('active-dot').style.background=c.color;document.getElementById('active-value').textContent=fe(cV(cid));opsFilter='todas';opsLimit='20';closeAllModals();goTo('s-resumen');}
 function addCartera(){const n=document.getElementById('nc-nom').value.trim();if(!n)return;const nc={id:'c'+Date.now(),nombre:n,desc:document.getElementById('nc-desc').value||'',divisa:document.getElementById('nc-div').value,color:document.getElementById('nc-col').value};carteras.push(nc);closeModal('m-nueva-cartera');selectCartera(nc.id);showToast('Cartera creada ✓');}
-function renderResumen(){const c=carteras.find(x=>x.id===activeId);document.getElementById('res-title').textContent='Resumen · '+c.nombre;const v=cV(activeId),i=cI(activeId),g=v-i,p=i>0?g/i*100:0;document.getElementById('res-metrics').innerHTML=`<div class="metric"><div class="mlabel">Valor cartera</div><div class="mvalue"><span class="amt">${fe(v)}</span></div><div class="msub ${g>=0?'pos':'neg'}">${fp(p)}</div></div><div class="metric"><div class="mlabel">Total invertido</div><div class="mvalue"><span class="amt">${fe(i)}</span></div></div><div class="metric"><div class="mlabel">Ganancia / pérdida</div><div class="mvalue ${g>=0?'pos':'neg'}"><span class="amt">${(g>=0?'+':'')+fe(Math.abs(g))}</span></div></div><div class="metric"><div class="mlabel">Activos</div><div class="mvalue">${cA(activeId).length}</div></div>`;document.getElementById('actividad').innerHTML=ops.filter(o=>o.cartera===activeId).slice(0,4).map(o=>`<div class="dr"><span class="dk">${o.fecha.slice(5)} · ${o.op} ${o.ticker}</span><span class="dv ${o.op==='Compra'?'neg':'pos'}">${o.op==='Compra'?'-':'+'}<span class="amt">${fe(o.qty*o.precio)}</span></span></div>`).join('')||'<div style="font-size:12px;color:var(--t1);padding:8px 0">Sin operaciones recientes</div>';}
+function renderResumen(){const c=carteras.find(x=>x.id===activeId);document.getElementById('res-title').textContent='Resumen · '+c.nombre;const v=cV(activeId),i=cI(activeId),g=v-i,p=i>0?g/i*100:0;document.getElementById('res-metrics').innerHTML=`<div class="metric"><div class="mlabel">Valor cartera</div><div class="mvalue"><span class="amt">${fe(v)}</span></div><div class="msub ${g>=0?'pos':'neg'}">${fp(p)}</div></div><div class="metric"><div class="mlabel">Total invertido</div><div class="mvalue"><span class="amt">${fe(i)}</span></div></div><div class="metric"><div class="mlabel">Ganancia / pérdida</div><div class="mvalue ${g>=0?'pos':'neg'}"><span class="amt">${(g>=0?'+':'')+fe(Math.abs(g))}</span></div></div><div class="metric"><div class="mlabel">Activos</div><div class="mvalue">${cA(activeId).length}</div></div>`;document.getElementById('actividad').innerHTML=ops.filter(o=>o.cartera===activeId&&o.status!=='cancelled').slice(0,4).map(o=>`<div class="dr"><span class="dk">${o.fecha.slice(5)} · ${o.op} ${o.ticker}</span><span class="dv ${o.op==='Compra'?'neg':'pos'}">${o.op==='Compra'?'-':'+'}<span class="amt">${fe(o.qty*o.precio)}</span></span></div>`).join('')||'<div style="font-size:12px;color:var(--t1);padding:8px 0">Sin operaciones recientes</div>';}
 function renderCR(){const C=CC(),gV={};cA(activeId).forEach(a=>{gV[a.grupo]=(gV[a.grupo]||0)+a.qty*a.cot;});const ls=Object.keys(gV),dt=Object.values(gV),tot=dt.reduce((s,v)=>s+v,0);document.getElementById('leg-resumen').innerHTML=ls.map((l,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1)"><div style="width:9px;height:9px;border-radius:2px;background:${C[i%C.length]}"></div>${l} ${tot>0?(dt[i]/tot*100).toFixed(0)+'%':''}</div>`).join('');if(chR)chR.destroy();chR=new Chart(document.getElementById('cResumen'),{type:'doughnut',data:{labels:ls,datasets:[{data:dt,backgroundColor:C.slice(0,ls.length),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed)}}}}});}
 function setPeriod(btn,p){document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderHistorial(p);}
 function renderHistorial(period){const pts={'1S':7,'1M':30,'3M':90,'6M':180,'1A':365,'Todo':730}[period]||30,base=cV(activeId)||10000,C=CC(),labels=[],data=[];for(let i=pts;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);labels.push(i===0?'Hoy':d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}));const noise=(Math.sin(i*.3)+Math.cos(i*.7))*.02;data.push(Math.round(base*(.85+i/pts*.15+noise)));}if(chH)chH.destroy();chH=new Chart(document.getElementById('cHistorial'),{type:'line',data:{labels,datasets:[{data,borderColor:C[0],backgroundColor:C[0]+'40',fill:true,tension:.4,pointRadius:0,borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed.y)}}},scales:{x:{ticks:{maxTicksLimit:6,color:'var(--t2)',font:{size:10}},grid:{display:false}},y:{ticks:{maxTicksLimit:5,callback:v=>'€'+Math.round(v/1000)+'k',color:'var(--t2)',font:{size:10}},grid:{color:'var(--chart-grid)'}}}}});}
@@ -1299,6 +1299,14 @@ function filterOpsLimit(el,lim){document.querySelectorAll('#ops-limit-chips .tag
 function showOpDetalle(opId){
   const o=ops.find(x=>x.id===opId);
   if(!o)return;
+  if(o.status==='cancelled'){
+    document.getElementById('op-detalle-body').innerHTML=`<div style="color:var(--t1);font-size:13px">Esta operación ha sido cancelada.</div>`;
+    document.getElementById('op-detalle-impacto').style.display='none';
+    document.getElementById('op-detalle-error').style.display='none';
+    const btn=document.getElementById('btn-cancelar-op');
+    btn.disabled=true;btn.style.opacity='0.4';
+    return openModal('m-op-detalle');
+  }
   const t=o.qty*o.precio+o.fee;
   document.getElementById('op-detalle-body').innerHTML=
     `<div style="margin-bottom:6px"><strong>${o.ticker}</strong> · ${o.fecha} · <span class="badge ${GC[o.grupo]||'b-gray'}">${o.op}</span></div>`+
@@ -1329,6 +1337,7 @@ function showOpDetalle(opId){
 }
 function calcImpactoCancel(opId){
   const o=ops.find(x=>x.id===opId);
+  if(!o)return{valida:false,qtyActual:0,qtyResultante:0,pmActual:null,pmResultante:0};
   const activo=activos.find(a=>a.ticker===o.ticker&&a.cartera===o.cartera);
   const qtyActual=activo?activo.qty:0;
   const pmActual=activo?activo.pm:null;
@@ -1357,7 +1366,7 @@ function cancelOp(){
   o.cancelledWith=nextId;
   const opInversa=Object.assign({},o,{
     id:nextId++,
-    op:o.op==='Compra'?'Venta':'Compra',
+    op:o.op==='Compra'?'Venta':o.op==='Venta'?'Compra':o.op,
     fecha:new Date().toISOString().slice(0,10),
     nota:`Cancelación de op #${opId}`,
     status:'cancelled',
@@ -1389,7 +1398,7 @@ function addOp(){
   ops.unshift({id:nextId++,fecha:d,ticker:t,tipo:tipoActivo,broker:document.getElementById('op-broker-sel').value,op:document.getElementById('op-op').value,qty,precio,fee:parseFloat(document.getElementById('op-fee').value)||0,divisa:document.getElementById('op-div').value,grupo:document.getElementById('op-grupo').value,nota:document.getElementById('op-nota').value,cartera:document.getElementById('op-cart').value||activeId,status:'active',cancelledWith:null});
   closeModal('m-op');renderOps();showToast('Operación guardada ✓');
 }
-function renderEfectivo(){document.getElementById('tb-efectivo').innerHTML=efectivoData.filter(e=>e.cartera===activeId).map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge ${e.importe>0?'b-teal':'b-coral'}">${e.tipo}</span></td><td><span class="badge ${e.origen==='op'?'b-purple':'b-gray'}">${e.origen==='op'?'Op.':'Cta.'}</span></td><td class="${e.importe>=0?'pos':'neg'}"><span class="amt">${e.importe>=0?'+':''}€${Math.abs(e.importe).toLocaleString('es-ES')}</span></td></tr>`).join('');}
+function renderEfectivo(){document.getElementById('tb-efectivo').innerHTML=efectivoData.filter(e=>e.cartera===activeId&&e.status!=='cancelled').map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge ${e.importe>0?'b-teal':'b-coral'}">${e.tipo}</span></td><td><span class="badge ${e.origen==='op'?'b-purple':'b-gray'}">${e.origen==='op'?'Op.':'Cta.'}</span></td><td class="${e.importe>=0?'pos':'neg'}"><span class="amt">${e.importe>=0?'+':''}€${Math.abs(e.importe).toLocaleString('es-ES')}</span></td></tr>`).join('');}
 let proyDetalle=true;
 function toggleTablaProy(btn){proyDetalle=!proyDetalle;btn.textContent=proyDetalle?'Vista simple':'Vista detallada';calcProy();}
 function calcProy(){
@@ -1745,7 +1754,7 @@ function renderRentabilidad(){
   const cutStr=cutoff.toISOString().split('T')[0];
   // Per-asset return: use avg price of buy-ops in period, fallback to pm
   const rows=act.map(a=>{
-    const opsA=ops.filter(o=>o.ticker===a.ticker&&o.cartera===activeId&&o.op==='Compra'&&(rentPeriod==='Todo'||o.fecha>=cutStr));
+    const opsA=ops.filter(o=>o.ticker===a.ticker&&o.cartera===activeId&&o.op==='Compra'&&o.status!=='cancelled'&&(rentPeriod==='Todo'||o.fecha>=cutStr));
     let pm0=a.pm,qty0=a.qty;
     if(opsA.length){const inv=opsA.reduce((s,o)=>s+o.qty*o.precio,0);qty0=opsA.reduce((s,o)=>s+o.qty,0);pm0=qty0>0?inv/qty0:a.pm;}
     const twr=pm0>0?(a.cot-pm0)/pm0*100:0;
@@ -1763,7 +1772,7 @@ function renderRentabilidad(){
   document.getElementById('rent-worst').textContent=worst.ticker+' '+(worst.twr>=0?'+':'')+worst.twr+'%';
   document.getElementById('tb-rentabilidad').innerHTML=rows.map(r=>`<tr><td><strong>${r.ticker}</strong></td><td><span class="badge ${GC[r.grupo]||'b-gray'}">${r.grupo}</span></td><td class="${r.twr>=0?'pos':'neg'}">${r.twr>=0?'+':''}${r.twr}%</td><td class="${r.abs>=0?'pos':'neg'}"><span class="amt">${r.abs>=0?'+':''}${fe(Math.abs(r.abs))}</span></td></tr>`).join('');
   // Chart: timeline from earliest op in period to today
-  const periodOps=ops.filter(o=>o.cartera===activeId&&(rentPeriod==='Todo'||o.fecha>=cutStr)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const periodOps=ops.filter(o=>o.cartera===activeId&&o.status!=='cancelled'&&(rentPeriod==='Todo'||o.fecha>=cutStr)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
   const startD=periodOps.length?new Date(periodOps[0].fecha):new Date(cutStr);
   const totalDays=Math.max(1,Math.round((new Date()-startD)/86400000));
   const pts=Math.min(totalDays,60);
