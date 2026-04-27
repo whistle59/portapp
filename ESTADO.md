@@ -2403,37 +2403,138 @@ Los dos sistemas son independientes — el DWH no interfiere con el rendimiento 
 - Activos más populares por región (útil para marketing localizado)
 - Tipo de suscripción por país
 
-### Esquema de eventos (pendiente de diseñar)
+### Esquema de eventos
 
-Cada acción relevante del usuario genera un evento con estructura:
+#### Estructura base
+
+Todos los eventos comparten estos campos. No se repiten en `properties`.
 
 ```json
 {
-  "event_name": "screen_view",
-  "user_id": "uuid",
-  "session_id": "uuid",
-  "timestamp": "ISO8601",
-  "platform": "ios|android|web",
-  "plan": "free|personal|pro",
-  "properties": { ... }
+  "event_name":   "string",
+  "user_id":      "uuid",
+  "session_id":   "uuid",
+  "timestamp":    "ISO8601",
+  "platform":     "ios | android | web",
+  "device_type":  "iphone | ipad | android_phone | android_tablet | desktop",
+  "plan":         "free | personal | pro",
+  "user_role":    "owner_only | shared_owner | shared_member",
+  "country":      "ES | MX | AR | ...",
+  "locale":       "es-ES | es-MX | es-AR | ...",
+  "properties":   { ... }
 }
 ```
 
-**Eventos a capturar (lista inicial):**
+- `device_type` — tipo de dispositivo dentro de cada plataforma. Permite segmentar iPhone vs iPad, móvil vs tablet Android, escritorio vs móvil web.
+- `user_role` — `owner_only`: usa la app en solitario · `shared_owner`: tiene carteras compartidas con otros · `shared_member`: accede a carteras de otro usuario.
+- `country` — inferido de IP en PostHog (Fase 1) o de Supabase en Fase 2. Clave para segmentación geográfica y estrategia de expansión LatAm.
+- `locale` — idioma del dispositivo. Útil para adaptar marketing por variante de español.
 
-| Evento | Descripción |
-|---|---|
-| `session_start` | Inicio de sesión en la app |
-| `session_end` | Cierre de sesión (con duración) |
-| `screen_view` | Cada pantalla visitada |
-| `feature_used` | Uso de funcionalidad específica |
-| `operation_added` | Nueva operación registrada |
-| `backup_triggered` | Backup ejecutado (manual o gestionado) |
-| `subscription_changed` | Cambio de plan |
-| `share_created` | Cartera compartida |
-| `onboarding_step` | Paso del onboarding completado |
+> **Regla de oro:** ningún evento incluye tickers, importes ni cantidades. Solo el *qué* y el *contexto mínimo necesario*.
 
-Pendiente: definir `properties` específicas por evento y diseñar los modelos dbt.
+---
+
+#### Catálogo de eventos
+
+##### Sesión y navegación
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `session_start` | `first_time: bool`, `push_source: string\|null` | Apertura de la app. `push_source` indica si viene de una notificación push. |
+| `session_end` | `duration_seconds: int` | Cierre de sesión. |
+| `screen_view` | `screen: string`, `previous_screen: string\|null`, `time_on_prev_ms: int\|null` | Cada cambio de pantalla. Permite calcular tiempo medio por pantalla y flujos de navegación. |
+
+##### Onboarding
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `onboarding_step_completed` | `step_name: string`, `step_index: int` | Paso del onboarding completado. Permite construir el funnel de activación. |
+| `first_portfolio_created` | `currency: string` | Primera cartera creada — señal de activación. |
+
+##### Operaciones y efectivo
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `operation_added` | `operation_type: buy\|sell\|dividend\|staking`, `asset_type: stock\|etf\|crypto\|other`, `is_first_for_type: bool` | Nueva operación registrada. `is_first_for_type` indica si es la primera vez que el usuario registra ese tipo de activo. |
+| `operation_cancelled` | `operation_type: string`, `days_since_original: int` | Operación cancelada. `days_since_original` indica si fue una corrección inmediata o tardía. |
+| `cash_movement_added` | `cash_type: deposit\|withdrawal` | Movimiento de efectivo registrado. |
+
+##### Carteras y colaboración
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `portfolio_created` | `portfolio_index: int` | Nueva cartera creada (1ª, 2ª, 3ª…). |
+| `portfolio_shared` | `role_granted: editor\|viewer` | Cartera compartida con otro usuario. Señal de satisfacción y uso colaborativo. |
+
+##### Backup y suscripción
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `backup_triggered` | `type: manual\|automatic` | Backup ejecutado. |
+| `subscription_changed` | `from_plan: string`, `to_plan: string`, `direction: upgrade\|downgrade` | Cambio de plan. |
+
+##### Engagement
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `annotation_created` | — | Anotación global creada. Señal de usuario comprometido. |
+| `privacy_mode_toggled` | `enabled: bool` | Modo privacidad activado/desactivado. |
+| `projection_viewed` | `dca_frequency: monthly\|biweekly\|weekly` | Herramienta de proyección DCA usada. |
+| `content_shared` | — | El usuario comparte contenido de la app (captura de cartera, rentabilidad…). |
+| `referral_shared` | — | El usuario comparte un enlace de referido. |
+
+##### Plataformas externas y canales
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `external_platform_opened` | `platform_name: string` | Enlace a plataforma externa abierto (broker, banco…). Clave para detectar qué brokers son más populares entre nuestros usuarios — insumo para negociar acuerdos comerciales. |
+| `channel_opened` | `channel_name: string`, `channel_type: youtube\|blog\|podcast` | Canal de aprendizaje abierto. Útil para partnerships con creadores de contenido. |
+| `channel_category_viewed` | `category: string` | Categoría de contenido visitada (value investing, análisis técnico, cripto…). |
+
+##### Notificaciones y valoración
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `notification_action_taken` | `notification_type: string` | El usuario interactúa con una notificación. Permite medir efectividad de notificaciones promocionales. |
+| `app_rated` | `rating: int (1-5)`, `platform: app_store\|google_play`, `triggered_by: manual\|prompt` | El usuario valora la app. |
+
+##### Errores
+
+| Evento | Properties | Descripción |
+|---|---|---|
+| `error_shown` | `error_type: string`, `screen: string` | Error mostrado al usuario. Útil para detectar fricciones en el flujo. |
+
+---
+
+#### Solicitud de valoración en la app
+
+La valoración nativa (diálogo del sistema dentro de la app, sin salir a la tienda) se implementa en el Prototipo 2 con:
+- **iOS:** `SKStoreReviewController.requestReview()` (StoreKit)
+- **Android:** `In-App Review API` (Google Play)
+
+**Cuándo lanzar el prompt:**
+- Tras registrar la 5ª operación (usuario activo)
+- Tras visualizar rentabilidad positiva por primera vez
+- Tras 7 días de uso con al menos 3 sesiones
+- Nunca más de una vez cada 90 días (límite del sistema iOS)
+
+El evento `app_rated` se dispara siempre que el usuario completa la valoración, independientemente de si usó el prompt o fue a la tienda manualmente.
+
+---
+
+#### Modelos dbt previstos
+
+| Modelo | Capa | Descripción |
+|---|---|---|
+| `stg_events` | staging | Limpieza y tipado de todos los eventos raw. Base para todos los marts. |
+| `dau` | marts | DAU / WAU / MAU calculados desde `session_start`. |
+| `screen_engagement` | marts | Tiempo medio por pantalla desde `screen_view`. Identifica pantallas con mayor retención. |
+| `onboarding_funnel` | marts | Conversión paso a paso desde `onboarding_step_completed`. Detecta dónde abandona el usuario nuevo. |
+| `feature_adoption` | marts | Uso de features por plan y `user_role`. Informa decisiones de producto y pricing. |
+| `subscription_funnel` | marts | Conversión free → personal → pro desde `subscription_changed`. |
+| `platform_popularity` | marts | Ranking de plataformas externas desde `external_platform_opened`. Insumo para negociar acuerdos con brokers. |
+| `content_engagement` | marts | Canales y categorías más consumidos desde `channel_opened` y `channel_category_viewed`. Insumo para partnerships con creadores. |
+| `geo_distribution` | marts | Distribución de usuarios por `country` y `locale`. Informa estrategia de expansión LatAm. |
 
 ### Tratamiento de operaciones canceladas en el DWH
 
