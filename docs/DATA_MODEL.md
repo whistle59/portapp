@@ -1,7 +1,8 @@
 # portapp — Modelo de datos
 
-> Versión 1.0 · Cerrado 2026-04-24  
-> Enfoque: Kimball para analytics + 3FN para datos operacionales  
+> Versión 1.1 · Actualizado 2026-04-27 (campos de cancelación en `operations` y `cash`)
+> Versión 1.0 · Cerrado 2026-04-24
+> Enfoque: Kimball para analytics + 3FN para datos operacionales
 > Plataforma: PostgreSQL en Supabase
 > **Este documento es la especificación del modelo de datos de producción — no describe el estado actual del prototipo HTML v6, que usa datos hardcodeados en variables JS.**
 
@@ -148,6 +149,8 @@ erDiagram
         decimal operation_fee
         string operation_currency
         string operation_note
+        string operation_status
+        uuid cancelled_by_operation_id FK
         timestamp operation_created_at
     }
 
@@ -162,6 +165,7 @@ erDiagram
         date cash_date
         string cash_origin
         string cash_note
+        string cash_status
         timestamp cash_created_at
     }
 
@@ -266,6 +270,7 @@ erDiagram
     assets ||--o{ stock_prices : "tiene"
     assets ||--o{ asset_notes : "tiene"
     operations ||--o{ cash : "genera"
+    operations ||--o| operations : "cancela"
 
     %% Usuario
     users ||--o{ annotations : "escribe"
@@ -289,8 +294,8 @@ erDiagram
 | `groups` | Dimensión | Grupos de activos definidos por el usuario |
 | `accounts` | Dimensión | Brokers y cuentas bancarias |
 | `assets` | Dimensión | Posiciones abiertas (estado cacheado) |
-| `operations` | Fact (inmutable) | Log de compras, ventas, dividendos, staking |
-| `cash` | Fact | Movimientos de efectivo |
+| `operations` | Fact (inmutable) | Log de compras, ventas, dividendos, staking. Nunca se borra — las cancelaciones generan una operación inversa. |
+| `cash` | Fact | Movimientos de efectivo vinculados a operaciones |
 | `stock_prices` | Fact (histórico) | Precios históricos de cotización |
 | `portfolio_snapshots` | Fact (snapshot diaria) | Valor diario de cartera para TWR y gráficos |
 | `annotations` | Entidad | Anotaciones globales del usuario |
@@ -309,15 +314,24 @@ erDiagram
 | `assets` | Soft delete — bloquear si tiene operations |
 | `accounts` | Soft delete — bloquear si tiene operations o cash |
 | `groups` | SET NULL en assets.group_id — no bloquear |
-| `operations` | Nunca se borra — solo se anula con operación inversa |
+| `operations` | Nunca se borra. Cancelación vía operación inversa — ambas quedan con `operation_status = 'cancelled'` y enlazadas por `cancelled_by_operation_id` |
 | `annotations` / `asset_notes` | Borrado físico |
 
 ---
 
 ## Notas de diseño
 
-- **`operations` es inmutable** — no hay UPDATE. Los errores se corrigen con una operación inversa.
-- **`assets.asset_qty` y `assets.asset_avg_price` son caches** — se recalculan desde `operations`. La fuente de verdad es siempre `operations`.
+- **`operations` es inmutable** — no hay UPDATE ni DELETE. Los errores se corrigen con una operación inversa siguiendo este patrón:
+  1. Se genera una nueva operación con tipo opuesto (Compra→Venta o viceversa), mismos valores (qty, precio, fee) y fecha de hoy.
+  2. Ambas operaciones (original e inversa) se marcan con `operation_status = 'cancelled'`.
+  3. El campo `cancelled_by_operation_id` en la operación original apunta a la inversa, y viceversa — enlace bidireccional para trazabilidad completa.
+  4. Los movimientos de efectivo vinculados (`cash`) también se marcan con `cash_status = 'cancelled'`.
+  5. `assets.asset_qty` y `assets.asset_avg_price` se recalculan excluyendo todas las operaciones con `operation_status = 'cancelled'`.
+  - **Bloqueo:** se impide cancelar una operación si el resultado generaría una posición negativa en `asset_qty`.
+  - **Snapshots pasados:** son inmutables — el impacto de la cancelación solo afecta a snapshots futuros.
+  - **Valores de `operation_status`:** `active` (por defecto) | `cancelled`.
+
+- **`assets.asset_qty` y `assets.asset_avg_price` son caches** — se recalculan desde `operations` filtrando `operation_status = 'active'`. La fuente de verdad es siempre `operations`.
 - **`assets.asset_last_price` y `assets.asset_prev_price`** son caches de `stock_prices` para evitar joins en cada render.
 - **`stock_prices.asset_id` es nullable** — permite precargar precios históricos antes de que el usuario añada el activo a su cartera.
 - **`portfolio_members`** gestiona la propiedad y permisos. Siempre existe exactamente un `owner` por cartera.
