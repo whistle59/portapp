@@ -59,13 +59,16 @@ jobs:
             echo "No open PR found — will create one"
           fi
 
-      - name: Create PR main -> dev
+      - name: Create PR main -> dev and enable auto-merge
         if: steps.compare.outputs.ahead_count != '0' && steps.existing_pr.outputs.pr_number == ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr create \
+          PR_URL=$(gh pr create \
             --base dev \
             --head main \
             --title "Sync main back into dev" \
-            --body "Automatic PR created after merging into main, to keep dev aligned with main."
+            --body "Automatic PR created after merging into main, to keep dev aligned with main.")
+
+          PR_NUMBER=$(gh pr view "$PR_URL" --json number --jq '.number')
+          gh pr merge "$PR_NUMBER" --auto --merge
