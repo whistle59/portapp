@@ -1,4 +1,5 @@
 // portapp — Modelo de datos
+// Versión 1.1 · Actualizado 2026-04-27 (campos de cancelación en operations y cash)
 // Versión 1.0 · Cerrado 2026-04-24
 // Pegar en https://dbdiagram.io
 
@@ -152,9 +153,11 @@ Table operations {
   operation_fee decimal
   operation_currency string
   operation_note string
+  operation_status string [note: 'active (default) | cancelled']
+  cancelled_by_operation_id uuid [ref: > operations.operation_id, note: 'nullable — apunta a la operación inversa cuando status=cancelled']
   operation_created_at timestamp
 
-  Note: 'Fact table — inmutable. Nunca se edita ni se borra'
+  Note: 'Fact table — inmutable. Nunca se edita ni se borra. Cancelación vía operación inversa: ambas quedan con status=cancelled y enlazadas por cancelled_by_operation_id. Ver Notas de diseño en DATA_MODEL.md.'
 }
 
 Table cash {
@@ -168,6 +171,7 @@ Table cash {
   cash_date date
   cash_origin string [note: 'manual|operation']
   cash_note string
+  cash_status string [note: 'active (default) | cancelled — se cancela en cascada cuando se cancela la operación vinculada']
   cash_created_at timestamp
 }
 
