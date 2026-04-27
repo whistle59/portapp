@@ -2117,6 +2117,16 @@ Operación inversa:    sell · 10 AAPL · 170 USD · 2026-04-26 · status: cance
 - Diagrama Mermaid completo → `docs/DATA_MODEL.md`
 - Exports y reports en PDF → pendiente de diseñar contenido y formato (ver sección 26)
 
+### FIFO — Pendiente de implementación (pre-producción)
+
+En España y el resto de países hispanohablantes la venta de acciones sigue el método FIFO (First In, First Out) a efectos fiscales. Funcionalidades previstas para pre-producción:
+
+- Marcar visualmente qué lotes se venden según FIFO y a qué precio de compra
+- Mostrar ganancia real por venta calculada sobre precio de compra FIFO (no sobre PM)
+- Gestión de ventas parciales del último lote
+
+Requiere motor de trazabilidad de lotes en backend. No implementado en el prototipo.
+
 ---
 
 ## 24. Supabase como backend de portapp
