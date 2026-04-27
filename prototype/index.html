@@ -524,7 +524,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <!-- SETTINGS -->
     <div class="screen" id="s-settings">
       <div class="screen-title">Ajustes</div>
-      <div class="slabel" style="margin-bottom:7px">Interfaz</div>
+      <div class="slabel" style="margin-bottom:7px">Modo de uso</div>
+      <div class="card">
+        <div class="dr">
+          <div><div class="dk">Modo avanzado</div><div style="font-size:11px;color:var(--t1)">Rentabilidad TWR, grupos, índices y más</div></div>
+          <input type="checkbox" id="advanced-chk" style="width:auto" onchange="toggleAppMode(this.checked)">
+        </div>
+      </div>
+      <div class="slabel" style="margin-top:12px;margin-bottom:7px">Interfaz</div>
       <div class="card">
         <div class="dr"><span class="dk">Modo oscuro</span><input type="checkbox" id="dark-chk" style="width:auto" onchange="toggleDark()"></div>
         <div class="dr"><span class="dk">Tamaño de fuente</span><select style="width:110px;padding:4px" onchange="setFontSize(this.value)"><option value="fs-sm">Pequeño</option><option value="fs-md" selected>Normal</option><option value="fs-lg">Grande</option><option value="fs-xl">Muy grande</option></select></div>
@@ -778,7 +785,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <button class="nav-item" id="nav-efectivo" onclick="goTo('s-efectivo',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="4" width="16" height="10" rx="2" stroke-width="1.3"/><path d="M1 7h16" stroke-width="1.3"/><circle cx="5" cy="11" r="1" fill="var(--t2)" stroke="none"/></svg><span class="nav-label">Efectivo</span></button>
     <button class="nav-item" id="nav-ops" onclick="goTo('s-ops',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5h12M3 9h8M3 13h10" stroke-width="1.3" stroke-linecap="round"/></svg><span class="nav-label">Ops.</span></button>
     <button class="nav-item" id="nav-proyeccion" onclick="goTo('s-proyeccion',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="1,14 6,8 10,11 17,3" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="nav-label">DCA</span></button>
-    <button class="nav-item" id="nav-indices" onclick="goTo('s-indices',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke-width="1.3"/><line x1="9" y1="2" x2="9" y2="16" stroke-width="1.3"/><line x1="2" y1="9" x2="16" y2="9" stroke-width="1.3"/></svg><span class="nav-label">Mercado</span></button>
+    <button class="nav-item nav-advanced" id="nav-indices" onclick="goTo('s-indices',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke-width="1.3"/><line x1="9" y1="2" x2="9" y2="16" stroke-width="1.3"/><line x1="2" y1="9" x2="16" y2="9" stroke-width="1.3"/></svg><span class="nav-label">Mercado</span></button>
     <button class="nav-item" id="nav-settings" onclick="goTo('s-settings',this)"><svg class="ni-svg" width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke-width="1.3"/><path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.2 3.2l1.4 1.4M13.4 13.4l1.4 1.4M3.2 14.8l1.4-1.4M13.4 4.6l1.4-1.4" stroke-width="1.3" stroke-linecap="round"/></svg><span class="nav-label">Ajustes</span></button>
   </div>
 </div>
@@ -1125,7 +1132,7 @@ const plats=[
   {nombre:'Coinbase',url:'https://www.coinbase.com',cat:'Cripto',color:'#0052ff',icon:'CB'},
 ];
 const idxData={'FTSE All-World':{ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},'MSCI World':{ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados'},'S&P 500':{ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'}};
-let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=31,privacyOn=false,opsFilter='todas',opsLimit='20',lastBackupDate=null;
+let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=31,privacyOn=false,opsFilter='todas',opsLimit='20',lastBackupDate=null,appMode=localStorage.getItem('appMode')||'basic';
 const canales=[
   {id:'ch1',nombre:'Fondos Indexados',ini:'FI',color:'#4a7fa5',cat:'ETFs',desc:'Inversión pasiva en índices globales, ETFs y estrategias de largo plazo.',url:'#',fav:false,dest:true},
   {id:'ch2',nombre:'Value School',ini:'VS',color:'#4a8c6f',cat:'Value',desc:'Value investing, análisis fundamental y filosofía de inversión a largo plazo.',url:'#',fav:true,dest:false},
@@ -1202,13 +1209,16 @@ document.addEventListener('visibilitychange',()=>{
 });
 function togglePrivacy(){privacyOn=!privacyOn;document.getElementById('device').classList.toggle('masked',privacyOn);document.getElementById('privacy-bar').classList.toggle('on',privacyOn);}
 function toggleDark(){document.documentElement.classList.toggle('dark');document.getElementById('dark-chk').checked=document.documentElement.classList.contains('dark');reCharts();}
+function applyAppMode(){const adv=appMode==='advanced';document.querySelectorAll('.nav-advanced').forEach(el=>el.style.display=adv?'':'none');const chk=document.getElementById('advanced-chk');if(chk)chk.checked=adv;}
+function toggleAppMode(adv){appMode=adv?'advanced':'basic';localStorage.setItem('appMode',appMode);applyAppMode();}
 function setFontSize(cls){['fs-sm','fs-md','fs-lg','fs-xl'].forEach(c=>document.documentElement.classList.remove(c));document.documentElement.classList.add(cls);}
 function togglePwd(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.style.opacity=el.type==='text'?'1':'0.5';}
 function reCharts(){const a=id=>document.getElementById(id).classList.contains('active');if(a('s-global'))requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));if(a('s-resumen'))requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));if(a('s-rentabilidad'))requestAnimationFrame(()=>requestAnimationFrame(renderRentabilidad));if(a('s-grupos'))requestAnimationFrame(()=>requestAnimationFrame(renderGruposCapital));}
+const ADVANCED_SCREENS=['s-rentabilidad','s-grupos','s-rent-efectivo','s-indices','s-anotaciones','s-canales'];
 const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones','s-canales','s-ayuda'];
 const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Ajustes','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas','s-canales':'Aprende','s-ayuda':'Ayuda'};
 const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
-function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;const ps=document.getElementById('port-sel');const gt=document.getElementById('global-title');if(ps)ps.style.display=sid==='s-global'?'none':'flex';if(gt)gt.style.display=sid==='s-global'?'block':'none';
+function goTo(sid,btn){if(appMode==='basic'&&ADVANCED_SCREENS.includes(sid)){sid='s-global';btn=null;}SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;const ps=document.getElementById('port-sel');const gt=document.getElementById('global-title');if(ps)ps.style.display=sid==='s-global'?'none':'flex';if(gt)gt.style.display=sid==='s-global'?'block':'none';
   if(sid==='s-global'){requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));}
   else if(sid==='s-resumen'){renderResumen();requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));}
   else if(sid==='s-cartera')renderCartera();
@@ -1227,7 +1237,7 @@ function goTo(sid,btn){SCREENS.forEach(s=>document.getElementById(s).classList.r
   else if(sid==='s-ayuda')renderAyuda();
   else if(sid==='s-proyeccion'){const el=document.getElementById('dca-base-display');if(el)el.textContent=fe(cV(activeId)||0);}
 }
-function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones','canales'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil'&&id!=='s-ayuda'&&id!=='s-anotaciones').map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
+function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones','canales'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil'&&id!=='s-ayuda'&&id!=='s-anotaciones'&&(appMode==='advanced'||!ADVANCED_SCREENS.includes(id))).map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
 function renderAyuda(){}
 function openModal(id){document.getElementById(id).classList.add('open');if(id==='m-portfolios')renderPortList();if(id==='m-op'||id==='m-efectivo')fillCS();}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -1946,6 +1956,7 @@ function renderRentEfectivo(){
   document.getElementById('tb-re').innerHTML=ingresos.map(e=>`<tr><td>${e.fecha.slice(5)}</td><td><span class="badge b-teal">${e.tipo}</span></td><td>${e.broker}</td><td class="pos"><span class="amt">+€${e.importe.toLocaleString('es-ES')}</span></td></tr>`).join('')||'<tr><td colspan="4" style="color:var(--t1)">Sin rendimientos en este período</td></tr>';
 }
 document.getElementById('op-date').value=new Date().toISOString().split('T')[0];
+applyAppMode();
 </script>
 </body>
 </html>
