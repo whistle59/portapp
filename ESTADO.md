@@ -140,6 +140,8 @@
 
 > **Nota sobre datos del prototipo:** cotizaciones, tipos de cambio y parte del historial de efectivo son datos hardcodeados en variables JS. No hay integración con APIs externas. El código OTP `123456` es simulado — no valida contra un backend real.
 
+> **Modo básico/avanzado:** las pantallas `s-rentabilidad`, `s-grupos`, `s-rent-efectivo`, `s-indices`, `s-anotaciones` y `s-canales` están ocultas en modo básico. El usuario puede activar el modo avanzado desde Ajustes → Modo de uso. Switch gratuito, sin restricción de plan. Decisión: reducir fricción de onboarding para inversores nuevos sin penalizar a los avanzados. El modo persiste entre sesiones (localStorage).
+
 ---
 
 ## 3. Iteraciones de pulido — estado
@@ -1736,6 +1738,8 @@ Pantalla de onboarding de paso único, tras el registro y antes de crear la prim
 > portapp guarda tus carteras e inversiones únicamente en este dispositivo. Nadie más puede verlos — ni nosotros.
 >
 > Esto significa que si pierdes el móvil o lo cambias sin hacer una copia, perderías tus datos. Te lo decimos ahora para que lo tengas claro desde el principio.
+>
+> La app tiene un **modo básico** ideal para empezar y un **modo avanzado** con herramientas analíticas más potentes (rentabilidad TWR, análisis por grupos, índices…). Puedes cambiar entre ellos cuando quieras, gratis, desde Ajustes.
 >
 > Si quieres, podemos guardar una copia de seguridad cifrada en nuestra nube — solo tú tendrás la clave para descifrarla. Nosotros no podemos leerla. Puedes activarlo ahora o más adelante desde Ajustes.
 
