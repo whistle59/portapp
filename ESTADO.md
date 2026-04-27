@@ -1715,6 +1715,43 @@ Dado que las operaciones son inmutables, la estrategia de conflictos es trivial:
 
 ---
 
+### Pantalla de onboarding — transparencia sobre privacidad y datos
+
+Durante el registro, antes de que el usuario cree su primera cartera, se muestra una pantalla dedicada que explica honestamente cómo funcionan sus datos. El objetivo es generar confianza desde el primer momento y convertir la arquitectura local-first en un argumento de venta emocional.
+
+#### Por qué esta pantalla es importante
+
+- El usuario que viene de competidores cloud asume que sus datos están en un servidor. Hay que romper esa expectativa explícitamente.
+- Ser transparente sobre el riesgo de pérdida de datos (si pierde el móvil) antes de que ocurra genera mucha más confianza que descubrirlo después.
+- El backup opcional presentado como un servicio de valor añadido, no como obligación, refuerza el mensaje de control total.
+
+#### Diseño propuesto
+
+Pantalla de onboarding de paso único, tras el registro y antes de crear la primera cartera. Tono: claro, directo, sin jerga técnica.
+
+**Título:**
+> Tus datos son solo tuyos
+
+**Cuerpo:**
+> portapp guarda tus carteras e inversiones únicamente en este dispositivo. Nadie más puede verlos — ni nosotros.
+>
+> Esto significa que si pierdes el móvil o lo cambias sin hacer una copia, perderías tus datos. Te lo decimos ahora para que lo tengas claro desde el principio.
+>
+> Si quieres, podemos guardar una copia de seguridad cifrada en nuestra nube — solo tú tendrás la clave para descifrarla. Nosotros no podemos leerla. Puedes activarlo ahora o más adelante desde Ajustes.
+
+**Acciones:**
+- Botón principal: `Activar backup seguro` → lleva al flujo de configuración de backup
+- Botón secundario: `Ahora no, solo guardar en mi móvil` → continúa al onboarding
+
+#### Notas de implementación (Prototipo 2)
+
+- La pantalla aparece **una sola vez**, justo después del primer login exitoso
+- Se registra en `user_demographics` o `app_usage` si el usuario activó el backup o lo rechazó
+- Si rechaza el backup, la app recuerda no volver a preguntar hasta que el usuario entre en Ajustes → Backup
+- El evento `onboarding_step_completed` con `step_name: 'privacy_screen'` captura si el usuario llegó a esta pantalla y qué opción eligió (`activated_backup` | `skipped`)
+
+---
+
 ### Plan: Prototipo 2 — validación técnica local-first
 
 El prototipo HTML actual (v6) validó **flujos y UX**. El Prototipo 2 no rehace lo mismo — valida **la arquitectura de datos local y el sync**.
