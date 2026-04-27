@@ -1,24 +1,71 @@
-name: Sync dev with main
+name: Sync main back to dev
 
 on:
-  workflow_dispatch: # sync manual — ruleset de dev requiere PR para push directo
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
 
 permissions:
-  contents: write
+  contents: read
+  pull-requests: write
 
 jobs:
-  sync:
+  sync-back:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Sync dev with main
+      - name: Fetch branches
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout dev
-          git merge origin/main --no-edit
-          git push origin dev
+          git fetch origin main dev
+
+      - name: Check whether main is ahead of dev
+        id: compare
+        run: |
+          AHEAD_COUNT=$(git rev-list --right-only --count origin/dev...origin/main)
+          echo "ahead_count=$AHEAD_COUNT" >> "$GITHUB_OUTPUT"
+
+          if [ "$AHEAD_COUNT" -eq 0 ]; then
+            echo "main is not ahead of dev — nothing to do"
+          else
+            echo "main is ahead of dev by $AHEAD_COUNT commit(s)"
+          fi
+
+      - name: Check for existing PR main -> dev
+        if: steps.compare.outputs.ahead_count != '0'
+        id: existing_pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr list \
+            --base dev \
+            --head main \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$PR_NUMBER" ]; then
+            echo "Open PR already exists: #$PR_NUMBER"
+          else
+            echo "No open PR found — will create one"
+          fi
+
+      - name: Create PR main -> dev
+        if: steps.compare.outputs.ahead_count != '0' && steps.existing_pr.outputs.pr_number == ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base dev \
+            --head main \
+            --title "Sync main back into dev" \
+            --body "Automatic PR created after merging into main, to keep dev aligned with main."
