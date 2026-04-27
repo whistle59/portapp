@@ -1588,7 +1588,7 @@ Importación confirmada por el usuario
 - **Android** — Google Play (React Native + Expo)
 - **Web** — PWA o web app (Expo Web / React Native Web)
 
-Las tres plataformas comparten la misma base de código. El sync entre dispositivos (móvil ↔ web ↔ otro móvil) funciona via Supabase Realtime / PowerSync.
+Las tres plataformas comparten la misma base de código. El sync entre dispositivos (móvil ↔ web ↔ otro móvil) funciona via WatermelonDB + Supabase Edge Function.
 
 ---
 
@@ -1626,7 +1626,7 @@ Apps consolidadas con este modelo: **Linear**, **Obsidian**, **Bear**, **Anytype
 |---|---|---|
 | App | React Native + Expo | Una base de código iOS + Android + web |
 | BD local | Expo SQLite / WatermelonDB | SQLite en el dispositivo, muy rápido, offline total |
-| Sync | Electric SQL o PowerSync | Sincroniza SQLite local ↔ PostgreSQL en nube |
+| Sync | WatermelonDB | Sincroniza SQLite local ↔ PostgreSQL — MIT, sin dependencia de terceros |
 | BD nube (opcional) | PostgreSQL (Supabase) | Solo para sync, no como fuente de verdad |
 | Auth | Supabase Auth | Solo necesaria para sync y licencias |
 | Pagos | Paddle | Sin cambios vs. arquitectura clásica |
@@ -1666,7 +1666,52 @@ SQLite local  ←→  Electric SQL  ←→  PostgreSQL  ←→  Electric SQL  �
 | Multi-dispositivo | Sync opcional — el usuario lo activa si lo necesita |
 | B2B desktop | PWA + sync cubre el caso de uso del asesor en desktop |
 | Migraciones de esquema SQLite | Expo SQLite + sistema de migraciones versionadas (igual que en BD clásica) |
-| Complejidad del sync | Electric SQL / PowerSync abstraen la complejidad — no hay que implementar CRDTs a mano |
+| Complejidad del sync | WatermelonDB abstrae la complejidad — no hay que implementar CRDTs a mano |
+
+---
+
+### Análisis de dependencia de la capa de sync (2026-04-27)
+
+La elección de la librería de sync es la decisión técnica con mayor impacto en la independencia del proyecto a largo plazo.
+
+#### Opciones evaluadas
+
+| Opción | Licencia | Dependencia | Complejidad | Veredicto |
+|---|---|---|---|---|
+| **PowerSync** | Propietaria (free tier) | Alta — si cierran o cambian precios, hay que migrar | Baja (abstrae todo) | ❌ Riesgo de dependencia |
+| **Electric SQL** | Apache 2.0 | Media — open source pero tercero en infraestructura | Baja-Media | ⚠️ Mejor que PowerSync pero aún dependencia |
+| **WatermelonDB** | MIT | **Nula** — open source, tú controlas el sync endpoint | Media | ✅ Recomendado |
+| **Sync propio** | — | Nula — control total | Alta | ⚠️ Solo si el equipo tiene experiencia en sync distribuido |
+
+#### Por qué WatermelonDB es la elección correcta para portapp
+
+**1. Sin dependencia de terceros en la capa crítica**
+WatermelonDB es una librería MIT. El protocolo de sync lo implementas tú en una Supabase Edge Function — código que posees completamente. Si WatermelonDB dejara de mantenerse, el código ya está en tu repo y puedes seguir usándolo o migrarlo.
+
+**2. El modelo de datos de portapp simplifica el sync**
+Los datos de portapp son casi todos **append-only** (las operaciones son inmutables, nunca se editan). Esto elimina prácticamente todos los conflictos de sync — el problema más difícil del sync distribuido. No necesitas CRDTs completos: basta con una cola de inserciones pendientes.
+
+**3. Madurez probada**
+WatermelonDB tiene +10.000 estrellas en GitHub, es usado en producción por Nozbe y Hey.com, y lleva activo desde 2018.
+
+**4. Integración natural con Supabase**
+El endpoint de sync de WatermelonDB es una función HTTP estándar — una Supabase Edge Function con ~100 líneas de código lo cubre.
+
+#### Patrón de sync para portapp
+
+```
+Dispositivo (React Native)          Backend (Supabase)
+WatermelonDB (SQLite local)
+    │
+    ├─ pull: GET /sync?lastPulledAt=...  ──→  Edge Function
+    │                                          lee cambios en PostgreSQL
+    │                                    ←──  devuelve registros nuevos/modificados
+    │
+    └─ push: POST /sync                 ──→  Edge Function
+                                               aplica cambios locales en PostgreSQL
+```
+
+Dado que las operaciones son inmutables, la estrategia de conflictos es trivial: **last-write-wins en inserciones**. No hay ediciones que resolver.
 
 ---
 
@@ -1685,9 +1730,9 @@ El prototipo HTML actual (v6) validó **flujos y UX**. El Prototipo 2 no rehace 
 **Stack:**
 ```
 React Native + Expo
-Expo SQLite (bd local)
-PowerSync o Electric SQL (sync)
-Supabase (auth + PostgreSQL para sync)
+WatermelonDB (bd local + sync)
+Supabase Edge Function (endpoint de sync)
+Supabase Auth + PostgreSQL
 ```
 
 **Criterio de éxito:** si el sync funciona de forma transparente y los datos persisten offline, la arquitectura está validada y se adopta para producción. Si hay demasiada complejidad operativa, se vuelve al cliente-servidor clásico.
