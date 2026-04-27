@@ -463,7 +463,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <!-- PROYECCIÓN -->
     <div class="screen" id="s-proyeccion">
       <div class="qnav" id="qn-proyeccion"></div>
-      <div class="screen-title">Proyección DCA</div>
+      <div class="screen-title" id="proy-titulo">Proyección DCA</div>
+      <div id="proy-list" style="display:none;margin-bottom:10px"></div>
       <div class="card">
         <div style="font-size:11px;color:var(--t1);margin-bottom:8px">Saldo inicial: <span id="dca-base-display" style="color:var(--t0);font-weight:600"></span> <span style="color:var(--t2)">(cartera activa)</span></div>
         <div class="two-col">
@@ -475,6 +476,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
           <div class="fg"><label>Horizonte (años)</label><input type="number" id="dca-years" value="10" min="1" max="40"></div>
         </div>
         <button class="btn btn-p" onclick="calcProy()">Calcular</button>
+        <button class="btn" style="margin-top:8px;width:100%" onclick="saveProy()">Guardar proyección</button>
       </div>
       <div class="card" id="card-proy" style="display:none">
         <div class="metric-grid" id="proy-metrics"></div>
@@ -1132,7 +1134,7 @@ const plats=[
   {nombre:'Coinbase',url:'https://www.coinbase.com',cat:'Cripto',color:'#0052ff',icon:'CB'},
 ];
 const idxData={'FTSE All-World':{ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},'MSCI World':{ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados'},'S&P 500':{ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'}};
-let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=31,privacyOn=false,opsFilter='todas',opsLimit='20',lastBackupDate=null,appMode=localStorage.getItem('appMode')||'basic';
+let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=31,privacyOn=false,opsFilter='todas',opsLimit='20',lastBackupDate=null,appMode=localStorage.getItem('appMode')||'basic',proyecciones=[],proyId=1;
 const canales=[
   {id:'ch1',nombre:'Fondos Indexados',ini:'FI',color:'#4a7fa5',cat:'ETFs',desc:'Inversión pasiva en índices globales, ETFs y estrategias de largo plazo.',url:'#',fav:false,dest:true},
   {id:'ch2',nombre:'Value School',ini:'VS',color:'#4a8c6f',cat:'Value',desc:'Value investing, análisis fundamental y filosofía de inversión a largo plazo.',url:'#',fav:true,dest:false},
@@ -1235,7 +1237,7 @@ function goTo(sid,btn){if(appMode==='basic'&&ADVANCED_SCREENS.includes(sid)){sid
   else if(sid==='s-perfil')renderPerfil();
   else if(sid==='s-canales')renderCanales();
   else if(sid==='s-ayuda')renderAyuda();
-  else if(sid==='s-proyeccion'){const el=document.getElementById('dca-base-display');if(el)el.textContent=fe(cV(activeId)||0);}
+  else if(sid==='s-proyeccion'){const el=document.getElementById('dca-base-display');if(el)el.textContent=fe(cV(activeId)||0);renderProyList();}
 }
 function renderQN(cur){['resumen','cartera','efectivo','ops','proyeccion','indices','notif','plataformas','rentabilidad','grupos','rent-efectivo','anotaciones','canales'].forEach(k=>{const el=document.getElementById('qn-'+k);if(!el)return;el.innerHTML=Object.entries(SL).filter(([id])=>id!==cur&&id!=='s-global'&&id!=='s-settings'&&id!=='s-perfil'&&id!=='s-ayuda'&&id!=='s-anotaciones'&&(appMode==='advanced'||!ADVANCED_SCREENS.includes(id))).map(([id,l])=>`<button class="qbtn" onclick="goTo('${id}')">${l}</button>`).join('');});}
 function renderAyuda(){}
@@ -1449,6 +1451,43 @@ function calcProy(){
       rows.map(r=>`<tr><td>${new Date().getFullYear()+r.y}</td><td class="pos"><span class="amt">${fe(r.final)}</span></td></tr>`).join('')+
       '</tbody></table>';
   }
+}
+function renderProyList(){
+  const lista=proyecciones.filter(p=>p.cartera===activeId);
+  const el=document.getElementById('proy-list');
+  const tit=document.getElementById('proy-titulo');
+  const cart=carteras.find(c=>c.id===activeId);
+  if(tit)tit.textContent=lista.length?`Proyecciones — ${cart?.nombre||''}`: 'Proyección DCA';
+  if(!el)return;
+  el.style.display=lista.length?'block':'none';
+  el.innerHTML=lista.length?`<div class="card" style="padding:10px"><div class="card-title" style="margin-bottom:8px">Proyecciones guardadas</div>`+
+    lista.map(p=>`<div class="dr" style="gap:8px;padding:4px 0"><span class="tag" onclick="loadProy(${p.id})" style="cursor:pointer;flex:1">${p.nombre}</span><button class="btn-icon" onclick="deleteProy(${p.id})" style="color:var(--neg);font-size:14px">🗑</button></div>`).join('')+
+    `</div>`:'';
+}
+function saveProy(){
+  const nombre=prompt('Nombre de esta proyección:');
+  if(!nombre||!nombre.trim())return;
+  proyecciones.push({id:proyId++,cartera:activeId,nombre:nombre.trim(),
+    amt:parseFloat(document.getElementById('dca-amt').value)||300,
+    freq:document.getElementById('dca-freq').value,
+    rate:parseFloat(document.getElementById('dca-rate').value)||8,
+    years:parseInt(document.getElementById('dca-years').value)||10});
+  renderProyList();
+  showToast('Proyección guardada ✓');
+}
+function loadProy(id){
+  const p=proyecciones.find(x=>x.id===id);
+  if(!p)return;
+  document.getElementById('dca-amt').value=p.amt;
+  document.getElementById('dca-freq').value=p.freq;
+  document.getElementById('dca-rate').value=p.rate;
+  document.getElementById('dca-years').value=p.years;
+  calcProy();
+}
+function deleteProy(id){
+  if(!confirm('¿Eliminar esta proyección?'))return;
+  proyecciones=proyecciones.filter(x=>x.id!==id);
+  renderProyList();
 }
 function renderIndices(){const idx={};activos.forEach(a=>{if(a.indice&&a.indice!=='-'){if(!idx[a.indice])idx[a.indice]=[];idx[a.indice].push(a.ticker);}});if(!Object.keys(idx).length){document.getElementById('lista-indices').innerHTML='<div style="font-size:13px;color:var(--t1);padding:12px 0">Ningún activo de esta cartera sigue un índice.</div>';return;}document.getElementById('lista-indices').innerHTML=Object.entries(idx).map(([name,ticks])=>{const d=idxData[name]||{ytd:'—',y1:'—',pe:'—',div:'—',n:'—',desc:'Índice personalizado'};return`<div class="card"><div class="card-header"><span class="card-title">${name}</span><span class="badge b-blue">${ticks.join(', ')}</span></div><div class="dr"><span class="dk">YTD</span><span class="dv pos">${d.ytd}</span></div><div class="dr"><span class="dk">12 meses</span><span class="dv pos">${d.y1}</span></div><div class="dr"><span class="dk">PER</span><span class="dv">${d.pe}</span></div><div class="dr"><span class="dk">Dividendo</span><span class="dv">${d.div}</span></div><div class="dr"><span class="dk">N.º valores</span><span class="dv">${d.n}</span></div><div style="margin-top:7px;font-size:11px;color:var(--t1)">${d.desc}</div></div>`;}).join('');}
 function renderNotif(){document.getElementById('notif-dot').style.display='none';notifs.forEach(n=>n.leida=true);const ic={alerta:'⚠',dca:'📅',info:'✓'},co={alerta:'b-coral',dca:'b-blue',info:'b-teal'};document.getElementById('lista-notif').innerHTML=notifs.map(n=>`<div class="card" id="notif-${n.id}" style="opacity:${n.leida?.85:1}"><div style="display:flex;align-items:flex-start;gap:10px"><span class="badge ${co[n.tipo]}" style="margin-top:1px">${ic[n.tipo]}</span><div style="flex:1"><div style="font-size:13px;color:var(--t0);margin-bottom:3px">${n.texto}</div><div style="font-size:11px;color:var(--t1)">${n.fecha}</div></div><div style="display:flex;gap:4px;flex-shrink:0"><button onclick="toggleFavNotif(${n.id})" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px" title="Favorita">${n.favorita?'⭐':'☆'}</button><button onclick="borrarNotif(${n.id})" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--t2);padding:2px" title="Borrar">✕</button></div></div></div>`).join('')||'<div style="font-size:13px;color:var(--t1);padding:12px 0">Sin notificaciones.</div>';}
