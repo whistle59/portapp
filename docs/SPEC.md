@@ -80,9 +80,21 @@ Agrupaciones predefinidas y personalizables:
 - Actualización online en tiempo real (v2)
 
 ### 10. Anotaciones
-- Anotaciones a todos los niveles: activo, broker, grupo, cartera, global
+- Anotaciones globales del usuario (pantalla dedicada `s-anotaciones`)
+- Notas por activo individual (accesibles desde el detalle del activo)
 - No interfieren con el flujo ni la navegación
-- Accesibles desde el detalle de cada entidad
+
+### 13. Rentabilidad efectivo (`s-rent-efectivo`)
+- Rentabilidad calculada sobre los movimientos de efectivo
+
+### 14. Perfil (`s-perfil`)
+- Datos del usuario, gestión de cuenta
+
+### 15. Canales / Aprende (`s-canales`)
+- Canales de contenido curados para formación inversora
+
+### 16. Ayuda / FAQ (`s-ayuda`)
+- Preguntas frecuentes, guía de uso, información sobre el cálculo de precio medio
 
 ### 11. Detalle de activo
 Pantalla individual por activo con:
@@ -107,7 +119,7 @@ Pantalla individual por activo con:
 ---
 
 ## Navegación
-- Menú inferior estilo móvil (7 secciones principales)
+- Menú inferior estilo móvil (8 secciones principales)
 - Acceso rápido cross-screen desde cada pantalla
 - Selector de cartera siempre visible en la barra superior
 - Botón de acceso directo a vista global
@@ -144,7 +156,8 @@ Pantalla individual por activo con:
 
 | Versión | Contenido |
 |---------|-----------|
-| v0.1 | Prototipo UI completo (actual) |
+| v6 (HTML) | Prototipo UI completo — 17 pantallas, modo básico/avanzado, proyecciones DCA (actual) |
+| Prototipo 2 | Validación arquitectura local-first: React Native + WatermelonDB + Supabase |
 | v1.0 | App funcional con datos reales, sin APIs externas |
 | v1.5 | Integración cotizaciones en tiempo real |
-| v2.0 | Autenticación biométrica WebAuthn, app móvil nativa |
+| v2.0 | Autenticación biométrica WebAuthn, funcionalidades avanzadas |

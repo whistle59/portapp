@@ -148,13 +148,13 @@ Asesores financieros independientes, family offices. Acceso de lectura a cartera
 
 ### Estado actual
 
-El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un prototipo HTML autocontenido que valida flujos y experiencia de usuario, sin backend. Incluye 16 pantallas funcionales: global, resumen, cartera, efectivo, operaciones, rentabilidad TWR, proyección DCA, índices, guía de uso integrada y preguntas frecuentes.
+El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un prototipo HTML autocontenido que valida flujos y experiencia de usuario, sin backend. Incluye 17 pantallas funcionales con modo básico/avanzado, proyecciones DCA guardadas, cancelación de operaciones y FAQ integrada.
 
 ### Roadmap
 
 | Fase | Entregable | Plazo estimado |
 |---|---|---|
-| **Prototipo 2** | Validación arquitectura local-first: React Native + Expo SQLite + PowerSync + Supabase | 3-4 meses |
+| **Prototipo 2** | Validación arquitectura local-first: React Native + WatermelonDB + Supabase (sin dependencia de terceros en capa sync) | 3-4 meses |
 | **Beta cerrada** | App iOS + Android con funcionalidades core, 100 usuarios beta | 6-8 meses |
 | **Lanzamiento v1** | App Store + Google Play + Web, Plan Personal disponible | 10-12 meses |
 | **v1.1** | Plan Profesional B2B, importación PDF de broker con IA | 14-16 meses |
@@ -181,7 +181,7 @@ El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un proto
 - **Funcionamiento offline completo** — el usuario consulta y registra operaciones sin conexión. Relevante en mercados latinoamericanos con conectividad variable.
 - **Comunidad hispanohablante ya educada** — existe un ecosistema maduro de blogs, podcasts y canales de YouTube sobre inversión en español (El Inversor Inteligente, Indexa Capital, Finect…) que genera demanda orgánica y facilita la distribución.
 - **Coste de infraestructura mínimo** — la arquitectura local-first desplaza el coste computacional al dispositivo. El backend gestiona solo sync, auth y licencias.
-- **Prototipo validado con usuarios reales** — 16 pantallas funcionales en pruebas con inversores reales.
+- **Prototipo validado con usuarios reales** — 17 pantallas funcionales en pruebas con inversores reales.
 - **Modelo de monetización sin publicidad** — los datos financieros del usuario nunca se monetizan, lo que refuerza el argumento de privacidad.
 - **Escalabilidad geográfica natural** — España como mercado de validación, con expansión natural a México, Argentina, Colombia y Chile sin cambio de idioma ni de producto.
 
