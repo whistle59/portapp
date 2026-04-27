@@ -2596,3 +2596,79 @@ Usa exclusivamente `operation_status = 'active'`. Las operaciones canceladas no 
 | Ingesta | Supabase Edge Functions → BigQuery API | Incluido en Supabase |
 | Visualización | Looker Studio (conexión nativa BigQuery) | Gratis |
 | Visualización avanzada | Looker (cuando haya escala) | De pago |
+
+---
+
+## 30. Agentes de IA — Estrategia de integración
+
+### Principio general
+
+Los agentes de IA son herramientas que ejecutan tareas específicas definidas por el equipo. El código sigue siendo nuestro, en nuestro repositorio, auditable en todo momento. Un agente no "toma el control" — ejecuta instrucciones acotadas en respuesta a eventos o peticiones del usuario.
+
+El riesgo real no es pérdida de control sino **complejidad añadida**: más superficie de error, más dependencias externas. Para una app financiera, cada caso de uso debe justificar ese coste.
+
+**Regla fundamental:** ningún agente modifica datos financieros del usuario sin confirmación explícita previa. Los agentes leen, analizan y sugieren — el usuario decide y confirma.
+
+---
+
+### Casos de uso por fase
+
+#### Casos aprobados — lectura y análisis (bajo riesgo)
+
+| Caso de uso | Descripción | Fase |
+|---|---|---|
+| Actualización de cotizaciones | Agente que consulta APIs de mercado y actualiza precios periódicamente | Prototipo 2 |
+| Generación de alertas inteligentes | Analiza datos de cartera y redacta avisos contextualizados (ej. "VWCE ha caído un 5% esta semana") | Prototipo 2 |
+| Asistente de análisis de cartera | Responde preguntas en lenguaje natural sobre los datos del usuario ("¿cuál es mi activo más rentable?") | Producción |
+| Resumen de rendimiento periódico | Genera un informe semanal/mensual en texto natural con los movimientos del período | Producción |
+
+#### Casos aprobados — escritura con confirmación explícita (riesgo medio)
+
+| Caso de uso | Descripción | Fase |
+|---|---|---|
+| Importación de PDF de broker | Extrae operaciones de un extracto PDF y las presenta al usuario para que confirme antes de guardar | Producción |
+| Sugerencias de DCA | Calcula y sugiere la próxima aportación según el plan del usuario — el usuario confirma | Producción |
+
+#### Casos excluidos permanentemente
+
+| Caso de uso | Motivo |
+|---|---|
+| Gestión autónoma de operaciones o datos financieros | Nunca sin confirmación explícita del usuario |
+| Decisiones o recomendaciones de inversión | Fuera del alcance legal (CNMV) y ético de la app |
+| Acceso a datos financieros de terceros sin consentimiento | Incompatible con el argumento de privacidad de portapp |
+
+---
+
+### Arquitectura técnica
+
+Los agentes se construyen sobre la **Claude API con tool use** (Anthropic SDK). Es el enfoque más fiable para Claude y mantiene el stack homogéneo.
+
+**Patrón básico:**
+```
+Evento / petición del usuario
+    → Agente (Claude API + tools definidas)
+        → Tool: consulta BD / API externa / análisis
+            → Resultado → Claude genera respuesta
+                → App muestra resultado al usuario
+```
+
+**Frameworks evaluados:**
+
+| Framework | Valoración para portapp |
+|---|---|
+| **Claude API + tool use** (Anthropic) | ✅ Recomendado — nativo, fiable, auditable |
+| **CrewAI** | Interesante para multi-agente (ej. agente de datos + agente de redacción de alertas), evaluar en producción |
+| **LangGraph** | Más control del flujo, útil si los workflows se complican |
+| **AutoGen** (Microsoft) | Descartado — stack distinto, sin ventaja clara |
+
+---
+
+### Control y auditoría
+
+Para mantener el control total:
+
+- Todo el código de los agentes vive en el repositorio de portapp — no en plataformas externas
+- Cada tool que puede modificar datos requiere un paso de confirmación en la UI
+- Los agentes se ejecutan en Supabase Edge Functions (infraestructura ya planificada) — no en servidores de terceros
+- Logs de todas las acciones de agentes en BigQuery para auditoría
+- Posibilidad de desactivar cualquier agente desde Ajustes sin afectar al resto de la app
