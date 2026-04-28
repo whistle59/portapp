@@ -2829,3 +2829,53 @@ Para mantener el control total:
 - La diferencia entre ambos refleja el drift respecto a la asignación original
 
 **Nota:** estos mismos datos serán visibles en la app mediante toggle "Vista rendimiento" en s-cartera (F15), solo en modo avanzado.
+
+---
+
+### Export 4: Informe fiscal anual (PDF)
+
+**Formato:** PDF — no Excel. Los certificados fiscales de brokers siempre son PDF; el formato refuerza el carácter formal y no editable del documento.
+
+**Cuándo:** generado bajo demanda con selector de año fiscal (no limitado al año en curso).
+
+**Contenido:**
+- Plusvalías y minusvalías realizadas (posiciones vendidas en el año)
+- Dividendos y rendimientos cobrados
+- Retenciones aplicadas
+
+**Columnas — Plusvalías/Minusvalías:**
+`Ticker | Nombre | ISIN | Fecha compra | Precio compra | Fecha venta | Precio venta | Cantidad | Resultado`
+
+**Columnas — Dividendos y retenciones:**
+`Fecha | Ticker | Nombre | ISIN | Importe bruto | Retención | Importe neto`
+
+**Disclaimer obligatorio** (primera página, texto destacado):
+> *"AVISO IMPORTANTE: La información contenida en este documento tiene carácter meramente orientativo y ha sido generada exclusivamente a partir de los datos introducidos por el usuario en la aplicación. Portgrow no garantiza la exactitud, integridad o adecuación fiscal de los datos aquí reflejados. Este informe no sustituye en ningún caso la documentación oficial emitida por su entidad financiera o broker, la cual prevalecerá a todos los efectos ante la Agencia Tributaria. El usuario es el único responsable de contrastar esta información con los certificados fiscales oficiales antes de presentar su declaración del Impuesto sobre la Renta de las Personas Físicas (IRPF) u otras obligaciones tributarias aplicables."*
+
+**Implementación:** jsPDF o `window.print()` con CSS `@media print`.
+
+---
+
+### Export 5: Movimientos de efectivo (Excel)
+
+**Equivalente al diario de operaciones pero para efectivo.** Filtro de fechas con rango por defecto: 1 del mes en curso → hoy.
+
+**Una sola hoja.** Una fila por movimiento.
+
+**Columnas:**
+`Fecha | Cartera | Broker / Cuenta | Tipo | Importe | Saldo acumulado | Nota`
+
+- **Tipo:** Ingreso / Retirada / Dividendo / Comisión / Otro
+
+---
+
+### Export 6: Dividendos y rendimientos (Excel)
+
+**Seguimiento de renta pasiva** por ticker y año. Sin filtro de fechas — selector de año.
+
+**Una sola hoja**, ordenada por fecha.
+
+**Columnas:**
+`Fecha | Año | Cartera | Ticker | Nombre | ISIN | Tipo | Importe bruto | Retención | Importe neto | Divisa`
+
+- **Tipo:** Dividendo / Cupón / Staking / Otro rendimiento
