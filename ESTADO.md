@@ -2769,6 +2769,21 @@ Para mantener el control total:
 
 > Spec en construcción. Se irá ampliando export a export.
 
+### Normas comunes a todos los exports
+
+**Identidad visual:**
+- Logo de Portgrow en la cabecera de cada documento
+- Colores y tipografía de marca (misma paleta que la app)
+- Pie de página con: *"Generado por Portgrow · portgrow.app · [fecha y hora de generación]"*
+
+**Copyright:**
+- Pie de documento: *"© [año] Portgrow. Documento generado automáticamente a partir de los datos del usuario."*
+- No aplica copyright sobre los datos del usuario — son suyos. El copyright cubre únicamente el formato y diseño del documento.
+
+**Disclaimer general** (exports Excel — tono ligero, sin generar inseguridad):
+- Una línea discreta en el pie: *"Los datos reflejados provienen de la información introducida por el usuario en Portgrow y son de carácter orientativo."*
+- No incluir advertencias alarmantes en los exports de uso cotidiano — reservar el disclaimer detallado para el export "Datos de interés fiscal" (Export 4).
+
 ### Export 1: Cartera
 
 **Estructura del archivo:**
