@@ -2834,7 +2834,7 @@ Para mantener el control total:
 
 ### Export 4: Datos de interés fiscal (PDF)
 
-**Formato:** PDF — no Excel. Los certificados fiscales de brokers siempre son PDF; el formato refuerza el carácter formal y no editable del documento.
+**Formato:** PDF — no Excel. El PDF refuerza el carácter no editable del documento y es más adecuado para un resumen de consulta personal que el usuario llevará a su asesor o usará como referencia.
 
 **Cuándo:** generado bajo demanda con selector de año fiscal (no limitado al año en curso).
 
