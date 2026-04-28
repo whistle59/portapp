@@ -42,7 +42,7 @@ jobs:
         if: steps.compare.outputs.ahead_count != '0'
         id: existing_pr
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SYNC_PAT }}
         run: |
           PR_NUMBER=$(gh pr list \
             --base dev \
@@ -59,10 +59,10 @@ jobs:
             echo "No open PR found — will create one"
           fi
 
-      - name: Create PR main -> dev and enable auto-merge
+      - name: Create PR main -> dev and auto-merge
         if: steps.compare.outputs.ahead_count != '0' && steps.existing_pr.outputs.pr_number == ''
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SYNC_PAT }}
         run: |
           PR_URL=$(gh pr create \
             --base dev \
