@@ -15,7 +15,7 @@
 | Divisas | Multi-divisa (EUR, USD y otras) | Tipos de cambio manuales en prototipo, automáticos en producción |
 | Offline / cloud | **Híbrido** — ver sección 20 | Datos operacionales local-first + sync; resto en Supabase |
 | Plataforma | **React Native + Expo + web** | iOS + Android + web — las tres plataformas desde una base de código |
-| Nombre comercial | Pendiente de decidir | Nombre interno: portapp |
+| Nombre comercial | **Portgrow** | Dominio: portgrow.app (registrado 2026-04-28) |
 | Repo | GitHub privado (whistle59/portapp) | Branches: `main` (estable) + `dev` (integración) + `feature/*` (trabajo) |
 | CI/CD | GitHub Actions | Validación HTML en cada push a `dev` y PR a `main` |
 
