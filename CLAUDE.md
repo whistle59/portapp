@@ -124,6 +124,7 @@ Al cambiar modo oscuro, llamar `reCharts()` para re-renderizar los activos.
 
 ## Lo que NO hacer
 
+- **NUNCA leer `prototype/index.html` ni `ESTADO.md` completos** — usar siempre Grep o Read con offset/limit. Son archivos grandes (index.html ~184KB, ESTADO.md ~43K tokens) que llenan el contexto en un solo turno y causan error irrecuperable de 1M_CONTEXT.
 - **No separar en múltiples archivos** — es un monolito por diseño (facilita compartir y desplegar en Netlify Drop)
 - **No añadir dependencias** salvo Chart.js (ya incluido por CDN)
 - **No usar `localStorage`** — los datos viven en memoria durante la sesión
