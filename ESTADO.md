@@ -2832,7 +2832,7 @@ Para mantener el control total:
 
 ---
 
-### Export 4: Informe fiscal anual (PDF)
+### Export 4: Datos de interés fiscal (PDF)
 
 **Formato:** PDF — no Excel. Los certificados fiscales de brokers siempre son PDF; el formato refuerza el carácter formal y no editable del documento.
 
