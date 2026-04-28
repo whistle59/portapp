@@ -154,6 +154,7 @@
 | P4 | Notificaciones: botón borrar + marcar como favorita ⭐ | ✅ v6 |
 | P5 | Exposición por Región/Divisa: recalcular al usar filtros de tipo de activo | ✅ v6 |
 | P6 | Toggle mostrar/ocultar contraseña en login, lock screen y cambio de contraseña | ✅ v6 |
+| P7 | Reemplazar acrónimo "TWR" por "RPT" (Rentabilidad Ponderada por Tiempo) — público hispanohablante | 🔄 Pendiente |
 
 ---
 
@@ -173,6 +174,9 @@
 | F10 | Grupos de activos: CRUD completo + drag & drop | ✅ v5 |
 | F11 | Compartir cartera: enlace público (permanente/3h/24h), solo porcentajes | ✅ v6 |
 | F12 | Pantalla "Aprende": canales YouTube curados con filtros y favoritos | ✅ v6 |
+| F13 | Glosario de términos financieros en "Aprende" (~40-50 términos: ETFs, acciones, macro) | 🔄 Prototipo pendiente |
+| F14 | IA conversacional en "Aprende": responde preguntas contextualizadas sobre términos y cartera | 🔄 Producción |
+| F15 | Toggle "Vista detalle / Vista rendimiento" en s-cartera (solo modo avanzado) | 🔄 Prototipo pendiente |
 
 ---
 
@@ -183,7 +187,7 @@
 | PR1 | API cotizaciones tiempo real (Yahoo Finance / Alpha Vantage / ProRealTime) |
 | PR2 | Autenticación biométrica WebAuthn (gratuita) |
 | PR3 | Backend con base de datos persistente |
-| PR4 | Exportación real Excel/CSV |
+| PR4 | Exportación real Excel — spec parcial, ver sección 31 |
 | PR5 | Importación CSV desde brokers |
 | PR6 | Tipos de cambio automáticos (ECB API / Fixer.io) |
 | PR7 | SMS 2FA (Twilio ~0,05€/SMS) |
@@ -2758,3 +2762,70 @@ Para mantener el control total:
 - Los agentes se ejecutan en Supabase Edge Functions (infraestructura ya planificada) — no en servidores de terceros
 - Logs de todas las acciones de agentes en BigQuery para auditoría
 - Posibilidad de desactivar cualquier agente desde Ajustes sin afectar al resto de la app
+
+---
+
+## 31. Especificación — Exportación Excel
+
+> Spec en construcción. Se irá ampliando export a export.
+
+### Export 1: Cartera
+
+**Estructura del archivo:**
+- **Tab 1 — Global:** tabla resumen con una fila por cartera (valoración, invertido, P/L, % rentabilidad)
+- **Tab 2..N — [Nombre cartera]:** detalle de activos de cada cartera
+- Orden: Global primero, carteras a continuación
+
+**Cabecera de cada tab de cartera:**
+- Nombre de la cartera + fecha de generación del report
+
+**Columnas de la tabla de activos:**
+`Bolsa | Proveedor | Nombre | ISIN | Ticker | WKN | Divisa | Cantidad | Precio medio | Valoración actual`
+
+- **Proveedor:** vacío para acciones; emisor del producto para ETFs/fondos (ej. iShares, Vanguard, Amundi)
+- **WKN:** incluir si el activo lo tiene registrado; vacío en caso contrario
+
+**Gráficos por tab de cartera:**
+- Donut de distribución por grupos (imagen PNG generada desde Chart.js via `toBase64Image()`)
+- Donut/barras de exposición por región y divisa (imagen PNG)
+- Layout: tabla de activos a la izquierda, gráficos a la derecha; tabla de datos del gráfico debajo de cada imagen
+
+**Implementación:**
+- Librería: SheetJS (xlsx) para estructura + imágenes incrustadas
+- Gráficos como PNG (no gráficos nativos Excel) — editables en producción futura
+
+---
+
+### Export 2: Diario de operaciones
+
+**Filtro de fechas:**
+- Modal previo a la descarga con fecha_desde y fecha_hasta
+- Rango por defecto: 1 del mes en curso → hoy
+
+**Una sola hoja.** Todas las carteras mezcladas, columna "Cartera" para distinguir.
+
+**Columnas:**
+`Fecha | Fecha original | Cartera | Ticker | Nombre | ISIN | Tipo | Cantidad | Precio | Importe bruto | Comisión | Importe neto | Divisa | Broker | Grupo | Estado | Nota`
+
+**Reglas:**
+- Ordenado cronológicamente por **Fecha** (ascendente)
+- Operaciones activas: **Fecha** = fecha de la operación; **Fecha original** = vacío; **Estado** = Activa
+- Operaciones canceladas: **Fecha** = fecha de cancelación; **Fecha original** = fecha de la operación inicial; **Estado** = Cancelada
+- El filtro de fechas aplica sobre **Fecha** en ambos casos
+
+---
+
+### Export 3: Resumen de posiciones
+
+**Foto del estado actual** de cada posición — sin filtro de fechas (siempre es snapshot del momento de descarga).
+
+**Una sola hoja.** Una fila por ticker por cartera.
+
+**Columnas:**
+`Cartera | Ticker | Invertido | % sobre cartera | Valor actual | PyG | % PyG | % real de cartera`
+
+- **% sobre cartera:** peso del ticker sobre el capital invertido total de la cartera
+- **% real de cartera:** peso del ticker sobre el valor actual total de la cartera
+- La diferencia entre ambos refleja el drift respecto a la asignación original
+
+**Nota:** estos mismos datos serán visibles en la app mediante toggle "Vista rendimiento" en s-cartera (F15), solo en modo avanzado.
