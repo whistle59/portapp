@@ -176,7 +176,7 @@
 | F12 | Pantalla "Aprende": canales YouTube curados con filtros y favoritos | ✅ v6 |
 | F13 | Glosario de términos financieros en "Aprende" (~40-50 términos: ETFs, acciones, macro) | 🔄 Prototipo pendiente |
 | F14 | IA conversacional en "Aprende": responde preguntas contextualizadas sobre términos y cartera | 🔄 Producción |
-| F15 | Toggle "Vista detalle / Vista rendimiento" en s-cartera (solo modo avanzado) | 🔄 Prototipo pendiente |
+| F15 | Toggle "Vista detalle / Vista rendimiento" en s-cartera (solo modo avanzado) | ✅ v6 |
 
 ---
 
