@@ -417,56 +417,60 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       </div>
     </div>
 
-    <!-- OPS + DETALLE -->
+    <!-- OPS -->
     <div class="screen" id="s-ops">
-      <div id="panel-ops">
-        <div class="qnav" id="qn-ops"></div>
-        <div class="screen-title">Operaciones</div>
-        <div class="chip-row" id="ops-chips">
-          <span class="tag selected" onclick="filterOps(this,'todas')">Todas</span>
-          <span class="tag" onclick="filterOps(this,'Compra')">Compras</span>
-          <span class="tag" onclick="filterOps(this,'Venta')">Ventas</span>
-          <span class="tag" onclick="filterOps(this,'rendimiento')">Rendimientos</span>
-          <span class="tag" onclick="filterOps(this,'Ajuste')">Ajustes</span>
-        </div>
-        <div class="chip-row" id="ops-limit-chips" style="margin-top:4px">
-          <span class="tag selected" onclick="filterOpsLimit(this,'20')">Últ. 20</span>
-          <span class="tag" onclick="filterOpsLimit(this,'mes')">Este mes</span>
-          <span class="tag" onclick="filterOpsLimit(this,'todas')">Todo</span>
-        </div>
-        <button class="btn btn-p" style="margin-bottom:10px" onclick="openModal('m-op')">+ Registrar operación</button>
-        <div style="font-size:11px;color:var(--t2);margin-bottom:6px">Toca una operación para ver el detalle o cancelarla</div>
-        <div class="card" style="padding:0;overflow:hidden"><div style="overflow-x:auto">
-          <table><thead><tr><th>Fecha</th><th>Activo</th><th>Tipo</th><th>Total</th></tr></thead>
-          <tbody id="tb-ops"></tbody></table>
-        </div></div>
+      <div class="qnav" id="qn-ops"></div>
+      <div class="screen-title">Operaciones</div>
+      <div class="chip-row" id="ops-chips">
+        <span class="tag selected" onclick="filterOps(this,'todas')">Todas</span>
+        <span class="tag" onclick="filterOps(this,'Compra')">Compras</span>
+        <span class="tag" onclick="filterOps(this,'Venta')">Ventas</span>
+        <span class="tag" onclick="filterOps(this,'rendimiento')">Rendimientos</span>
+        <span class="tag" onclick="filterOps(this,'Ajuste')">Ajustes</span>
       </div>
-      <div id="panel-detalle" style="display:none">
-        <div class="breadcrumb">
-          <button class="bc-link" onclick="backOps()">← Operaciones</button>
-          <span>/</span><span id="d-titulo" style="font-weight:600;color:var(--t0)">Activo</span>
+      <div class="chip-row" id="ops-limit-chips" style="margin-top:4px">
+        <span class="tag selected" onclick="filterOpsLimit(this,'20')">Últ. 20</span>
+        <span class="tag" onclick="filterOpsLimit(this,'mes')">Este mes</span>
+        <span class="tag" onclick="filterOpsLimit(this,'todas')">Todo</span>
+      </div>
+      <button class="btn btn-p" style="margin-bottom:10px" onclick="openModal('m-op')">+ Registrar operación</button>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:6px">Toca un activo en <strong>Cartera</strong> para ver su ficha, o una operación para ver su detalle</div>
+      <div class="card" style="padding:0;overflow:hidden"><div style="overflow-x:auto">
+        <table><thead><tr><th>Fecha</th><th>Activo</th><th>Tipo</th><th>Total</th></tr></thead>
+        <tbody id="tb-ops"></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- DETALLE ACTIVO -->
+    <div class="screen" id="s-detalle">
+      <div class="breadcrumb">
+        <button class="bc-link" id="detalle-back" onclick="goTo(detalleFrom)">← Cartera</button>
+        <span>/</span><span id="d-titulo" style="font-weight:600;color:var(--t0)">Activo</span>
+      </div>
+      <div class="metric-grid">
+        <div class="metric"><div class="mlabel">Valor actual</div><div class="mvalue"><span class="amt" id="d-valor"></span></div></div>
+        <div class="metric"><div class="mlabel">P/L total</div><div class="mvalue" id="d-pl"></div></div>
+        <div class="metric"><div class="mlabel">Precio medio <button class="btn-icon" style="font-size:11px;color:var(--t1);vertical-align:middle;padding:0 2px" onclick="openModal('m-pm-info')">ⓘ</button></div><div class="mvalue"><span class="amt" id="d-pm"></span></div></div>
+        <div class="metric"><div class="mlabel">Cotización</div><div class="mvalue"><span class="amt" id="d-cot"></span></div></div>
+      </div>
+      <div class="card"><div class="card-title" style="margin-bottom:8px">Ficha del activo</div><div id="ficha"></div></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Historial de operaciones <button class="btn-icon" style="font-size:11px;color:var(--t1);vertical-align:middle;padding:0 2px" onclick="openModal('m-ajuste-info')">ⓘ</button></span>
+          <button class="btn btn-sm nav-advanced" onclick="openAjuste(detalleTicker,'Precio medio')">+ Registrar ajuste</button>
         </div>
-        <div class="metric-grid">
-          <div class="metric"><div class="mlabel">Valor actual</div><div class="mvalue"><span class="amt" id="d-valor"></span></div></div>
-          <div class="metric"><div class="mlabel">P/L total</div><div class="mvalue" id="d-pl"></div></div>
-          <div class="metric"><div class="mlabel">Precio medio <button class="btn-icon" style="font-size:11px;color:var(--t1);vertical-align:middle;padding:0 2px" onclick="openModal('m-pm-info')">ⓘ</button></div><div class="mvalue"><span class="amt" id="d-pm"></span></div></div>
-          <div class="metric"><div class="mlabel">Cotización</div><div class="mvalue"><span class="amt" id="d-cot"></span></div></div>
+        <table><thead><tr><th>Fecha</th><th>Op.</th><th>Qty</th><th>Precio</th><th>Com.</th></tr></thead>
+        <tbody id="d-hist"></tbody></table>
+        <div id="d-ajustes" style="display:none;margin-top:12px;padding-top:10px;border-top:1px solid var(--bd)">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:var(--t0)">Ajustes aplicados</span><span class="badge b-amber" style="font-size:9px">reconciliación</span></div>
+          <div style="font-size:11px;color:var(--t2);margin-bottom:8px">Correcciones registradas para alinear los valores con tu broker</div>
+          <div id="d-ajustes-lista"></div>
         </div>
-        <div class="card"><div class="card-title" style="margin-bottom:8px">Ficha del activo</div><div id="ficha"></div></div>
-        <div class="card"><div class="card-header"><span class="card-title">Historial de operaciones <button class="btn-icon" style="font-size:11px;color:var(--t1);vertical-align:middle;padding:0 2px" onclick="openModal('m-ajuste-info')">ⓘ</button></span><button class="btn btn-sm nav-advanced" id="btn-reg-ajuste" onclick="openAjuste('','Precio medio')">+ Registrar ajuste</button></div>
-          <table><thead><tr><th>Fecha</th><th>Op.</th><th>Qty</th><th>Precio</th><th>Com.</th></tr></thead>
-          <tbody id="d-hist"></tbody></table>
-          <div id="d-ajustes" style="display:none;margin-top:12px;padding-top:10px;border-top:1px solid var(--bd)">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:var(--t0)">Ajustes aplicados</span><span class="badge b-amber" style="font-size:9px">reconciliación</span></div>
-            <div style="font-size:11px;color:var(--t2);margin-bottom:8px">Correcciones registradas para alinear los valores con tu broker</div>
-            <div id="d-ajustes-lista"></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title" style="margin-bottom:7px">Anotaciones</div>
-          <div id="d-notas"></div>
-          <button class="note-add" onclick="openModal('m-nota')">+ Añadir nota</button>
-        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:7px">Anotaciones</div>
+        <div id="d-notas"></div>
+        <button class="note-add" onclick="openModal('m-nota')">+ Añadir nota</button>
       </div>
     </div>
 
@@ -1212,7 +1216,7 @@ const plats=[
   {nombre:'Coinbase',url:'https://www.coinbase.com',cat:'Cripto',color:'#0052ff',icon:'CB'},
 ];
 const idxData={'FTSE All-World':{ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},'MSCI World':{ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados'},'S&P 500':{ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'}};
-let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=32,privacyOn=false,opsFilter='todas',opsLimit='20',lastBackupDate=null,appMode=localStorage.getItem('appMode')||'basic',proyecciones=[],proyId=1,cartaVista='detalle';
+let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=32,privacyOn=false,opsFilter='todas',opsLimit='20',lastBackupDate=null,appMode=localStorage.getItem('appMode')||'basic',proyecciones=[],proyId=1,cartaVista='detalle',detalleFrom='s-cartera',detalleTicker='';
 const canales=[
   {id:'ch1',nombre:'Fondos Indexados',ini:'FI',color:'#4a7fa5',cat:'ETFs',desc:'Inversión pasiva en índices globales, ETFs y estrategias de largo plazo.',url:'#',fav:false,dest:true},
   {id:'ch2',nombre:'Value School',ini:'VS',color:'#4a8c6f',cat:'Value',desc:'Value investing, análisis fundamental y filosofía de inversión a largo plazo.',url:'#',fav:true,dest:false},
@@ -1295,7 +1299,7 @@ function setFontSize(cls){['fs-sm','fs-md','fs-lg','fs-xl'].forEach(c=>document.
 function togglePwd(id,btn){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';btn.style.opacity=el.type==='text'?'1':'0.5';}
 function reCharts(){const a=id=>document.getElementById(id).classList.contains('active');if(a('s-global'))requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));if(a('s-resumen'))requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));if(a('s-rentabilidad'))requestAnimationFrame(()=>requestAnimationFrame(renderRentabilidad));if(a('s-grupos'))requestAnimationFrame(()=>requestAnimationFrame(renderGruposCapital));}
 const ADVANCED_SCREENS=['s-rentabilidad','s-grupos','s-rent-efectivo','s-indices','s-anotaciones'];
-const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones','s-canales','s-ayuda'];
+const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-detalle','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones','s-canales','s-ayuda'];
 const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Config','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas','s-canales':'Aprende','s-ayuda':'Ayuda'};
 const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
 function goTo(sid,btn){if(appMode==='basic'&&ADVANCED_SCREENS.includes(sid)){sid='s-global';btn=null;}SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;const ps=document.getElementById('port-sel');const gt=document.getElementById('global-title');if(ps)ps.style.display=sid==='s-global'?'none':'flex';if(gt)gt.style.display=sid==='s-global'?'block':'none';
@@ -1303,7 +1307,8 @@ function goTo(sid,btn){if(appMode==='basic'&&ADVANCED_SCREENS.includes(sid)){sid
   else if(sid==='s-resumen'){renderResumen();requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));}
   else if(sid==='s-cartera')renderCartera();
   else if(sid==='s-efectivo')renderEfectivo();
-  else if(sid==='s-ops'){document.querySelectorAll('#ops-chips .tag').forEach(t=>t.classList.remove('selected'));document.querySelector('#ops-chips .tag').classList.add('selected');document.querySelectorAll('#ops-limit-chips .tag').forEach(t=>t.classList.remove('selected'));document.querySelector('#ops-limit-chips .tag').classList.add('selected');renderOps();document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}
+  else if(sid==='s-ops'){document.querySelectorAll('#ops-chips .tag').forEach(t=>t.classList.remove('selected'));document.querySelector('#ops-chips .tag').classList.add('selected');document.querySelectorAll('#ops-limit-chips .tag').forEach(t=>t.classList.remove('selected'));document.querySelector('#ops-limit-chips .tag').classList.add('selected');renderOps();}
+  else if(sid==='s-detalle')renderDetalle(detalleTicker);
   else if(sid==='s-indices')renderIndices();
   else if(sid==='s-notif')renderNotif();
   else if(sid==='s-plataformas')renderPlats();
@@ -1368,11 +1373,11 @@ function setPeriod(btn,p){document.querySelectorAll('.period-btn').forEach(b=>b.
 function renderHistorial(period){const pts={'1S':7,'1M':30,'3M':90,'6M':180,'1A':365,'Todo':730}[period]||30,base=cV(activeId)||10000,C=CC(),labels=[],data=[];for(let i=pts;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);labels.push(i===0?'Hoy':d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'}));const noise=(Math.sin(i*.3)+Math.cos(i*.7))*.02;data.push(Math.round(base*(.85+i/pts*.15+noise)));}if(chH)chH.destroy();chH=new Chart(document.getElementById('cHistorial'),{type:'line',data:{labels,datasets:[{data,borderColor:C[0],backgroundColor:C[0]+'40',fill:true,tension:.4,pointRadius:0,borderWidth:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+fe(c.parsed.y)}}},scales:{x:{ticks:{maxTicksLimit:6,color:'var(--t2)',font:{size:10}},grid:{display:false}},y:{ticks:{maxTicksLimit:5,callback:v=>'€'+Math.round(v/1000)+'k',color:'var(--t2)',font:{size:10}},grid:{color:'var(--chart-grid)'}}}}});}
 function setCartaVista(v){cartaVista=v;document.querySelectorAll('#vista-toggle .tag').forEach(t=>t.classList.remove('selected'));document.getElementById('vt-'+v).classList.add('selected');renderCartera();}
 function cartaHead(){return cartaVista==='rendimiento'?'<tr><th>Activo</th><th>Invertido</th><th>%Cart.</th><th>Valor</th><th>PyG</th><th>%PyG</th><th>%Real</th></tr>':'<tr><th>Activo</th><th>Grupo</th><th>Valor</th><th>P/L</th></tr>';}
-function cartaRows(act){const totV=act.reduce((s,a)=>s+a.qty*a.cot,0),totI=act.reduce((s,a)=>s+a.qty*a.pm,0);return act.map(a=>{const v=a.qty*a.cot,i=a.qty*a.pm,pyg=v-i,pPyg=i>0?(v-i)/i*100:0,pCart=totI>0?i/totI*100:0,pReal=totV>0?v/totV*100:0;return cartaVista==='rendimiento'?`<tr><td><strong>${a.ticker}</strong></td><td class="amt">${fe(i)}</td><td>${pCart.toFixed(1)}%</td><td class="amt">${fe(v)}</td><td class="${pyg>=0?'pos':'neg'} amt">${pyg>=0?'+':'-'}${fe(Math.abs(pyg))}</td><td class="${pPyg>=0?'pos':'neg'}">${fp(pPyg)}</td><td>${pReal.toFixed(1)}%</td></tr>`:`<tr class="row-link" onclick="goTo('s-ops');showDetalle('${a.ticker}')"><td><strong>${a.ticker}</strong><br><span style="color:var(--t1);font-size:10px">${a.broker}</span></td><td><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></td><td class="amt">${fe(v)}</td><td class="${(v-i)/i*100>=0?'pos':'neg'}">${fp((v-i)/i*100)}</td></tr>`;});}
+function cartaRows(act){const totV=act.reduce((s,a)=>s+a.qty*a.cot,0),totI=act.reduce((s,a)=>s+a.qty*a.pm,0);return act.map(a=>{const v=a.qty*a.cot,i=a.qty*a.pm,pyg=v-i,pPyg=i>0?(v-i)/i*100:0,pCart=totI>0?i/totI*100:0,pReal=totV>0?v/totV*100:0;return cartaVista==='rendimiento'?`<tr><td><strong>${a.ticker}</strong></td><td class="amt">${fe(i)}</td><td>${pCart.toFixed(1)}%</td><td class="amt">${fe(v)}</td><td class="${pyg>=0?'pos':'neg'} amt">${pyg>=0?'+':'-'}${fe(Math.abs(pyg))}</td><td class="${pPyg>=0?'pos':'neg'}">${fp(pPyg)}</td><td>${pReal.toFixed(1)}%</td></tr>`:`<tr class="row-link" onclick="showDetalle('${a.ticker}','s-cartera')"><td><strong>${a.ticker}</strong><br><span style="color:var(--t1);font-size:10px">${a.broker}</span></td><td><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></td><td class="amt">${fe(v)}</td><td class="${(v-i)/i*100>=0?'pos':'neg'}">${fp((v-i)/i*100)}</td></tr>`;});}
 function renderCartera(){const C=CC(),act=cA(activeId);document.getElementById('tb-cartera-head').innerHTML=cartaHead();document.getElementById('tb-cartera').innerHTML=act.length?cartaRows(act).join(''):'<tr><td colspan="'+(cartaVista==='rendimiento'?7:4)+'"><div class="empty-state"><span class="empty-state-icon">📭</span><div class="empty-state-title">Cartera vacía</div><div class="empty-state-sub">Registra tu primera operación con el botón + Op. de la barra superior</div></div></td></tr>';const rT={};let rt=0;act.forEach(a=>{const v=a.qty*a.cot;rt+=v;Object.entries(a.region).forEach(([r,p])=>{rT[r]=(rT[r]||0)+v*p/100;});});document.getElementById('exp-region').innerHTML=Object.entries(rT).map(([r,v])=>{const p=rt>0?v/rt*100:0;return pb(p,C[1],r);}).join('');const dT={};let dt=0;act.forEach(a=>{const v=a.qty*a.cot;dt+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});document.getElementById('exp-divisa').innerHTML=Object.entries(dT).map(([d,v])=>{const p=dt>0?v/dt*100:0;return pb(p,C[0],d);}).join('');}
 function filterCt(el,tipo){document.querySelectorAll('#ct-filter-chips .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');const act=tipo==='todos'?cA(activeId):cA(activeId).filter(a=>a.tipo===tipo);const C=CC();document.getElementById('tb-cartera-head').innerHTML=cartaHead();document.getElementById('tb-cartera').innerHTML=act.length?cartaRows(act).join(''):'<tr><td colspan="'+(cartaVista==='rendimiento'?7:4)+'" style="color:var(--t1);padding:12px;text-align:center">Sin activos para este filtro</td></tr>';const rT={};let rt=0;act.forEach(a=>{const v=a.qty*a.cot;rt+=v;Object.entries(a.region).forEach(([r,p])=>{rT[r]=(rT[r]||0)+v*p/100;});});document.getElementById('exp-region').innerHTML=Object.entries(rT).length?Object.entries(rT).map(([r,v])=>{const p=rt>0?v/rt*100:0;return pb(p,C[1],r);}).join(''):'<div style="font-size:12px;color:var(--t1);padding:6px 0">Sin datos para este filtro</div>';const dT={};let dt=0;act.forEach(a=>{const v=a.qty*a.cot;dt+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});document.getElementById('exp-divisa').innerHTML=Object.entries(dT).length?Object.entries(dT).map(([d,v])=>{const p=dt>0?v/dt*100:0;return pb(p,C[0],d);}).join(''):'<div style="font-size:12px;color:var(--t1);padding:6px 0">Sin datos para este filtro</div>';}
-function showDetalle(ticker){const a=activos.find(x=>x.ticker===ticker);if(!a)return;document.getElementById('panel-ops').style.display='none';document.getElementById('panel-detalle').style.display='block';document.getElementById('d-titulo').textContent=ticker+' · '+a.nombre;const v=a.qty*a.cot,i=a.qty*a.pm,pl=v-i;document.getElementById('d-valor').textContent=fe(v);document.getElementById('d-pl').innerHTML=`<span class="amt">${(pl>=0?'+':'')+fe(Math.abs(pl))}</span>`;document.getElementById('d-pl').className='mvalue '+(pl>=0?'pos':'neg');document.getElementById('d-pm').textContent=fe(a.pm);document.getElementById('d-cot').textContent=fe(a.cot);document.getElementById('ficha').innerHTML=`<div class="dr"><span class="dk">ISIN</span><span class="dv">${a.isin}</span></div><div class="dr"><span class="dk">Tipo</span><span class="dv">${a.tipo}</span></div><div class="dr"><span class="dk">Mercado</span><span class="dv">${a.mercado}</span></div><div class="dr"><span class="dk">Divisa</span><span class="dv">${a.divisa}</span></div><div class="dr"><span class="dk">Índice</span><span class="dv">${a.indice}</span></div><div class="dr"><span class="dk">Broker</span><span class="dv">${a.broker}</span></div><div class="dr"><span class="dk">Grupo</span><span class="dv"><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></span></div>`;document.getElementById('d-hist').innerHTML=ops.filter(o=>o.ticker===ticker&&o.cartera===activeId&&o.status!=='cancelled'&&o.op!=='Ajuste').map(o=>`<tr><td>${o.fecha.slice(5)}</td><td>${o.op}</td><td>${o.qty}</td><td class="amt">${fe(o.precio)}</td><td>${fe(o.fee)}</td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--t1)">Sin operaciones</td></tr>';document.getElementById('d-notas').innerHTML=notas.map(n=>`<div class="note-box">${n}</div>`).join('');const aj=ops.filter(o=>o.ticker===ticker&&o.cartera===activeId&&o.op==='Ajuste');const ajDiv=document.getElementById('d-ajustes');ajDiv.style.display=aj.length?'':'none';if(aj.length){document.getElementById('d-ajustes-lista').innerHTML=aj.map(o=>`<div class="dr"><span class="dk" style="flex:1">${o.fecha.slice(5)} · ${o.tipoAjuste}</span><span class="dv" style="flex-direction:column;align-items:flex-end;gap:1px"><span style="font-size:11px">${o.valorAnterior} → <strong>${o.valorNuevo}</strong></span><span style="font-size:10px;color:var(--t2)">${o.fuente}${o.motivo?' · '+o.motivo:''}</span></span></div>`).join('');}const btnAj=document.getElementById('btn-reg-ajuste');if(btnAj)btnAj.onclick=()=>openAjuste(ticker,'Precio medio');}
-function backOps(){document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}
+function showDetalle(ticker,from){detalleFrom=from||'s-cartera';detalleTicker=ticker;goTo('s-detalle');}
+function renderDetalle(ticker){const a=activos.find(x=>x.ticker===ticker&&x.cartera===activeId);if(!a)return;const backBtn=document.getElementById('detalle-back');if(backBtn)backBtn.textContent='← '+(SL[detalleFrom]||'Volver');document.getElementById('d-titulo').textContent=ticker+' · '+a.nombre;const v=a.qty*a.cot,i=a.qty*a.pm,pl=v-i;document.getElementById('d-valor').textContent=fe(v);document.getElementById('d-pl').innerHTML=`<span class="amt">${(pl>=0?'+':'')+fe(Math.abs(pl))}</span>`;document.getElementById('d-pl').className='mvalue '+(pl>=0?'pos':'neg');document.getElementById('d-pm').textContent=fe(a.pm);document.getElementById('d-cot').textContent=fe(a.cot);document.getElementById('ficha').innerHTML=`<div class="dr"><span class="dk">ISIN</span><span class="dv">${a.isin}</span></div><div class="dr"><span class="dk">Tipo</span><span class="dv">${a.tipo}</span></div><div class="dr"><span class="dk">Mercado</span><span class="dv">${a.mercado}</span></div><div class="dr"><span class="dk">Divisa</span><span class="dv">${a.divisa}</span></div><div class="dr"><span class="dk">Índice</span><span class="dv">${a.indice}</span></div><div class="dr"><span class="dk">Broker</span><span class="dv">${a.broker}</span></div><div class="dr"><span class="dk">Grupo</span><span class="dv"><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></span></div>`;document.getElementById('d-hist').innerHTML=ops.filter(o=>o.ticker===ticker&&o.cartera===activeId&&o.status!=='cancelled'&&o.op!=='Ajuste').map(o=>`<tr><td>${o.fecha.slice(5)}</td><td>${o.op}</td><td>${o.qty}</td><td class="amt">${fe(o.precio)}</td><td>${fe(o.fee)}</td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--t1)">Sin operaciones</td></tr>';document.getElementById('d-notas').innerHTML=notas.map(n=>`<div class="note-box">${n}</div>`).join('');const aj=ops.filter(o=>o.ticker===ticker&&o.cartera===activeId&&o.op==='Ajuste');const ajDiv=document.getElementById('d-ajustes');ajDiv.style.display=aj.length?'':'none';if(aj.length)document.getElementById('d-ajustes-lista').innerHTML=aj.map(o=>`<div class="dr"><span class="dk" style="flex:1">${o.fecha.slice(5)} · ${o.tipoAjuste}</span><span class="dv" style="flex-direction:column;align-items:flex-end;gap:1px"><span style="font-size:11px">${o.valorAnterior} → <strong>${o.valorNuevo}</strong></span><span style="font-size:10px;color:var(--t2)">${o.fuente}${o.motivo?' · '+o.motivo:''}</span></span></div>`).join('');}
 const REND=['Dividendo','Staking','Interés','Saveback'];
 // ── AJUSTES DE RECONCILIACIÓN (F16) ─────────────────────────────────────────
 let ajusteCtx={ticker:'',tipoAjuste:'Precio medio'};
@@ -1392,7 +1397,7 @@ function renderOps(){
   else if(opsLimit==='mes'){const c=new Date(hoy.getFullYear(),hoy.getMonth(),1).toISOString().slice(0,10);f=f.filter(o=>o.fecha>=c);}
   document.getElementById('tb-ops').innerHTML=f.map(o=>{
     if(o.op==='Ajuste'){const delta=o.valorNuevo-o.valorAnterior;return`<tr class="row-link" onclick="showOpDetalle(${o.id})"><td>${o.fecha.slice(5)}</td><td><strong>${o.ticker||'Efectivo'}</strong><br><span style="font-size:10px;color:var(--t1)">${o.tipoAjuste}</span></td><td><span class="badge b-amber">Ajuste</span></td><td class="${delta>=0?'pos':'neg'}">${delta>=0?'+':''}${o.tipoAjuste==='Precio medio'||o.tipoAjuste==='Saldo efectivo'?fe(Math.abs(delta)):delta.toFixed(4)}</td></tr>`;}
-    const t=o.qty*o.precio+o.fee;return`<tr class="row-link" onclick="showOpDetalle(${o.id})"><td>${o.fecha.slice(5)}</td><td><strong>${o.ticker}</strong><br><span style="font-size:10px;color:var(--t1)">${o.broker}</span></td><td><span class="badge ${GC[o.grupo]||'b-gray'}">${o.op}</span></td><td class="${o.op==='Compra'?'neg':'pos'}"><span class="amt">${o.op==='Compra'?'-':'+'}{t}</span></td></tr>`.replace('{t}',fe(t));
+    const t=o.qty*o.precio+o.fee;return`<tr class="row-link" onclick="showOpDetalle(${o.id})"><td>${o.fecha.slice(5)}</td><td><strong onclick="event.stopPropagation();showDetalle('${o.ticker}','s-ops')" style="color:var(--ac);cursor:pointer">${o.ticker}</strong><br><span style="font-size:10px;color:var(--t1)">${o.broker}</span></td><td><span class="badge ${GC[o.grupo]||'b-gray'}">${o.op}</span></td><td class="${o.op==='Compra'?'neg':'pos'}"><span class="amt">${o.op==='Compra'?'-':'+'}{t}</span></td></tr>`.replace('{t}',fe(t));
   }).join('')||'<tr><td colspan="4"><div class="empty-state" style="padding:24px 12px"><span class="empty-state-icon" style="font-size:28px">🔍</span><div class="empty-state-title">Sin operaciones</div><div class="empty-state-sub">Usa + Op. para registrar tu primera compra o venta</div></div></td></tr>';
 }
 function filterOps(el,tipo){document.querySelectorAll('#ops-chips .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');opsFilter=tipo;renderOps();}
