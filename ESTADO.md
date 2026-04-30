@@ -65,18 +65,23 @@
 - Tabla de movimientos con campo "Origen" (cuenta vs operación)
 - Formulario de nuevo movimiento con integridad referencial
 
-### Operaciones (v2)
-- Tabla con filtros funcionales: Todas / Compras / Ventas / Rendimientos
+### Operaciones (v6)
+- Tabla con filtros funcionales: Todas / Compras / Ventas / Rendimientos / Ajustes
+- Ticker de cada operación clicable (azul) → navega a s-detalle con "← Ops"
 - Formulario de nueva operación (cartera, fecha, ticker, tipo, broker, qty, precio, comisión, divisa, grupo, nota)
 - Botón + Op. accesible desde la barra superior
+- Ajustes de reconciliación visibles con badge b-amber; en "Todas" se ocultan para mantener flujo limpio
 
-### Detalle de activo (v2)
-- Accesible desde Cartera y desde Operaciones
-- Métricas: valor actual, P/L, precio medio, cotización
+### Detalle de activo — `s-detalle` (v6)
+- Pantalla propia (ya no embebida en s-ops)
+- Entradas: Cartera (clic en fila de activo) y Ops (clic en ticker en azul)
+- Botón "← Volver" dinámico según origen (← Cartera / ← Ops)
+- Métricas: valor actual, P/L, precio medio ⓘ, cotización
 - Ficha completa (ISIN, tipo, mercado, divisa, índice, broker, grupo)
-- Historial de operaciones del activo
+- Historial de operaciones del activo (excluye ajustes)
+- Ajustes de reconciliación aplicados (sección visible solo si hay ajustes)
+- Botón "+ Registrar ajuste" (solo modo avanzado)
 - Anotaciones con formulario para añadir notas
-- Breadcrumb para volver
 
 ### Proyección DCA (v1)
 - Calculadora con aportación, frecuencia (semanal/quincenal/mensual), revalorización y horizonte
@@ -140,7 +145,7 @@
 
 > **Nota sobre datos del prototipo:** cotizaciones, tipos de cambio y parte del historial de efectivo son datos hardcodeados en variables JS. No hay integración con APIs externas. El código OTP `123456` es simulado — no valida contra un backend real.
 
-> **Modo básico/avanzado:** las pantallas `s-rentabilidad`, `s-grupos`, `s-rent-efectivo`, `s-indices`, `s-anotaciones` y `s-canales` están ocultas en modo básico. El usuario puede activar el modo avanzado desde Ajustes → Modo de uso. Switch gratuito, sin restricción de plan. Decisión: reducir fricción de onboarding para inversores nuevos sin penalizar a los avanzados. El modo persiste entre sesiones (localStorage).
+> **Modo básico/avanzado:** las pantallas `s-rentabilidad`, `s-grupos`, `s-rent-efectivo`, `s-indices`, `s-anotaciones` están ocultas en modo básico (`ADVANCED_SCREENS`). `s-canales` (Aprende) es visible en ambos modos. El usuario activa el modo avanzado desde **Config → Modo de uso**. Switch gratuito, sin restricción de plan. El modo persiste entre sesiones (localStorage).
 
 ---
 
