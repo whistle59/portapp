@@ -114,7 +114,7 @@
 - CSS variables redefinidas con clase `.dark` en `<html>`
 - Gráficos se rerrenderizan con paleta oscura al cambiar
 
-### Rentabilidad TWR (v6)
+### Rentabilidad RPT (v6)
 - Pantalla `s-rentabilidad` con cálculo TWR real desde operaciones
 - Filtros por período: 1M / 3M / 6M / 1A / Todo
 - Tabla por activo con rentabilidad individual
@@ -154,7 +154,7 @@
 | P4 | Notificaciones: botón borrar + marcar como favorita ⭐ | ✅ v6 |
 | P5 | Exposición por Región/Divisa: recalcular al usar filtros de tipo de activo | ✅ v6 |
 | P6 | Toggle mostrar/ocultar contraseña en login, lock screen y cambio de contraseña | ✅ v6 |
-| P7 | Reemplazar acrónimo "TWR" por "RPT" (Rentabilidad Ponderada por Tiempo) — público hispanohablante | 🔄 Pendiente |
+| P7 | Reemplazar acrónimo "TWR" por "RPT" (Rentabilidad Ponderada por Tiempo) — público hispanohablante | ✅ v6 |
 
 ---
 
