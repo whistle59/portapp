@@ -411,7 +411,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <div class="dr"><span class="dk">Coinbase</span><span class="dv"><span class="amt">€500</span> <span class="badge b-amber">USD</span></span></div>
       </div>
       <div class="card">
-        <div class="card-header"><span class="card-title">Movimientos</span><button class="btn btn-sm" onclick="openModal('m-efectivo')">+ Nuevo</button></div>
+        <div class="card-header"><span class="card-title">Movimientos</span><div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="openModal('m-efectivo')">+ Nuevo</button><button class="btn btn-sm nav-advanced" onclick="openAjuste('','Saldo efectivo')">Ajuste</button></div></div>
         <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Origen</th><th>Importe</th></tr></thead>
         <tbody id="tb-efectivo"></tbody></table>
       </div>
@@ -427,6 +427,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
           <span class="tag" onclick="filterOps(this,'Compra')">Compras</span>
           <span class="tag" onclick="filterOps(this,'Venta')">Ventas</span>
           <span class="tag" onclick="filterOps(this,'rendimiento')">Rendimientos</span>
+          <span class="tag" onclick="filterOps(this,'Ajuste')">Ajustes</span>
         </div>
         <div class="chip-row" id="ops-limit-chips" style="margin-top:4px">
           <span class="tag selected" onclick="filterOpsLimit(this,'20')">Últ. 20</span>
@@ -452,9 +453,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
           <div class="metric"><div class="mlabel">Cotización</div><div class="mvalue"><span class="amt" id="d-cot"></span></div></div>
         </div>
         <div class="card"><div class="card-title" style="margin-bottom:8px">Ficha del activo</div><div id="ficha"></div></div>
-        <div class="card"><div class="card-title" style="margin-bottom:8px">Historial de operaciones</div>
+        <div class="card"><div class="card-header"><span class="card-title">Historial de operaciones</span><button class="btn btn-sm nav-advanced" id="btn-reg-ajuste" onclick="openAjuste('','Precio medio')">Ajuste</button></div>
           <table><thead><tr><th>Fecha</th><th>Op.</th><th>Qty</th><th>Precio</th><th>Com.</th></tr></thead>
           <tbody id="d-hist"></tbody></table>
+          <div id="d-ajustes" style="display:none;margin-top:10px">
+            <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:4px">AJUSTES APLICADOS</div>
+            <div id="d-ajustes-lista"></div>
+          </div>
         </div>
         <div class="card">
           <div class="card-title" style="margin-bottom:7px">Anotaciones</div>
@@ -1067,6 +1072,42 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
 </div>
 
 </div>
+
+<div class="modal-overlay" id="m-ajuste">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle">Registrar ajuste</span><button class="btn-icon" onclick="closeModal('m-ajuste')">✕</button></div>
+    <div class="fg">
+      <label>Tipo de ajuste</label>
+      <select id="aj-tipo" onchange="ajTipoChange()">
+        <option value="Precio medio">Precio medio</option>
+        <option value="Cantidad">Cantidad</option>
+        <option value="Saldo efectivo">Saldo efectivo</option>
+      </select>
+    </div>
+    <div class="fg" id="aj-ticker-row">
+      <label>Activo</label>
+      <input id="aj-ticker" type="text" readonly style="background:var(--bg1);color:var(--t1)">
+    </div>
+    <div class="fg">
+      <label>Valor anterior (calculado por Portgrow)</label>
+      <input id="aj-anterior" type="number" readonly style="background:var(--bg1);color:var(--t1)">
+    </div>
+    <div class="fg">
+      <label>Valor nuevo (según broker / fuente)</label>
+      <input id="aj-nuevo" type="number" step="any" placeholder="0">
+    </div>
+    <div class="fg">
+      <label>Fuente</label>
+      <input id="aj-fuente" placeholder="ej. DEGIRO, IBKR, Sabadell…">
+    </div>
+    <div class="fg">
+      <label>Motivo</label>
+      <input id="aj-motivo" placeholder="ej. split 2:1, comisión no registrada…">
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-top:4px" onclick="saveAjuste()">Guardar ajuste</button>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 <script>
 const GC={'Core':'b-blue','Cripto':'b-amber','AI/Tech':'b-purple','Renta fija':'b-teal','Legacy':'b-gray','Core ampliado':'b-green'};
@@ -1116,6 +1157,7 @@ let ops=[
   {id:28,fecha:'2025-03-01',ticker:'NVDA',tipo:'Acción',broker:'DEGIRO',op:'Venta',qty:3,precio:108,fee:1,divisa:'USD',grupo:'AI/Tech',nota:'Stop loss — caída post resultados',cartera:'c3',status:'active',cancelledWith:null},
   {id:29,fecha:'2025-08-22',ticker:'BTC',tipo:'Cripto',broker:'Coinbase',op:'Venta',qty:0.2,precio:51000,fee:12,divisa:'USD',grupo:'Cripto',nota:'Liquidez — venta con pérdida',cartera:'c3',status:'active',cancelledWith:null},
   {id:30,fecha:'2026-02-28',ticker:'ETH',tipo:'Cripto',broker:'Coinbase',op:'Venta',qty:0.5,precio:3400,fee:8,divisa:'USD',grupo:'Cripto',nota:'Toma de beneficios staking acumulado',cartera:'c3',status:'active',cancelledWith:null},
+  {id:31,fecha:'2026-04-15',ticker:'VWCE',tipo:'ETF',broker:'DEGIRO',op:'Ajuste',tipoAjuste:'Precio medio',valorAnterior:107.8,valorNuevo:108.2,motivo:'Comisión de custodia no incluida en precio de compra',fuente:'DEGIRO',qty:0,precio:0,fee:0,divisa:'EUR',grupo:'Core',nota:'Comisión de custodia no incluida en precio de compra',cartera:'c1',status:'active',cancelledWith:null},
 ];
 const efectivoData=[
   {fecha:'2024-01-05',tipo:'Transferencia entrada',origen:'cuenta',broker:'IB',importe:5000,divisa:'EUR',cartera:'c1',status:'active'},
@@ -1149,7 +1191,7 @@ const plats=[
   {nombre:'Coinbase',url:'https://www.coinbase.com',cat:'Cripto',color:'#0052ff',icon:'CB'},
 ];
 const idxData={'FTSE All-World':{ytd:'+8,2%',y1:'+12,4%',pe:'18,4x',div:'1,8%',n:'3.700+',desc:'Renta variable global desarrollada + emergente'},'MSCI World':{ytd:'+8,7%',y1:'+13,1%',pe:'19,8x',div:'1,5%',n:'1.400+',desc:'Renta variable mercados desarrollados'},'S&P 500':{ytd:'+9,1%',y1:'+14,2%',pe:'21,2x',div:'1,3%',n:'500',desc:'500 mayores empresas de EE.UU.'}};
-let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=31,privacyOn=false,opsFilter='todas',opsLimit='20',lastBackupDate=null,appMode=localStorage.getItem('appMode')||'basic',proyecciones=[],proyId=1,cartaVista='detalle';
+let notas=['Tesis: largo plazo DCA sobre índices globales.'],nextId=32,privacyOn=false,opsFilter='todas',opsLimit='20',lastBackupDate=null,appMode=localStorage.getItem('appMode')||'basic',proyecciones=[],proyId=1,cartaVista='detalle';
 const canales=[
   {id:'ch1',nombre:'Fondos Indexados',ini:'FI',color:'#4a7fa5',cat:'ETFs',desc:'Inversión pasiva en índices globales, ETFs y estrategias de largo plazo.',url:'#',fav:false,dest:true},
   {id:'ch2',nombre:'Value School',ini:'VS',color:'#4a8c6f',cat:'Value',desc:'Value investing, análisis fundamental y filosofía de inversión a largo plazo.',url:'#',fav:true,dest:false},
@@ -1308,21 +1350,29 @@ function cartaHead(){return cartaVista==='rendimiento'?'<tr><th>Activo</th><th>I
 function cartaRows(act){const totV=act.reduce((s,a)=>s+a.qty*a.cot,0),totI=act.reduce((s,a)=>s+a.qty*a.pm,0);return act.map(a=>{const v=a.qty*a.cot,i=a.qty*a.pm,pyg=v-i,pPyg=i>0?(v-i)/i*100:0,pCart=totI>0?i/totI*100:0,pReal=totV>0?v/totV*100:0;return cartaVista==='rendimiento'?`<tr><td><strong>${a.ticker}</strong></td><td class="amt">${fe(i)}</td><td>${pCart.toFixed(1)}%</td><td class="amt">${fe(v)}</td><td class="${pyg>=0?'pos':'neg'} amt">${pyg>=0?'+':'-'}${fe(Math.abs(pyg))}</td><td class="${pPyg>=0?'pos':'neg'}">${fp(pPyg)}</td><td>${pReal.toFixed(1)}%</td></tr>`:`<tr class="row-link" onclick="showDetalle('${a.ticker}');goTo('s-ops')"><td><strong>${a.ticker}</strong><br><span style="color:var(--t1);font-size:10px">${a.broker}</span></td><td><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></td><td class="amt">${fe(v)}</td><td class="${(v-i)/i*100>=0?'pos':'neg'}">${fp((v-i)/i*100)}</td></tr>`;});}
 function renderCartera(){const C=CC(),act=cA(activeId);document.getElementById('tb-cartera-head').innerHTML=cartaHead();document.getElementById('tb-cartera').innerHTML=act.length?cartaRows(act).join(''):'<tr><td colspan="'+(cartaVista==='rendimiento'?7:4)+'"><div class="empty-state"><span class="empty-state-icon">📭</span><div class="empty-state-title">Cartera vacía</div><div class="empty-state-sub">Registra tu primera operación con el botón + Op. de la barra superior</div></div></td></tr>';const rT={};let rt=0;act.forEach(a=>{const v=a.qty*a.cot;rt+=v;Object.entries(a.region).forEach(([r,p])=>{rT[r]=(rT[r]||0)+v*p/100;});});document.getElementById('exp-region').innerHTML=Object.entries(rT).map(([r,v])=>{const p=rt>0?v/rt*100:0;return pb(p,C[1],r);}).join('');const dT={};let dt=0;act.forEach(a=>{const v=a.qty*a.cot;dt+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});document.getElementById('exp-divisa').innerHTML=Object.entries(dT).map(([d,v])=>{const p=dt>0?v/dt*100:0;return pb(p,C[0],d);}).join('');}
 function filterCt(el,tipo){document.querySelectorAll('#ct-filter-chips .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');const act=tipo==='todos'?cA(activeId):cA(activeId).filter(a=>a.tipo===tipo);const C=CC();document.getElementById('tb-cartera-head').innerHTML=cartaHead();document.getElementById('tb-cartera').innerHTML=act.length?cartaRows(act).join(''):'<tr><td colspan="'+(cartaVista==='rendimiento'?7:4)+'" style="color:var(--t1);padding:12px;text-align:center">Sin activos para este filtro</td></tr>';const rT={};let rt=0;act.forEach(a=>{const v=a.qty*a.cot;rt+=v;Object.entries(a.region).forEach(([r,p])=>{rT[r]=(rT[r]||0)+v*p/100;});});document.getElementById('exp-region').innerHTML=Object.entries(rT).length?Object.entries(rT).map(([r,v])=>{const p=rt>0?v/rt*100:0;return pb(p,C[1],r);}).join(''):'<div style="font-size:12px;color:var(--t1);padding:6px 0">Sin datos para este filtro</div>';const dT={};let dt=0;act.forEach(a=>{const v=a.qty*a.cot;dt+=v;Object.entries(a.exposDiv).forEach(([d,p])=>{dT[d]=(dT[d]||0)+v*p/100;});});document.getElementById('exp-divisa').innerHTML=Object.entries(dT).length?Object.entries(dT).map(([d,v])=>{const p=dt>0?v/dt*100:0;return pb(p,C[0],d);}).join(''):'<div style="font-size:12px;color:var(--t1);padding:6px 0">Sin datos para este filtro</div>';}
-function showDetalle(ticker){const a=activos.find(x=>x.ticker===ticker);if(!a)return;document.getElementById('panel-ops').style.display='none';document.getElementById('panel-detalle').style.display='block';document.getElementById('d-titulo').textContent=ticker+' · '+a.nombre;const v=a.qty*a.cot,i=a.qty*a.pm,pl=v-i;document.getElementById('d-valor').textContent=fe(v);document.getElementById('d-pl').innerHTML=`<span class="amt">${(pl>=0?'+':'')+fe(Math.abs(pl))}</span>`;document.getElementById('d-pl').className='mvalue '+(pl>=0?'pos':'neg');document.getElementById('d-pm').textContent=fe(a.pm);document.getElementById('d-cot').textContent=fe(a.cot);document.getElementById('ficha').innerHTML=`<div class="dr"><span class="dk">ISIN</span><span class="dv">${a.isin}</span></div><div class="dr"><span class="dk">Tipo</span><span class="dv">${a.tipo}</span></div><div class="dr"><span class="dk">Mercado</span><span class="dv">${a.mercado}</span></div><div class="dr"><span class="dk">Divisa</span><span class="dv">${a.divisa}</span></div><div class="dr"><span class="dk">Índice</span><span class="dv">${a.indice}</span></div><div class="dr"><span class="dk">Broker</span><span class="dv">${a.broker}</span></div><div class="dr"><span class="dk">Grupo</span><span class="dv"><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></span></div>`;document.getElementById('d-hist').innerHTML=ops.filter(o=>o.ticker===ticker&&o.cartera===activeId&&o.status!=='cancelled').map(o=>`<tr><td>${o.fecha.slice(5)}</td><td>${o.op}</td><td>${o.qty}</td><td class="amt">${fe(o.precio)}</td><td>${fe(o.fee)}</td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--t1)">Sin operaciones</td></tr>';document.getElementById('d-notas').innerHTML=notas.map(n=>`<div class="note-box">${n}</div>`).join('');}
+function showDetalle(ticker){const a=activos.find(x=>x.ticker===ticker);if(!a)return;document.getElementById('panel-ops').style.display='none';document.getElementById('panel-detalle').style.display='block';document.getElementById('d-titulo').textContent=ticker+' · '+a.nombre;const v=a.qty*a.cot,i=a.qty*a.pm,pl=v-i;document.getElementById('d-valor').textContent=fe(v);document.getElementById('d-pl').innerHTML=`<span class="amt">${(pl>=0?'+':'')+fe(Math.abs(pl))}</span>`;document.getElementById('d-pl').className='mvalue '+(pl>=0?'pos':'neg');document.getElementById('d-pm').textContent=fe(a.pm);document.getElementById('d-cot').textContent=fe(a.cot);document.getElementById('ficha').innerHTML=`<div class="dr"><span class="dk">ISIN</span><span class="dv">${a.isin}</span></div><div class="dr"><span class="dk">Tipo</span><span class="dv">${a.tipo}</span></div><div class="dr"><span class="dk">Mercado</span><span class="dv">${a.mercado}</span></div><div class="dr"><span class="dk">Divisa</span><span class="dv">${a.divisa}</span></div><div class="dr"><span class="dk">Índice</span><span class="dv">${a.indice}</span></div><div class="dr"><span class="dk">Broker</span><span class="dv">${a.broker}</span></div><div class="dr"><span class="dk">Grupo</span><span class="dv"><span class="badge ${GC[a.grupo]||'b-gray'}">${a.grupo}</span></span></div>`;document.getElementById('d-hist').innerHTML=ops.filter(o=>o.ticker===ticker&&o.cartera===activeId&&o.status!=='cancelled'&&o.op!=='Ajuste').map(o=>`<tr><td>${o.fecha.slice(5)}</td><td>${o.op}</td><td>${o.qty}</td><td class="amt">${fe(o.precio)}</td><td>${fe(o.fee)}</td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--t1)">Sin operaciones</td></tr>';document.getElementById('d-notas').innerHTML=notas.map(n=>`<div class="note-box">${n}</div>`).join('');const aj=ops.filter(o=>o.ticker===ticker&&o.cartera===activeId&&o.op==='Ajuste');const ajDiv=document.getElementById('d-ajustes');ajDiv.style.display=aj.length?'':'none';if(aj.length){document.getElementById('d-ajustes-lista').innerHTML=aj.map(o=>`<div class="dr"><span class="dk" style="flex:1">${o.fecha.slice(5)} · ${o.tipoAjuste}</span><span class="dv" style="flex-direction:column;align-items:flex-end;gap:1px"><span style="font-size:11px">${o.valorAnterior} → <strong>${o.valorNuevo}</strong></span><span style="font-size:10px;color:var(--t2)">${o.fuente}${o.motivo?' · '+o.motivo:''}</span></span></div>`).join('');}const btnAj=document.getElementById('btn-reg-ajuste');if(btnAj)btnAj.onclick=()=>openAjuste(ticker,'Precio medio');}
 function backOps(){document.getElementById('panel-ops').style.display='block';document.getElementById('panel-detalle').style.display='none';}
 const REND=['Dividendo','Staking','Interés','Saveback'];
+// ── AJUSTES DE RECONCILIACIÓN (F16) ─────────────────────────────────────────
+let ajusteCtx={ticker:'',tipoAjuste:'Precio medio'};
+function openAjuste(ticker,tipoAjuste){ajusteCtx={ticker,tipoAjuste};const sel=document.getElementById('aj-tipo');sel.value=tipoAjuste;document.getElementById('aj-ticker').value=ticker||'—';document.getElementById('aj-ticker-row').style.display=tipoAjuste==='Saldo efectivo'?'none':'';const a=activos.find(x=>x.ticker===ticker&&x.cartera===activeId);let ant='';if(tipoAjuste==='Precio medio')ant=a?a.pm:'';else if(tipoAjuste==='Cantidad')ant=a?a.qty:'';else if(tipoAjuste==='Saldo efectivo')ant=efectivoData.filter(e=>e.cartera===activeId&&e.status!=='cancelled').reduce((s,e)=>s+e.importe,0);document.getElementById('aj-anterior').value=ant;document.getElementById('aj-nuevo').value='';document.getElementById('aj-fuente').value='';document.getElementById('aj-motivo').value='';openModal('m-ajuste');}
+function ajTipoChange(){const tipo=document.getElementById('aj-tipo').value;ajusteCtx.tipoAjuste=tipo;document.getElementById('aj-ticker-row').style.display=tipo==='Saldo efectivo'?'none':'';const a=activos.find(x=>x.ticker===ajusteCtx.ticker&&x.cartera===activeId);let ant='';if(tipo==='Precio medio')ant=a?a.pm:'';else if(tipo==='Cantidad')ant=a?a.qty:'';else if(tipo==='Saldo efectivo')ant=efectivoData.filter(e=>e.cartera===activeId&&e.status!=='cancelled').reduce((s,e)=>s+e.importe,0);document.getElementById('aj-anterior').value=ant;}
+function saveAjuste(){const tipo=document.getElementById('aj-tipo').value;const nuevo=parseFloat(document.getElementById('aj-nuevo').value);const anterior=parseFloat(document.getElementById('aj-anterior').value);if(isNaN(nuevo)){showToast('Introduce el valor nuevo');return;}const motivo=document.getElementById('aj-motivo').value.trim();const fuente=document.getElementById('aj-fuente').value.trim();const ticker=ajusteCtx.ticker||'';const a=activos.find(x=>x.ticker===ticker&&x.cartera===activeId);const d=new Date().toISOString().slice(0,10);ops.unshift({id:nextId++,fecha:d,ticker,tipo:a?a.tipo:'Efectivo',broker:a?a.broker:'—',op:'Ajuste',tipoAjuste:tipo,valorAnterior:anterior,valorNuevo:nuevo,motivo,fuente,qty:0,precio:0,fee:0,divisa:a?a.divisa:'EUR',grupo:a?a.grupo:'—',nota:motivo,cartera:activeId,status:'active',cancelledWith:null});closeModal('m-ajuste');showToast('Ajuste registrado ✓');renderOps();}
 function renderOps(){
   let f=ops.filter(o=>{
     if(o.cartera!==activeId)return false;
     if(o.status==='cancelled')return false;
-    if(opsFilter==='todas')return true;
+    if(opsFilter==='todas')return o.op!=='Ajuste';
     if(opsFilter==='rendimiento')return REND.includes(o.op);
     return o.op===opsFilter;
   }).reverse();
   const hoy=new Date();
   if(opsLimit==='20')f=f.slice(0,20);
   else if(opsLimit==='mes'){const c=new Date(hoy.getFullYear(),hoy.getMonth(),1).toISOString().slice(0,10);f=f.filter(o=>o.fecha>=c);}
-  document.getElementById('tb-ops').innerHTML=f.map(o=>{const t=o.qty*o.precio+o.fee;return`<tr class="row-link" onclick="showOpDetalle(${o.id})"><td>${o.fecha.slice(5)}</td><td><strong>${o.ticker}</strong><br><span style="font-size:10px;color:var(--t1)">${o.broker}</span></td><td><span class="badge ${GC[o.grupo]||'b-gray'}">${o.op}</span></td><td class="${o.op==='Compra'?'neg':'pos'}"><span class="amt">${o.op==='Compra'?'-':'+'}{t}</span></td></tr>`.replace('{t}',fe(t));}).join('')||'<tr><td colspan="4"><div class="empty-state" style="padding:24px 12px"><span class="empty-state-icon" style="font-size:28px">🔍</span><div class="empty-state-title">Sin operaciones</div><div class="empty-state-sub">Usa + Op. para registrar tu primera compra o venta</div></div></td></tr>';
+  document.getElementById('tb-ops').innerHTML=f.map(o=>{
+    if(o.op==='Ajuste'){const delta=o.valorNuevo-o.valorAnterior;return`<tr class="row-link" onclick="showOpDetalle(${o.id})"><td>${o.fecha.slice(5)}</td><td><strong>${o.ticker||'Efectivo'}</strong><br><span style="font-size:10px;color:var(--t1)">${o.tipoAjuste}</span></td><td><span class="badge b-amber">Ajuste</span></td><td class="${delta>=0?'pos':'neg'}">${delta>=0?'+':''}${o.tipoAjuste==='Precio medio'||o.tipoAjuste==='Saldo efectivo'?fe(Math.abs(delta)):delta.toFixed(4)}</td></tr>`;}
+    const t=o.qty*o.precio+o.fee;return`<tr class="row-link" onclick="showOpDetalle(${o.id})"><td>${o.fecha.slice(5)}</td><td><strong>${o.ticker}</strong><br><span style="font-size:10px;color:var(--t1)">${o.broker}</span></td><td><span class="badge ${GC[o.grupo]||'b-gray'}">${o.op}</span></td><td class="${o.op==='Compra'?'neg':'pos'}"><span class="amt">${o.op==='Compra'?'-':'+'}{t}</span></td></tr>`.replace('{t}',fe(t));
+  }).join('')||'<tr><td colspan="4"><div class="empty-state" style="padding:24px 12px"><span class="empty-state-icon" style="font-size:28px">🔍</span><div class="empty-state-title">Sin operaciones</div><div class="empty-state-sub">Usa + Op. para registrar tu primera compra o venta</div></div></td></tr>';
 }
 function filterOps(el,tipo){document.querySelectorAll('#ops-chips .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');opsFilter=tipo;renderOps();}
 function filterOpsLimit(el,lim){document.querySelectorAll('#ops-limit-chips .tag').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');opsLimit=lim;renderOps();}
