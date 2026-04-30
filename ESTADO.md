@@ -205,10 +205,18 @@
 
 ## 6. Backlog v2+
 
-| # | Descripción |
-|---|---|
-| B1 | Comparativa de rentabilidad vs índice de referencia benchmark |
-| B2 | Soporte para splits y dividendos en especie con recálculo de precio medio |
+| # | Descripción | Prioridad |
+|---|---|---|
+| B1 | Comparativa de rentabilidad vs índice de referencia benchmark | Media |
+| B2 | Soporte para splits y dividendos en especie con recálculo de precio medio | Media |
+| B3 | Informe fiscal / plus-valías — ganancias/pérdidas realizadas en el año, retenciones en dividendos, resumen para la declaración de renta | Alta |
+| B4 | Asignación objetivo y desviación — definir % objetivo por clase de activo y ver la desviación actual | Alta |
+| B5 | Resumen de dividendos — total cobrado en el año desglosado por activo | Media |
+| B6 | Búsqueda en Cartera y Operaciones | Media |
+| B7 | Gráfico de evolución del precio en s-detalle | Media |
+| B8 | Calculadora de rebalanceo — cuánto comprar/vender para volver a la asignación objetivo (depende de B4) | Media |
+| B9 | Watchlist / lista de seguimiento de activos no comprados | Baja |
+| B10 | Vista de comisiones pagadas — total de fees por broker y por período | Baja |
 
 ---
 
