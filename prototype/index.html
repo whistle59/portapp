@@ -20,9 +20,9 @@ html.dark{--bg0:#1c1c1e;--bg1:#2c2c2e;--bg2:#3a3a3c;--t0:#f5f5f7;--t1:#e8e8ec;--
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--ac);border-radius:4px}
 *{scrollbar-color:var(--ac) transparent;scrollbar-width:thin}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:var(--fs);color:var(--t0);background:var(--bg2);display:flex;justify-content:center;min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:var(--fs);color:var(--t0);background:var(--bg2);display:flex;justify-content:center;min-height:100vh;overscroll-behavior:none}
 .device{width:100%;max-width:390px;height:100vh;height:100dvh;background:var(--bg0);display:flex;flex-direction:column;position:relative;overflow:hidden}
-@media(min-width:500px){body{align-items:flex-start;padding:24px 0}.device{min-height:auto;height:800px;border-radius:40px;box-shadow:0 24px 80px rgba(0,0,0,.22)}}
+@media(min-width:500px){body{align-items:flex-start;padding:24px 0}.device{min-height:auto;height:min(800px,100dvh);border-radius:40px;box-shadow:0 24px 80px rgba(0,0,0,.22)}}
 .masked .amt{position:relative;color:transparent!important}.masked .amt::after{content:'•••••';position:absolute;left:0;color:var(--t1);font-size:.9em}
 .privacy-bar{display:none;align-items:center;justify-content:center;gap:6px;background:var(--ac-bg);padding:6px 14px;font-size:12px;color:var(--ac-t);cursor:pointer;border-bottom:.5px solid var(--bd)}
 .privacy-bar.on{display:flex}
@@ -41,7 +41,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .port-sel span{font-size:13px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t0)}
 .port-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
 .tb-btn{background:var(--bg1);border:.5px solid var(--bd2);border-radius:8px;padding:7px 9px;font-size:11px;cursor:pointer;color:var(--t1);white-space:nowrap;font-family:inherit}
-.screens-wrap{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screens-wrap{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
 .screen{display:none;padding:10px 13px 90px}
 .screen.active{display:block}
 .nav-bar{display:flex;border-top:.5px solid var(--bd);background:var(--bg0);padding:5px 0 env(safe-area-inset-bottom,5px);flex-shrink:0}
