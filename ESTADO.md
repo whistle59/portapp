@@ -3006,3 +3006,113 @@ Los ajustes se registran como un tipo especial de operación integrado en el sis
 - La app recalcula posiciones y valores a partir de operaciones + ajustes aplicados
 - Los ajustes son **inmutables** una vez guardados — si hay un error se crea un ajuste correctivo, nunca se edita el anterior
 - El historial de ajustes queda visible siempre para el usuario
+
+---
+
+## 34. Consentimientos de usuario — Modelo de datos y flujo UX
+
+### Principio general
+
+Todos los consentimientos del usuario se almacenan en una **tabla central `user_consents`**, no en campos sueltos del perfil. Esto permite auditoría completa, gestión de versiones de políticas y cumplimiento GDPR con un único punto de consulta.
+
+---
+
+### Tabla `user_consents` (producción — Supabase/PostgreSQL)
+
+```sql
+create table user_consents (
+  id              uuid primary key default gen_random_uuid(),
+  user_id         uuid not null references auth.users(id) on delete cascade,
+  consent_type    text not null,        -- ver catálogo abajo
+  version         text not null,        -- versión del texto aceptado, ej. "2026-04"
+  accepted        boolean not null,     -- true = aceptado, false = revocado
+  accepted_at     timestamptz,          -- null si accepted=false
+  revoked_at      timestamptz,          -- null si sigue activo
+  ip_address      text,                 -- opcional, para auditoría
+  user_agent      text,                 -- opcional, para auditoría
+  created_at      timestamptz not null default now()
+);
+
+-- índice para consultas rápidas por usuario + tipo
+create index on user_consents(user_id, consent_type);
+```
+
+**RLS:** solo el propio usuario puede leer sus consentimientos. Solo el backend (service role) puede insertar/actualizar (nunca el cliente directamente, para evitar manipulación).
+
+---
+
+### Catálogo de `consent_type`
+
+| Valor | Descripción | Obligatorio para usar la app |
+|---|---|---|
+| `gdpr_data_processing` | Tratamiento de datos personales (RGPD art. 6.1.b) | ✅ Sí |
+| `terms_of_service` | Aceptación de términos y condiciones | ✅ Sí |
+| `privacy_policy` | Política de privacidad | ✅ Sí |
+| `backup_cloud` | Almacenamiento cifrado de backup en servidores de Portgrow | Solo si usa backup gestionado |
+| `marketing_emails` | Comunicaciones comerciales | ❌ Opcional |
+| `analytics_usage` | Uso de datos anonimizados para mejora del producto | ❌ Opcional |
+
+Los tres obligatorios se recogen en el onboarding (sec. 32). Los opcionales se muestran en Ajustes > Privacidad y pueden revocarse en cualquier momento.
+
+---
+
+### Flujo específico: consentimiento de backup gestionado
+
+**Quién puede activarlo:** solo el `owner` de la cartera. Si otro rol intenta acceder, se muestra: *"Solo el propietario puede gestionar copias de seguridad."*
+
+**Primera activación (flujo completo):**
+
+1. Owner pulsa "Activar backup gestionado" en Ajustes > Backup
+2. Se abre modal de consentimiento con:
+   - Texto: *"Portgrow guardará una copia cifrada de tus datos en nuestros servidores seguros. El cifrado se aplica antes de la transmisión y solo tú posees la clave de descifrado. Portgrow no puede acceder al contenido de tu backup."*
+   - Checkbox: "He leído y acepto el almacenamiento cifrado de mis datos"
+   - Botón primario: "Activar backup" (deshabilitado hasta marcar checkbox)
+   - Botón secundario: "Cancelar"
+3. Al confirmar: se inserta fila en `user_consents` (`consent_type='backup_cloud'`, `accepted=true`, `accepted_at=now()`, `version=versión_actual`) y se activa el backup
+4. En Ajustes queda visible: *"Backup activado · Consentimiento registrado el DD/MM/AAAA"*
+
+**Revocación:**
+
+- Owner pulsa "Desactivar backup gestionado"
+- Confirmación: *"Se eliminará la copia de seguridad de nuestros servidores y no se realizarán más backups automáticos. Tus datos locales no se ven afectados."*
+- Al confirmar: se actualiza la fila (`accepted=false`, `revoked_at=now()`) y se programa la eliminación del backup en servidor (retención 30 días por si hay arrepentimiento)
+- La próxima vez que el owner quiera reactivarlo, se vuelve a mostrar el modal de consentimiento
+
+---
+
+### Periodicidad del backup automático
+
+Configurable por el owner en Ajustes > Backup una vez activado el consentimiento:
+
+| Opción | Comportamiento |
+|---|---|
+| **Manual** (default) | Solo cuando el owner pulsa "Hacer backup ahora" |
+| **Semanal** | Cada lunes a las 02:00 UTC (o la próxima vez que el dispositivo tenga conexión) |
+| **Mensual** | Primer día del mes a las 02:00 UTC |
+
+En Ajustes se muestra siempre:
+- Fecha y hora del último backup realizado
+- Próximo backup programado (si periodicidad ≠ manual)
+- Botón "Hacer backup ahora" (disponible siempre, independientemente de la periodicidad)
+
+---
+
+### Prototipo — simulación en memoria
+
+```js
+// Variables globales a añadir
+let backupConsent = { accepted: false, date: null, version: null };
+let backupConfig  = { periodicity: 'manual', lastBackup: null };
+// El owner se simula como el único usuario activo del prototipo
+```
+
+El modal de consentimiento y los controles de periodicidad se implementan en `s-settings` (Ajustes). El botón "Backup gestionado" solo queda activo si `backupConsent.accepted === true`.
+
+---
+
+### ⚠️ Pendiente antes del lanzamiento
+
+- Redacción legal final del texto de consentimiento de backup (revisar con asesor legal junto con sec. 32)
+- Decidir versión inicial de políticas (ej. `"2026-04"`) para el campo `version`
+- Implementar endpoint de eliminación de backup en servidor (retención 30 días post-revocación)
+- Añadir `user_consents` al DATA_MODEL.md v1.2
