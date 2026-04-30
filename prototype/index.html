@@ -411,7 +411,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <div class="dr"><span class="dk">Coinbase</span><span class="dv"><span class="amt">€500</span> <span class="badge b-amber">USD</span></span></div>
       </div>
       <div class="card">
-        <div class="card-header"><span class="card-title">Movimientos</span><div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="openModal('m-efectivo')">+ Nuevo</button><button class="btn btn-sm nav-advanced" onclick="openAjuste('','Saldo efectivo')">Ajuste</button></div></div>
+        <div class="card-header"><span class="card-title">Movimientos</span><div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="openModal('m-efectivo')">+ Nuevo</button><button class="btn btn-sm nav-advanced" onclick="openAjuste('','Saldo efectivo')">+ Registrar ajuste</button></div></div>
         <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Origen</th><th>Importe</th></tr></thead>
         <tbody id="tb-efectivo"></tbody></table>
       </div>
@@ -453,11 +453,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
           <div class="metric"><div class="mlabel">Cotización</div><div class="mvalue"><span class="amt" id="d-cot"></span></div></div>
         </div>
         <div class="card"><div class="card-title" style="margin-bottom:8px">Ficha del activo</div><div id="ficha"></div></div>
-        <div class="card"><div class="card-header"><span class="card-title">Historial de operaciones</span><button class="btn btn-sm nav-advanced" id="btn-reg-ajuste" onclick="openAjuste('','Precio medio')">Ajuste</button></div>
+        <div class="card"><div class="card-header"><span class="card-title">Historial de operaciones <button class="btn-icon" style="font-size:11px;color:var(--t1);vertical-align:middle;padding:0 2px" onclick="openModal('m-ajuste-info')">ⓘ</button></span><button class="btn btn-sm nav-advanced" id="btn-reg-ajuste" onclick="openAjuste('','Precio medio')">+ Registrar ajuste</button></div>
           <table><thead><tr><th>Fecha</th><th>Op.</th><th>Qty</th><th>Precio</th><th>Com.</th></tr></thead>
           <tbody id="d-hist"></tbody></table>
-          <div id="d-ajustes" style="display:none;margin-top:10px">
-            <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:4px">AJUSTES APLICADOS</div>
+          <div id="d-ajustes" style="display:none;margin-top:12px;padding-top:10px;border-top:1px solid var(--bd)">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:var(--t0)">Ajustes aplicados</span><span class="badge b-amber" style="font-size:9px">reconciliación</span></div>
+            <div style="font-size:11px;color:var(--t2);margin-bottom:8px">Correcciones registradas para alinear los valores con tu broker</div>
             <div id="d-ajustes-lista"></div>
           </div>
         </div>
@@ -623,6 +624,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <details><summary>¿Cómo cambio de cartera?</summary><div class="det-body">Toca el nombre de la cartera activa en la barra superior. Se abre el selector de carteras. Pulsa sobre la que quieras activar.</div></details>
       <details><summary>¿Cómo creo una cartera nueva?</summary><div class="det-body">Toca el nombre de la cartera en la barra superior y pulsa <strong>"+ Nueva cartera"</strong> en la parte inferior del selector.</div></details>
       <details><summary>¿Qué es el método RPT?</summary><div class="det-body">RPT (Rentabilidad Ponderada por Tiempo) es la forma estándar de medir la rentabilidad real de una cartera. Elimina el efecto de cuándo hiciste cada aportación o retirada, por lo que refleja únicamente el rendimiento de las inversiones. Es el método que usan los fondos de inversión para publicar su rentabilidad.</div></details>
+      <details><summary>¿Para qué sirven los ajustes de reconciliación?</summary><div class="det-body">A veces el precio medio o la cantidad que calcula Portgrow no coincide exactamente con lo que muestra tu broker. Esto puede ocurrir por comisiones calculadas de forma distinta, splits, acciones corporativas o un error de entrada.<br><br>Un <strong>ajuste de reconciliación</strong> te permite corregir esa diferencia sin borrar ni modificar el historial de operaciones. El ajuste queda registrado con fecha, motivo y fuente para que siempre puedas auditarlo.<br><br><strong>Cómo registrar un ajuste:</strong><ol><li>Ve a <strong>Cartera</strong> y pulsa el activo que quieres ajustar</li><li>En el panel que se abre, pulsa <strong>"+ Registrar ajuste"</strong> (requiere modo avanzado)</li><li>Elige el tipo: <em>Precio medio</em>, <em>Cantidad</em> o <em>Saldo efectivo</em></li><li>Portgrow muestra el valor actual calculado — introduce el valor correcto según tu broker</li><li>Añade el motivo y la fuente, y guarda</li></ol>Para ajustes de saldo efectivo, el botón está en la pantalla <strong>Efectivo</strong>.</div></details>
       <details><summary>¿Cómo oculto las cifras si alguien ve mi pantalla?</summary><div class="det-body">Pulsa el icono <strong>👁</strong> de la barra superior. Todas las cifras de la app se enmascaran con ••••. Tócalo de nuevo para desactivarlo, o pulsa la barra que aparece en la parte superior de la pantalla.</div></details>
       <details><summary>¿Cómo activo el modo oscuro?</summary><div class="det-body">Ve a <strong>Config &gt; Interfaz</strong> y activa el interruptor de modo oscuro.</div></details>
       <details><summary>¿Mis datos se envían a algún servidor?</summary><div class="det-body">No. El prototipo funciona completamente en tu navegador, sin enviar ningún dato a servidores externos. En la versión de producción, los datos se guardarán en tu dispositivo y solo se sincronizarán con la nube si tú lo activas expresamente.</div></details>
@@ -1071,6 +1073,25 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   </div>
 </div>
 
+</div>
+
+<div class="modal-overlay" id="m-ajuste-info">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle">Ajustes de reconciliación</span><button class="btn-icon" onclick="closeModal('m-ajuste-info')">✕</button></div>
+    <p style="font-size:13px;color:var(--t1);line-height:1.65">A veces el precio medio o la cantidad que calcula Portgrow no coincide exactamente con lo que muestra tu broker. Esto puede ocurrir por comisiones registradas de forma distinta, splits, acciones corporativas o simplemente un error de entrada.</p>
+    <p style="font-size:13px;color:var(--t1);line-height:1.65">Un <strong>ajuste de reconciliación</strong> te permite registrar esa diferencia sin modificar el historial de operaciones. El ajuste queda registrado con fecha, motivo y fuente para que siempre puedas auditarlo.</p>
+    <div style="background:var(--bg1);border-radius:10px;padding:10px 12px;margin:10px 0">
+      <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px">CÓMO USARLO</div>
+      <div style="font-size:12px;color:var(--t1);line-height:1.7">
+        1. Ve a <strong>Cartera</strong> y pulsa el activo que quieres ajustar<br>
+        2. En el panel que se abre, pulsa <strong>"+ Registrar ajuste"</strong><br>
+        3. Elige el tipo (Precio medio, Cantidad o Saldo efectivo)<br>
+        4. Introduce el valor correcto según tu broker y el motivo<br>
+        5. Guarda — el ajuste queda registrado y visible en esta sección
+      </div>
+    </div>
+    <button class="btn-p" style="width:100%;margin-top:4px" onclick="closeModal('m-ajuste-info')">Entendido</button>
+  </div>
 </div>
 
 <div class="modal-overlay" id="m-ajuste">
