@@ -193,6 +193,7 @@
 | PR7 | SMS 2FA (Twilio ~0,05€/SMS) |
 | PR8 | Email 2FA (Resend/SendGrid, gratuito hasta 100/día) |
 | PR9 | Bot de asistencia al usuario (API de Claude) |
+| PR10 | ⚠️ **Revisión legal obligatoria antes del lanzamiento** — T&C, política de privacidad, cláusula de responsabilidad financiera, GDPR. Contratar asesoramiento legal especializado en SaaS/fintech España. |
 
 ---
 
@@ -2894,3 +2895,72 @@ Para mantener el control total:
 `Fecha | Año | Cartera | Ticker | Nombre | ISIN | Tipo | Importe bruto | Retención | Importe neto | Divisa`
 
 - **Tipo:** Dividendo / Cupón / Staking / Otro rendimiento
+
+---
+
+## 32. Onboarding y marco legal
+
+> ⚠️ Los textos legales (T&C, política de privacidad) deben ser redactados o revisados por asesor legal especializado en SaaS/fintech España antes del lanzamiento. Ver PR10.
+
+### 32.1 Registro — datos recogidos
+
+| Campo | Obligatorio | Notas |
+|---|---|---|
+| Email | ✅ | Identificador principal + verificación |
+| Nombre | ✅ | Personalización de la app |
+| Alias | ❌ | Nombre público opcional |
+| Teléfono | ✅ | Verificación SMS |
+| Contraseña | ✅ | Mínimo 8 caracteres |
+| País | ❌ | Solo para segmentación interna — no se muestra públicamente |
+
+### 32.2 Flujo de verificación (secuencial)
+
+1. Usuario rellena el formulario de registro
+2. Sistema envía **email de verificación** con enlace
+3. Al hacer clic en el enlace → se muestran T&C + política de privacidad → usuario acepta → **email verificado** + consentimiento registrado
+4. Sistema envía **SMS** con código de 6 dígitos
+5. Usuario introduce el código → **teléfono verificado**
+6. Cuenta activa → primera vez en la app → se muestra el carrusel de bienvenida
+
+### 32.3 Almacenamiento del consentimiento (GDPR)
+
+Por cada aceptación se registra:
+
+| Campo | Valor |
+|---|---|
+| user_id | ID del usuario |
+| consent_type | `terms_and_conditions` / `privacy_policy` |
+| document_version | Versión del documento (ej. "v1.0") |
+| accepted_at | Timestamp UTC |
+| ip_address | IP en el momento de la aceptación |
+| user_agent | Dispositivo y navegador/app |
+| method | `email_verification_click` |
+
+Estos registros son inmutables — nunca se borran ni modifican. Si el usuario acepta una versión nueva del documento se genera un nuevo registro.
+
+### 32.4 Textos legales y disclaimers obligatorios
+
+Los siguientes puntos deben quedar cubiertos en T&C y/o pantallas de la app:
+
+1. **Datos en local:** los datos del usuario se almacenan en su dispositivo. Portgrow ofrece opcionalmente una copia cifrada en la nube.
+2. **Sin consejos financieros:** Portgrow es una herramienta de registro y visualización de operaciones. No ofrece ni debe interpretarse como asesoramiento financiero de ningún tipo.
+3. **Responsabilidad sobre enlaces externos:** el contenido de los enlaces y plataformas externas accesibles desde la app es responsabilidad exclusiva de sus autores.
+4. **Blog divulgativo:** el contenido del blog de Portgrow es exclusivamente informativo. No constituye consejo financiero, fiscal ni de inversión.
+5. **Cálculos orientativos:** todos los cálculos realizados por la app (rentabilidad, valoraciones, datos fiscales) son orientativos. En caso de discrepancia con los datos de su broker o entidad financiera, prevalecerán los de estos últimos.
+6. **Titular de la suscripción:** el titular es el único con potestad para añadir o dar de baja a otros miembros de su suscripción.
+
+### 32.5 Carrusel de bienvenida (primer acceso)
+
+Se muestra automáticamente tras completar la verificación. Puede omitirse con "Saltar" en cualquier momento. Botón "Empezar" en la última card.
+
+Accesible de nuevo en cualquier momento desde **Ajustes → Ayuda → "Ver guía de inicio"** y desde `s-perfil`.
+
+| # | Card | Contenido clave |
+|---|---|---|
+| 1 | **Bienvenida** | Qué es Portgrow en una frase |
+| 2 | **Cómo empezar** | 1. Da de alta tu broker/banco · 2. Crea tus grupos · 3. Registra tu primera operación · 4. Explora "Aprende" |
+| 3 | **Tus datos, tu control** | Datos en local · copia cifrada opcional en la nube |
+| 4 | **Modo básico / avanzado** | Cómo cambiar entre ellos desde Ajustes |
+| 5 | **Sin consejos financieros** | Herramienta de registro y visualización, no de asesoramiento |
+| 6 | **Cálculos orientativos** | En caso de duda, prevalecen los datos de tu broker |
+| 7 | **Comparte tu suscripción** | Invita a otras personas por email · solo el titular puede añadir o dar de baja miembros |
