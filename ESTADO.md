@@ -2964,3 +2964,45 @@ Accesible de nuevo en cualquier momento desde **Ajustes → Ayuda → "Ver guía
 | 5 | **Sin consejos financieros** | Herramienta de registro y visualización, no de asesoramiento |
 | 6 | **Cálculos orientativos** | En caso de duda, prevalecen los datos de tu broker |
 | 7 | **Comparte tu suscripción** | Invita a otras personas por email · solo el titular puede añadir o dar de baja miembros |
+
+---
+
+## 33. Ajustes de reconciliación con el broker
+
+### Concepto
+
+Cuando los datos calculados por Portgrow difieren de los del broker (por comisiones, tipos de cambio, acciones corporativas, errores de entrada…), el usuario puede registrar un **ajuste** para alinear los valores. Los ajustes son auditables y no sobreescriben el historial de operaciones.
+
+### Implementación: nuevo tipo de operación "Ajuste"
+
+Los ajustes se registran como un tipo especial de operación integrado en el sistema existente — sin pantalla nueva ni nueva navegación.
+
+**Campos del ajuste:**
+
+| Campo | Descripción |
+|---|---|
+| Fecha | Fecha en que se registra el ajuste |
+| Cartera | Cartera afectada |
+| Ticker | Activo afectado (o vacío si es ajuste de efectivo) |
+| Tipo de ajuste | `Cantidad` / `Precio medio` / `Saldo efectivo` |
+| Valor anterior | Calculado por Portgrow antes del ajuste |
+| Valor nuevo | Dato correcto según el broker |
+| Motivo | Texto libre (ej. "split 2:1", "error de entrada", "comisión no registrada") |
+| Fuente | Broker o entidad de referencia (ej. "IBKR", "Banco Sabadell") |
+
+### Dónde se accede
+
+- **Detalle de activo** → botón "Registrar ajuste" — para ajustes de cantidad y precio medio
+- **Pantalla Efectivo** → botón "Registrar ajuste" — para ajustes de saldo efectivo
+
+### Dónde se visualizan
+
+- **Detalle de activo:** icono o badge visible cuando el activo tiene ajustes aplicados; al pulsar muestra el historial de ajustes
+- **Historial de operaciones (s-ops):** los ajustes aparecen con badge distintivo; filtro "Ajustes" para verlos aislados
+- **Export 2 (diario de operaciones):** columna Estado = `Ajuste`
+
+### Comportamiento
+
+- La app recalcula posiciones y valores a partir de operaciones + ajustes aplicados
+- Los ajustes son **inmutables** una vez guardados — si hay un error se crea un ajuste correctivo, nunca se edita el anterior
+- El historial de ajustes queda visible siempre para el usuario
