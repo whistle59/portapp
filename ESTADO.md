@@ -3116,3 +3116,127 @@ El modal de consentimiento y los controles de periodicidad se implementan en `s-
 - Decidir versión inicial de políticas (ej. `"2026-04"`) para el campo `version`
 - Implementar endpoint de eliminación de backup en servidor (retención 30 días post-revocación)
 - Añadir `user_consents` al DATA_MODEL.md v1.2
+
+---
+
+## 35. Entornos — Estrategia dev/prod y migraciones
+
+### Principio
+
+Dos proyectos Supabase desde el primer día. Nunca se toca prod manualmente: todo cambio de schema pasa primero por dev y llega a prod exclusivamente a través de una migración versionada.
+
+---
+
+### Proyectos Supabase
+
+| Proyecto | Uso | Datos |
+|---|---|---|
+| `portgrow-dev` | Desarrollo, pruebas, migraciones nuevas | Datos ficticios / seed de prueba |
+| `portgrow-prod` | Usuarios reales | Datos reales — acceso restringido |
+
+Ambos caben en el **tier gratuito** de Supabase (2 proyectos activos). Cuando el volumen justifique pasar a Pro, se upgradea solo `portgrow-prod`.
+
+---
+
+### Estructura de migraciones (Supabase CLI)
+
+```
+supabase/
+├── config.toml          ← configuración del proyecto local
+├── seed.sql             ← datos de prueba para dev (nunca llega a prod)
+└── migrations/
+    ├── 20260501_001_initial_schema.sql
+    ├── 20260501_002_user_consents.sql
+    ├── 20260515_001_add_backup_config.sql
+    └── ...              ← una migración por cambio de schema
+```
+
+**Reglas:**
+- Cada migración es **inmutable** una vez aplicada en prod — si hay un error se crea una migración correctiva, nunca se edita la anterior
+- Nombres con timestamp + índice + descripción: `YYYYMMDD_NNN_descripcion.sql`
+- Las migraciones se revisan en PR igual que el código — `supabase db diff` genera el SQL del diff automáticamente
+
+**Flujo de un cambio de schema:**
+
+```
+1. supabase db diff --schema public -f nombre_migracion
+   → genera el archivo en supabase/migrations/
+
+2. Probar en dev:
+   supabase db push --project-ref <dev-ref>
+
+3. PR a main → revisión
+
+4. Al mergear, CI aplica en prod:
+   supabase db push --project-ref <prod-ref>
+```
+
+---
+
+### Variables de entorno
+
+Cada entorno tiene su propio `.env`:
+
+```
+# .env.local  (dev — nunca se sube al repo)
+SUPABASE_URL=https://<dev-ref>.supabase.co
+SUPABASE_ANON_KEY=<dev-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<dev-service-key>
+APP_ENV=development
+
+# .env.production  (prod — gestionado en CI/CD secrets)
+SUPABASE_URL=https://<prod-ref>.supabase.co
+SUPABASE_ANON_KEY=<prod-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<prod-service-key>
+APP_ENV=production
+```
+
+`.env.local` y `.env.production` están en `.gitignore`. Las claves de prod viven como secrets en GitHub Actions (igual que `SYNC_PAT`).
+
+---
+
+### Analítica (DWH Kimball)
+
+**Fase actual → producción inicial:** schema `analytics` dentro del mismo proyecto Supabase (dev y prod). Queries analíticas corren contra Postgres con índices adecuados. Sin coste adicional, sin complejidad extra.
+
+```
+portgrow-prod (Supabase)
+├── schema: public        ← operacional (3NF)
+└── schema: analytics     ← DWH (Kimball — fact/dim tables)
+```
+
+**Criterios para promover analítica a proyecto/servicio separado:**
+
+| Señal | Acción |
+|---|---|
+| Queries analíticas >2 s en prod con índices | Evaluar réplica de lectura Supabase |
+| >500K filas en tablas de hechos | Evaluar migración a ClickHouse / BigQuery |
+| Necesidad de pipelines ETL complejos | Añadir capa dbt + scheduler |
+
+Hasta que se cumpla alguno de esos criterios, el schema `analytics` dentro de Supabase es la opción correcta.
+
+---
+
+### CI/CD — aplicación de migraciones
+
+Añadir step al workflow de GitHub Actions que se ejecuta al mergear a `main`:
+
+```yaml
+- name: Apply DB migrations (prod)
+  env:
+    SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  run: |
+    npx supabase db push --project-ref ${{ secrets.SUPABASE_PROD_REF }}
+```
+
+El mismo step con `secrets.SUPABASE_DEV_REF` se ejecuta al mergear a `dev`, para mantener el entorno de desarrollo siempre actualizado.
+
+---
+
+### ⚠️ Pendiente antes de crear los proyectos Supabase
+
+- Crear organización `portgrow` en Supabase y los dos proyectos (`portgrow-dev`, `portgrow-prod`)
+- Instalar Supabase CLI y ejecutar `supabase init` en el repo
+- Añadir `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DEV_REF` y `SUPABASE_PROD_REF` como secrets en GitHub
+- Escribir la migración inicial (`20260501_001_initial_schema.sql`) a partir de DATA_MODEL.md v1.1
+- Añadir `.env.local` al `.gitignore` si no está ya
