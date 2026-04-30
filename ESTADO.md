@@ -174,9 +174,10 @@
 | F10 | Grupos de activos: CRUD completo + drag & drop | ✅ v5 |
 | F11 | Compartir cartera: enlace público (permanente/3h/24h), solo porcentajes | ✅ v6 |
 | F12 | Pantalla "Aprende": canales YouTube curados con filtros y favoritos | ✅ v6 |
-| F13 | Glosario de términos financieros en "Aprende" (~40-50 términos: ETFs, acciones, macro) | 🔄 Prototipo pendiente |
+| F13 | Glosario de términos financieros en "Aprende" (~40-50 términos: ETFs, acciones, macro) | ✅ v6 |
 | F14 | IA conversacional en "Aprende": responde preguntas contextualizadas sobre términos y cartera | 🔄 Producción |
 | F15 | Toggle "Vista detalle / Vista rendimiento" en s-cartera (solo modo avanzado) | ✅ v6 |
+| F16 | Ajustes de reconciliación con el broker (Cantidad / Precio medio / Saldo efectivo) | ✅ v6 |
 
 ---
 
