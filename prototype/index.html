@@ -763,9 +763,20 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <div class="screen" id="s-canales">
       <div class="qnav" id="qn-canales"></div>
       <div class="screen-title">Aprende</div>
-      <div style="font-size:12px;color:var(--t1);margin-bottom:11px">Canales de inversión recomendados</div>
-      <div class="chip-row" id="canales-filtros" style="margin-bottom:12px"></div>
-      <div id="lista-canales"></div>
+      <div class="chip-row" style="margin-bottom:12px">
+        <span class="tag selected" id="tab-canales" onclick="setAprendeTab('canales')">Canales</span>
+        <span class="tag" id="tab-glosario" onclick="setAprendeTab('glosario')">Glosario</span>
+      </div>
+      <div id="aprende-canales">
+        <div style="font-size:12px;color:var(--t1);margin-bottom:11px">Canales de inversión recomendados</div>
+        <div class="chip-row" id="canales-filtros" style="margin-bottom:12px"></div>
+        <div id="lista-canales"></div>
+      </div>
+      <div id="aprende-glosario" style="display:none">
+        <div style="font-size:12px;color:var(--t1);margin-bottom:11px">Términos financieros más habituales</div>
+        <div class="chip-row" id="glosario-filtros" style="margin-bottom:12px"></div>
+        <div id="lista-glosario"></div>
+      </div>
     </div>
 
     <!-- ANOTACIONES GLOBAL (F3) -->
@@ -1259,7 +1270,7 @@ function fillActivos(){const cid=document.getElementById('op-cart')?.value||acti
 function opActivoChange(sel){const nuevo=sel.value==='__nuevo__';document.getElementById('op-nuevo-campos').style.display=nuevo?'block':'none';}
 function efTC(){const v=document.getElementById('ef-tipo').value;document.getElementById('ef-cf').style.display=v==='cuenta'?'block':'none';document.getElementById('ef-of').style.display=v==='op'?'block':'none';}
 function brokerTC(el){document.getElementById('bk-f').style.display=el.value==='broker'?'block':'none';document.getElementById('bn-f').style.display=el.value==='banco'?'block':'none';}
-const fe=n=>'€'+Math.round(n).toLocaleString('es-ES');
+const fe=n=>'€'+Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const fp=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
 const cA=cid=>activos.filter(a=>a.cartera===cid);
 const cV=cid=>cA(cid).reduce((s,a)=>s+a.qty*a.cot,0);
@@ -1922,7 +1933,61 @@ function revocarEnlace(){
 
 // ── CANALES YOUTUBE (F12) ────────────────────────────────────────────────────
 const CANAL_CAT_COLOR={'ETFs':'b-blue','Value':'b-teal','Cripto':'b-amber','Opciones':'b-purple','Dividendos':'b-green'};
-let canalFiltro='Todos';
+let canalFiltro='Todos',aprendeTab='canales',glosarioFiltro='Todos';
+const GLOSARIO=[
+  {t:'Activo',d:'Cualquier bien con valor económico: acciones, ETFs, bonos, inmuebles, criptomonedas, efectivo…',c:'General'},
+  {t:'Cartera / Portfolio',d:'Conjunto de todas las inversiones de un inversor.',c:'General'},
+  {t:'Diversificación',d:'Repartir las inversiones en varios activos, sectores o geografías para reducir el riesgo global.',c:'General'},
+  {t:'Liquidez',d:'Facilidad para convertir un activo en efectivo sin perder valor. La bolsa tiene alta liquidez; los inmuebles, baja.',c:'General'},
+  {t:'Rentabilidad',d:'Ganancia o pérdida de una inversión expresada en porcentaje sobre el capital invertido.',c:'General'},
+  {t:'Riesgo',d:'Probabilidad de obtener un resultado diferente al esperado, incluyendo pérdida parcial o total del capital.',c:'General'},
+  {t:'Precio medio',d:'Coste promedio de adquisición de un activo, calculado como (suma de compras) / (total de títulos).',c:'General'},
+  {t:'P/L (Profit & Loss)',d:'Ganancia o pérdida no realizada de una posición abierta: valor actual menos capital invertido.',c:'General'},
+  {t:'RPT',d:'Rentabilidad Ponderada por Tiempo. Mide el rendimiento real de la cartera eliminando el efecto de cuándo se hicieron las aportaciones o retiradas. Es el método que usan los fondos de inversión.',c:'General'},
+  {t:'ISIN',d:'Código internacional de 12 caracteres que identifica de forma única cualquier valor negociable.',c:'General'},
+  {t:'WKN',d:'Wertpapierkennnummer. Código alemán de 6 caracteres para identificar valores. Habitual en ETFs europeos.',c:'General'},
+  {t:'ETF',d:'Exchange Traded Fund. Fondo cotizado en bolsa que replica un índice. Combina la diversificación de un fondo con la liquidez de una acción.',c:'ETFs y fondos'},
+  {t:'Fondo indexado',d:'Fondo de inversión que replica la composición de un índice de referencia. Similar al ETF pero se contrata a través del banco o gestora, no en bolsa.',c:'ETFs y fondos'},
+  {t:'TER',d:'Total Expense Ratio. Coste anual total de un ETF o fondo expresado en porcentaje. Incluye gestión, custodia y otros gastos.',c:'ETFs y fondos'},
+  {t:'Tracking error',d:'Diferencia entre el rendimiento del ETF y el del índice que replica. Un tracking error bajo indica mayor fidelidad.',c:'ETFs y fondos'},
+  {t:'Réplica física',d:'El ETF compra directamente los valores que componen el índice. Mayor transparencia y sin riesgo de contraparte.',c:'ETFs y fondos'},
+  {t:'Réplica sintética',d:'El ETF usa derivados (swaps) para replicar el índice sin comprar los activos reales. Puede ser más eficiente pero añade riesgo de contraparte.',c:'ETFs y fondos'},
+  {t:'UCITS',d:'Undertakings for Collective Investment in Transferable Securities. Estándar europeo de regulación para fondos. Garantiza protección al inversor y permite distribución en toda la UE.',c:'ETFs y fondos'},
+  {t:'MSCI',d:'Morgan Stanley Capital International. Proveedor de índices bursátiles de referencia global (MSCI World, MSCI ACWI, MSCI Emerging Markets…).',c:'ETFs y fondos'},
+  {t:'MSCI World',d:'Índice que agrupa las mayores empresas de ~23 países desarrollados. Cubre aproximadamente el 85% de la capitalización de cada mercado incluido.',c:'ETFs y fondos'},
+  {t:'MSCI ACWI',d:'All Country World Index. Amplía el MSCI World con mercados emergentes. Cubre más de 2.900 empresas de 47 países.',c:'ETFs y fondos'},
+  {t:'MSCI Emerging Markets',d:'Índice de mercados emergentes con unos 24 países: China, India, Brasil, Taiwán, Corea del Sur, entre otros.',c:'ETFs y fondos'},
+  {t:'S&P 500',d:'Índice de las 500 mayores empresas cotizadas de Estados Unidos. Es el principal referente de la renta variable mundial.',c:'ETFs y fondos'},
+  {t:'Acc (Accumulating)',d:'Clase de ETF que reinvierte automáticamente los dividendos. Más eficiente fiscalmente en la mayoría de países.',c:'ETFs y fondos'},
+  {t:'Dist (Distributing)',d:'Clase de ETF que reparte los dividendos periódicamente en efectivo. Genera renta regular pero tributa en el momento del cobro.',c:'ETFs y fondos'},
+  {t:'NAV',d:'Net Asset Value o Valor Liquidativo. Valor real de los activos del fondo dividido entre el número de participaciones.',c:'ETFs y fondos'},
+  {t:'Acción',d:'Participación en el capital social de una empresa. El accionista tiene derecho a dividendos y a votar en la junta.',c:'Acciones'},
+  {t:'Dividendo',d:'Parte del beneficio que la empresa distribuye entre sus accionistas, normalmente en efectivo y de forma periódica.',c:'Acciones'},
+  {t:'PER',d:'Price to Earnings Ratio. Veces que el precio de la acción contiene el beneficio anual por acción. Un PER alto puede indicar que el mercado espera crecimiento futuro.',c:'Acciones'},
+  {t:'Yield / Rentabilidad por dividendo',d:'Dividendo anual dividido entre el precio actual de la acción, expresado en porcentaje.',c:'Acciones'},
+  {t:'Capitalización bursátil',d:'Valor total de mercado de una empresa: precio de la acción multiplicado por el número total de acciones.',c:'Acciones'},
+  {t:'Blue chip',d:'Empresa de gran capitalización, trayectoria consolidada y negocio estable. Suelen tener menor volatilidad y pagar dividendos regulares.',c:'Acciones'},
+  {t:'Split',d:'División de las acciones existentes en un mayor número a precio unitario más bajo. El valor total no cambia.',c:'Acciones'},
+  {t:'OPA',d:'Oferta Pública de Adquisición. Propuesta formal para comprar la totalidad o parte de las acciones de una empresa cotizada.',c:'Acciones'},
+  {t:'Bono',d:'Título de deuda emitido por una empresa o Estado. El inversor presta dinero y recibe intereses periódicos (cupones) más la devolución del capital al vencimiento.',c:'Renta fija'},
+  {t:'Cupón',d:'Interés periódico que paga un bono, expresado como porcentaje del valor nominal.',c:'Renta fija'},
+  {t:'Vencimiento',d:'Fecha en que el emisor devuelve el capital del bono al inversor.',c:'Renta fija'},
+  {t:'Duration',d:'Medida de la sensibilidad del precio de un bono a cambios en los tipos de interés. A mayor duration, mayor impacto de las variaciones de tipos.',c:'Renta fija'},
+  {t:'Mercado alcista (Bull market)',d:'Tendencia sostenida al alza en los precios. Convencionalmente, una subida superior al 20% desde mínimos recientes.',c:'Macro y mercado'},
+  {t:'Mercado bajista (Bear market)',d:'Tendencia sostenida a la baja en los precios. Convencionalmente, una caída superior al 20% desde máximos recientes.',c:'Macro y mercado'},
+  {t:'Volatilidad',d:'Intensidad de las fluctuaciones en el precio de un activo. Alta volatilidad implica mayores oscilaciones en ambas direcciones.',c:'Macro y mercado'},
+  {t:'Correlación',d:'Grado en que dos activos se mueven juntos. Una correlación baja o negativa mejora la diversificación de la cartera.',c:'Macro y mercado'},
+  {t:'Drawdown',d:'Caída máxima desde un pico hasta un mínimo posterior. Mide el peor escenario que un inversor habría sufrido en un período.',c:'Macro y mercado'},
+  {t:'DCA',d:'Dollar-Cost Averaging o Promediación del coste. Estrategia de invertir importes fijos a intervalos regulares, independientemente del precio.',c:'Macro y mercado'},
+  {t:'Rebalanceo',d:'Ajuste periódico de la cartera para recuperar los pesos objetivo de cada activo, vendiendo lo que ha crecido más y comprando lo que menos.',c:'Macro y mercado'},
+  {t:'Benchmark',d:'Índice de referencia con el que se compara el rendimiento de una cartera. El S&P 500 es el benchmark más usado en renta variable.',c:'Macro y mercado'},
+  {t:'Inflación',d:'Aumento generalizado del nivel de precios que reduce el poder adquisitivo del dinero. Afecta directamente a la rentabilidad real de las inversiones.',c:'Macro y mercado'},
+  {t:'Tipo de cambio',d:'Precio de una divisa expresado en otra. Las variaciones de tipo de cambio afectan a la rentabilidad de activos en moneda extranjera.',c:'Macro y mercado'}
+];
+function setAprendeTab(tab){aprendeTab=tab;document.getElementById('tab-canales').className='tag'+(tab==='canales'?' selected':'');document.getElementById('tab-glosario').className='tag'+(tab==='glosario'?' selected':'');document.getElementById('aprende-canales').style.display=tab==='canales'?'':'none';document.getElementById('aprende-glosario').style.display=tab==='glosario'?'':'none';if(tab==='glosario')renderGlosario();}
+function renderGlosario(){const cats=['Todos',...[...new Set(GLOSARIO.map(g=>g.c))]];document.getElementById('glosario-filtros').innerHTML=cats.map(c=>`<span class="tag${c===glosarioFiltro?' selected':''}" onclick="filterGlosario('${c}',this)">${c}</span>`).join('');const lista=glosarioFiltro==='Todos'?GLOSARIO:GLOSARIO.filter(g=>g.c===glosarioFiltro);document.getElementById('lista-glosario').innerHTML=lista.map(g=>`<details style="margin-bottom:6px"><summary style="padding:10px 12px;background:var(--bg1);border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--t0);list-style:none;display:flex;align-items:center;justify-content:space-between">${g.t}<span class="badge ${GLOSARIO_CAT_COLOR[g.c]||'b-gray'}" style="font-size:9px;flex-shrink:0">${g.c}</span></summary><div style="padding:10px 12px 10px 14px;font-size:12px;color:var(--t1);line-height:1.5;border-left:2px solid var(--ac);margin-left:10px;margin-top:3px">${g.d}</div></details>`).join('');}
+function filterGlosario(cat,el){glosarioFiltro=cat;renderGlosario();}
+const GLOSARIO_CAT_COLOR={'General':'b-blue','ETFs y fondos':'b-teal','Acciones':'b-amber','Renta fija':'b-purple','Macro y mercado':'b-coral'};
 function renderCanales(){
   const cats=['Todos',...[...new Set(canales.map(c=>c.cat))]];
   document.getElementById('canales-filtros').innerHTML=cats.map(c=>`<span class="tag${c===canalFiltro?' selected':''}" onclick="filterCanal('${c}',this)">${c}</span>`).join('');
