@@ -529,7 +529,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <div class="slabel" style="margin-bottom:7px">Modo de uso</div>
       <div class="card">
         <div class="dr">
-          <div><div class="dk">Modo avanzado</div><div style="font-size:11px;color:var(--t1)">Rentabilidad TWR, grupos, índices y más</div></div>
+          <div><div class="dk">Modo avanzado</div><div style="font-size:11px;color:var(--t1)">Rentabilidad RPT, grupos, índices y más</div></div>
           <input type="checkbox" id="advanced-chk" style="width:auto" onchange="toggleAppMode(this.checked)">
         </div>
       </div>
@@ -594,7 +594,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <details><summary>Proyección DCA</summary><div class="det-body">Calculadora de inversión periódica. Indica cuánto quieres aportar, con qué frecuencia y qué rentabilidad esperas, y la app te muestra cómo crecería tu cartera año a año.</div></details>
       <details><summary>Índices</summary><div class="det-body">Consulta los índices asociados a tus activos: rentabilidad en el año (YTD), últimos 12 meses, PER y dividendo. Solo aparecen índices con activos en tu cartera activa.</div></details>
       <details><summary>Avisos</summary><div class="det-body">Alertas configurables sobre variaciones de precio y recordatorios de aportación DCA. El icono 🔔 de la barra superior se pone en rojo cuando tienes avisos sin leer.</div></details>
-      <details><summary>Rentabilidad</summary><div class="det-body">Tu rentabilidad real calculada con el método TWR (Time-Weighted Return), que elimina el efecto de las aportaciones y retiradas. Puedes filtrar por período: 1M, 3M, 6M, 1A o todo el historial.</div></details>
+      <details><summary>Rentabilidad</summary><div class="det-body">Tu rentabilidad real calculada con el método RPT (Rentabilidad Ponderada por Tiempo), que elimina el efecto de las aportaciones y retiradas. Puedes filtrar por período: 1M, 3M, 6M, 1A o todo el historial.</div></details>
       <details><summary>Grupos</summary><div class="det-body">Muestra cuánto capital tienes en cada grupo de activos (por ejemplo "Acciones", "ETFs", "Cripto") y qué porcentaje representa sobre el total de la cartera.</div></details>
       <details><summary>Anotaciones</summary><div class="det-body">Espacio libre para apuntar ideas, tesis de inversión o reflexiones sobre tu estrategia. Las anotaciones son globales y no están vinculadas a ninguna cartera concreta.</div></details>
       <details><summary>Aprende</summary><div class="det-body">Canales de YouTube curados sobre inversión, organizados por categoría. Marca tus favoritos con ⭐ para acceder a ellos rápidamente.</div></details>
@@ -613,7 +613,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       <details><summary>¿Cómo añado una operación?</summary><div class="det-body">Pulsa el botón <strong>+</strong> que aparece en la barra superior. Puedes hacerlo desde cualquier pantalla. Rellena los datos (fecha, ticker, tipo, precio…) y guarda.</div></details>
       <details><summary>¿Cómo cambio de cartera?</summary><div class="det-body">Toca el nombre de la cartera activa en la barra superior. Se abre el selector de carteras. Pulsa sobre la que quieras activar.</div></details>
       <details><summary>¿Cómo creo una cartera nueva?</summary><div class="det-body">Toca el nombre de la cartera en la barra superior y pulsa <strong>"+ Nueva cartera"</strong> en la parte inferior del selector.</div></details>
-      <details><summary>¿Qué es el método TWR?</summary><div class="det-body">TWR (Time-Weighted Return) es la forma estándar de medir la rentabilidad real de una cartera. Elimina el efecto de cuándo hiciste cada aportación o retirada, por lo que refleja únicamente el rendimiento de las inversiones. Es el método que usan los fondos de inversión para publicar su rentabilidad.</div></details>
+      <details><summary>¿Qué es el método RPT?</summary><div class="det-body">RPT (Rentabilidad Ponderada por Tiempo) es la forma estándar de medir la rentabilidad real de una cartera. Elimina el efecto de cuándo hiciste cada aportación o retirada, por lo que refleja únicamente el rendimiento de las inversiones. Es el método que usan los fondos de inversión para publicar su rentabilidad.</div></details>
       <details><summary>¿Cómo oculto las cifras si alguien ve mi pantalla?</summary><div class="det-body">Pulsa el icono <strong>👁</strong> de la barra superior. Todas las cifras de la app se enmascaran con ••••. Tócalo de nuevo para desactivarlo, o pulsa la barra que aparece en la parte superior de la pantalla.</div></details>
       <details><summary>¿Cómo activo el modo oscuro?</summary><div class="det-body">Ve a <strong>Ajustes &gt; Interfaz</strong> y activa el interruptor de modo oscuro.</div></details>
       <details><summary>¿Mis datos se envían a algún servidor?</summary><div class="det-body">No. El prototipo funciona completamente en tu navegador, sin enviar ningún dato a servidores externos. En la versión de producción, los datos se guardarán en tu dispositivo y solo se sincronizarán con la nube si tú lo activas expresamente.</div></details>
@@ -654,7 +654,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
         <button class="period-btn" onclick="setRentPeriod(this,'Todo')">Todo</button>
       </div>
       <div class="metric-grid">
-        <div class="metric"><div class="mlabel">Rentabilidad total<span class="tip" data-tip="Time-Weighted Return (TWR): mide la rentabilidad real eliminando el efecto de las aportaciones">ⓘ</span></div><div class="mvalue pos" id="rent-twr">+12,4%</div></div>
+        <div class="metric"><div class="mlabel">Rentabilidad total<span class="tip" data-tip="Rentabilidad Ponderada por Tiempo (RPT): mide la rentabilidad real eliminando el efecto de las aportaciones">ⓘ</span></div><div class="mvalue pos" id="rent-twr">+12,4%</div></div>
         <div class="metric"><div class="mlabel">Ganancia absoluta</div><div class="mvalue pos"><span class="amt" id="rent-abs">€4.820</span></div></div>
         <div class="metric"><div class="mlabel">Mejor activo</div><div class="mvalue pos" id="rent-best">AAPL +8,8%</div></div>
         <div class="metric"><div class="mlabel">Peor activo</div><div class="mvalue neg" id="rent-worst">NVDA -5,2%</div></div>
@@ -666,7 +666,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
       </div>
       <div class="card">
         <div class="card-title" style="margin-bottom:9px">Evolución de la rentabilidad</div>
-        <div style="position:relative;height:155px"><canvas id="cRent" role="img" aria-label="Rentabilidad TWR"></canvas></div>
+        <div style="position:relative;height:155px"><canvas id="cRent" role="img" aria-label="Rentabilidad RPT"></canvas></div>
       </div>
     </div>
 
