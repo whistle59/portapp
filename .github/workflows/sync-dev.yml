@@ -71,4 +71,5 @@ jobs:
             --body "Automatic PR created after merging into main, to keep dev aligned with main.")
 
           PR_NUMBER=$(gh pr view "$PR_URL" --json number --jq '.number')
+          sleep 30
           gh pr merge "$PR_NUMBER" --auto --merge
