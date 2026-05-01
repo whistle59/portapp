@@ -1154,6 +1154,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
   </div>
 </div>
 
+<div class="modal-overlay" id="m-modo-avanzado">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle">Modo avanzado requerido</span><button class="btn-icon" onclick="closeModal('m-modo-avanzado')">✕</button></div>
+    <p style="font-size:13px;color:var(--t1);line-height:1.65">Esta pantalla no está disponible en modo básico. Activa el modo avanzado desde Configuración.</p>
+    <button class="btn btn-p" style="width:100%;margin-top:8px" onclick="closeModal('m-modo-avanzado');goTo('s-settings')">Ir a Configuración</button>
+    <button class="btn" style="width:100%;margin-top:6px" onclick="closeModal('m-modo-avanzado')">Cerrar</button>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
 <script>
 const GC={'Core':'b-blue','Cripto':'b-amber','AI/Tech':'b-purple','Renta fija':'b-teal','Legacy':'b-gray','Core ampliado':'b-green'};
@@ -1327,7 +1336,7 @@ const ADVANCED_SCREENS=['s-rentabilidad','s-grupos','s-rent-efectivo','s-indices
 const SCREENS=['s-global','s-resumen','s-cartera','s-efectivo','s-ops','s-detalle','s-proyeccion','s-indices','s-notif','s-plataformas','s-settings','s-rentabilidad','s-grupos','s-perfil','s-rent-efectivo','s-anotaciones','s-canales','s-ayuda'];
 const SL={'s-global':'Global','s-resumen':'Resumen','s-cartera':'Cartera','s-efectivo':'Efectivo','s-ops':'Ops.','s-proyeccion':'Proy.','s-indices':'Índices','s-notif':'Avisos','s-plataformas':'Links','s-settings':'Config','s-rentabilidad':'Rentab.','s-grupos':'Grupos','s-perfil':'Perfil','s-rent-efectivo':'Rent.Ef.','s-anotaciones':'Notas','s-canales':'Aprende','s-ayuda':'Ayuda'};
 const NM={'s-global':'nav-global','s-resumen':'nav-resumen','s-cartera':'nav-cartera','s-efectivo':'nav-efectivo','s-ops':'nav-ops','s-proyeccion':'nav-proyeccion','s-indices':'nav-indices','s-settings':'nav-settings'};
-function goTo(sid,btn){if(appMode==='basic'&&ADVANCED_SCREENS.includes(sid)){sid='s-global';btn=null;}SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;const ps=document.getElementById('port-sel');const gt=document.getElementById('global-title');if(ps)ps.style.display=sid==='s-global'?'none':'flex';if(gt)gt.style.display=sid==='s-global'?'block':'none';
+function goTo(sid,btn){if(appMode==='basic'&&ADVANCED_SCREENS.includes(sid)){openModal('m-modo-avanzado');return;}SCREENS.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(sid).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));const nb=btn||document.getElementById(NM[sid]);if(nb)nb.classList.add('active');closeAllModals();renderQN(sid);const sw=document.getElementById('sw');if(sw)sw.scrollTop=0;const ps=document.getElementById('port-sel');const gt=document.getElementById('global-title');if(ps)ps.style.display=sid==='s-global'?'none':'flex';if(gt)gt.style.display=sid==='s-global'?'block':'none';
   if(sid==='s-global'){requestAnimationFrame(()=>requestAnimationFrame(renderGlobal));}
   else if(sid==='s-resumen'){renderResumen();requestAnimationFrame(()=>requestAnimationFrame(()=>{renderCR();renderHistorial('1S');}));}
   else if(sid==='s-cartera'){cartaSearch='';const cs=document.getElementById('carta-search');if(cs)cs.value='';renderCartera();}
