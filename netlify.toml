@@ -1,2 +1,3 @@
 [build]
+  command = ""
   ignore = "exit 0"
