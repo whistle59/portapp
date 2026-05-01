@@ -200,6 +200,9 @@
 | PR8 | Email 2FA (Resend/SendGrid, gratuito hasta 100/día) |
 | PR9 | Bot de asistencia al usuario (API de Claude) |
 | PR10 | ⚠️ **Revisión legal obligatoria antes del lanzamiento** — T&C, política de privacidad, cláusula de responsabilidad financiera, GDPR. Contratar asesoramiento legal especializado en SaaS/fintech España. |
+| PR11 | **Disclaimer de responsabilidad en la app** — pantalla o modal visible en el onboarding: (a) los datos residen en el dispositivo del usuario, sin backup automático en v1; (b) portapp puede hacer cambios sin previo aviso; (c) portapp no se responsabiliza de pérdida de datos; (d) los usuarios deben hacer backup antes de actualizar. Texto definitivo a revisar por abogado. |
+| PR12 | **Política de migraciones de base de datos** — ninguna migración puede borrar o corromper datos de usuarios sin aviso previo. Toda migración destructiva requiere: (1) notificación con ≥7 días de antelación, (2) herramienta de backup exportable en la app, (3) script de rollback probado. Documentar en CONTRIBUTING.md cuando llegue Supabase. |
+| PR13 | **Certificado electrónico** — no se requiere para lanzamiento. portapp no realiza transacciones financieras ni firma documentos legales. Solo se necesita HTTPS/TLS estándar (ya incluido en Netlify/Vercel). Revisar si en el futuro se añaden funciones de firma o pagos. |
 
 ---
 
@@ -217,6 +220,17 @@
 | B8 | Calculadora de rebalanceo — cuánto comprar/vender para volver a la asignación objetivo (depende de B4) | Media |
 | B9 | Watchlist / lista de seguimiento de activos no comprados | Baja |
 | B10 | Vista de comisiones pagadas — total de fees por broker y por período | Baja |
+| B11 | Layout tablet para producción — la versión web responsive de producción debe tener un layout adaptado a tablet (≥768px): sidebar fijo, dos columnas o navegación lateral. El parche actual (max-width:520px en el prototipo) es temporal; en producción el diseño tablet debe ser nativo, no un teléfono ampliado. Ver sección 38 de ESTADO.md (diseño responsive) y M5 del roadmap. | Media |
+| B12 | Multi-divisa — v1 solo EUR. En v2: soporte de carteras en divisa distinta con conversión a divisa principal configurable por el usuario. Añadir disclaimer de que los precios de conversión son orientativos y pueden tener error. | Media |
+| B13 | Donut por tipo de activo en pantalla Global — desglose visual (cripto, ETF, acciones, etc.) del capital total. Tipos derivados del campo existente en los activos. | Media |
+| B14 | Chips de navegación duplicados — revisar qué chips del quick-nav repiten botones de la barra inferior y eliminar los redundantes para ganar espacio de pantalla. | Baja |
+| B15 | Confirmación al salir de la app — dialog "¿Salir?" con checkbox "No volver a mostrar" cuando el usuario presiona atrás varias veces. Previene cierres accidentales en móvil. | Baja |
+| B16 | PWA fullscreen — ocultar barra del navegador con manifest PWA (`display: standalone`). Mejora la experiencia visual y recupera espacio de pantalla. | Media |
+| B17 | Carrusel de bienvenida para usuario nuevo — onboarding guiado para primera apertura. Existe la estructura pero no está activado para testers nuevos. Revisar condición de activación. | Alta |
+| B18 | Upgrade de plan desde Perfil — en producción, el usuario debe poder suscribirse a un plan superior directamente desde s-perfil. Depende de tener billing configurado (Stripe u otro). | Alta |
+| B19 | Claves de recuperación de un solo uso — en producción, generar y mostrar 9 códigos de backup al activar 2FA. Almacenar como hashes en Supabase. Depende de tener auth real. | Alta |
+| B20 | Programa de referidos — descuentos o acceso a funciones premium por recomendar a un usuario que permanezca activo ≥1 mes. Diseño de incentivos pendiente de definir. | Baja |
+| B21 | API de exportación de datos — endpoint autenticado para que el usuario pueda descargar sus datos (carteras, operaciones, efectivo) en CSV/JSON. | Baja |
 
 ---
 
