@@ -1,0 +1,10 @@
+{
+  "name": "Portgrow",
+  "short_name": "Portgrow",
+  "description": "Gestión de carteras de inversión personal",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1c1c1e",
+  "theme_color": "#1c1c1e"
+}

@@ -39,3 +39,9 @@ const result = obfuscate(originalJs, {
 const obfuscatedHtml = html.replace(scriptRe, `<script>${result.getObfuscatedCode()}</script></body>`);
 fs.writeFileSync(out, obfuscatedHtml, 'utf8');
 console.log(`✓ dist/index.html generado (${Math.round(fs.statSync(out).size / 1024)} KB)`);
+
+const manifestSrc = path.join(__dirname, '..', 'prototype', 'manifest.json');
+if (fs.existsSync(manifestSrc)) {
+  fs.copyFileSync(manifestSrc, path.join(outDir, 'manifest.json'));
+  console.log('✓ dist/manifest.json copiado');
+}
