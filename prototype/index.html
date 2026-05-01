@@ -536,6 +536,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <!-- PLATAFORMAS -->
     <div class="screen" id="s-plataformas">
       <div class="qnav" id="qn-plataformas"></div>
+      <div class="breadcrumb"><button class="bc-link" onclick="goTo('s-settings')">← Config</button></div>
       <div class="screen-title">Plataformas externas</div>
       <div style="font-size:12px;color:var(--t1);margin-bottom:12px">Accesos directos configurables</div>
       <div id="lista-plataformas"></div>
@@ -778,6 +779,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 
     <!-- CANALES YOUTUBE (F12) -->
     <div class="screen" id="s-canales">
       <div class="qnav" id="qn-canales"></div>
+      <div class="breadcrumb"><button class="bc-link" onclick="goTo('s-settings')">← Config</button></div>
       <div class="screen-title">Aprende</div>
       <div class="chip-row" style="margin-bottom:12px">
         <span class="tag selected" id="tab-canales" onclick="setAprendeTab('canales')">Canales</span>
@@ -1243,7 +1245,7 @@ function selMethod(m){curM=m;document.getElementById('mb-email').classList.toggl
 function sendCode(){document.getElementById('osub').innerHTML=curM==='email'?'Enviado a <strong>us***@portapp.com</strong>':'Enviado por SMS a <strong>+34 *** *** 421</strong>';for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('oerr').style.display='none';document.getElementById('ook').style.display='none';intentos=3;tSec=587;clearInterval(tInt);tInt=setInterval(()=>{tSec--;if(tSec<=0){clearInterval(tInt);document.getElementById('tval').textContent='Expirado';return;}const m=Math.floor(tSec/60),s=tSec%60;document.getElementById('tval').textContent=m+':'+(s<10?'0':'')+s;},1000);showAuth('as-otp');setTimeout(()=>document.getElementById('o0').focus(),100);}
 function otpMove(i){if(document.getElementById('o'+i).value&&i<5)document.getElementById('o'+(i+1)).focus();}
 function getOtp(){return[0,1,2,3,4,5].map(i=>document.getElementById('o'+i).value).join('');}
-function verifyOtp(){const code=getOtp(),err=document.getElementById('oerr'),ok=document.getElementById('ook');if(code.length<6){err.style.display='block';err.textContent='Introduce los 6 dígitos.';return;}if(code===DEMO){err.style.display='none';ok.style.display='block';clearInterval(tInt);setTimeout(launchApp,900);}else{intentos--;if(intentos<=0){clearInterval(tInt);bSec=899;clearInterval(bInt);bInt=setInterval(()=>{bSec--;if(bSec<=0){clearInterval(bInt);document.getElementById('btime').textContent='Desbloqueado';return;}const m=Math.floor(bSec/60),s=bSec%60;document.getElementById('btime').textContent=m+':'+(s<10?'0':'')+s;},1000);showAuth('as-blocked');}else{err.style.display='block';err.innerHTML='Código incorrecto. Quedan <strong>'+intentos+'</strong> intento'+(intentos===1?'':'s')+'.';for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('o0').focus();}}}
+function verifyOtp(){const code=getOtp(),err=document.getElementById('oerr'),ok=document.getElementById('ook');if(code.length<6){err.style.display='block';err.textContent='Introduce los 6 dígitos.';return;}if(code===DEMO){err.style.display='none';ok.style.display='block';clearInterval(tInt);setTimeout(launchApp,900);}else{intentos--;if(intentos<=0){clearInterval(tInt);bSec=299;clearInterval(bInt);bInt=setInterval(()=>{bSec--;if(bSec<=0){clearInterval(bInt);document.getElementById('btime').textContent='Desbloqueado';return;}const m=Math.floor(bSec/60),s=bSec%60;document.getElementById('btime').textContent=m+':'+(s<10?'0':'')+s;},1000);showAuth('as-blocked');}else{err.style.display='block';err.innerHTML='Código incorrecto. Quedan <strong>'+intentos+'</strong> intento'+(intentos===1?'':'s')+'.';for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('o0').focus();}}}
 function resendCode(){tSec=587;intentos=3;for(let i=0;i<6;i++)document.getElementById('o'+i).value='';document.getElementById('oerr').style.display='none';document.getElementById('o0').focus();}
 function enviarSoporte(){
   const msg=document.getElementById('sop-msg').value.trim();
@@ -1272,7 +1274,7 @@ function launchApp(){
   }));
 }
 function resetAuth(){clearInterval(tInt);clearInterval(bInt);document.getElementById('app-shell').classList.remove('active');document.getElementById('auth-wrap').style.display='flex';privacyOn=false;document.getElementById('privacy-bar').classList.remove('on');document.getElementById('device').classList.remove('masked');showAuth('as-login');}
-function unlockApp(){const p=document.getElementById('lock-pass').value,e=document.getElementById('lock-err');if(p==='demo1234'){document.getElementById('lock-screen').classList.remove('active');document.getElementById('app-shell').classList.add('active');e.style.display='none';document.getElementById('lock-pass').value='';const cur=SCREENS.find(s=>document.getElementById(s).classList.contains('active'));const ps=document.getElementById('port-sel');const gt=document.getElementById('global-title');if(ps)ps.style.display=cur==='s-global'?'none':'flex';if(gt)gt.style.display=cur==='s-global'?'block':'none';requestAnimationFrame(()=>requestAnimationFrame(()=>reCharts()));}else{e.style.display='block';e.textContent='Contraseña incorrecta.';}}
+function unlockApp(){const p=document.getElementById('lock-pass').value,e=document.getElementById('lock-err');if(p==='demo1234'){document.getElementById('lock-screen').classList.remove('active');document.getElementById('auth-wrap').style.display='none';document.getElementById('app-shell').classList.add('active');e.style.display='none';document.getElementById('lock-pass').value='';const cur=SCREENS.find(s=>document.getElementById(s).classList.contains('active'));const ps=document.getElementById('port-sel');const gt=document.getElementById('global-title');if(ps)ps.style.display=cur==='s-global'?'none':'flex';if(gt)gt.style.display=cur==='s-global'?'block':'none';requestAnimationFrame(()=>requestAnimationFrame(()=>reCharts()));}else{e.style.display='block';e.textContent='Contraseña incorrecta.';}}
 document.querySelectorAll('.otp-in').forEach((inp,i)=>{inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&i>0)document.getElementById('o'+(i-1)).focus();if(e.key==='Enter')verifyOtp();});inp.addEventListener('paste',e=>{const p=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'');if(p.length>=6)for(let j=0;j<6;j++)document.getElementById('o'+j).value=p[j]||'';e.preventDefault();});});
 const lockSettings={enabled:true,grace:60};
 let lockTimer=null,hiddenAt=null;
@@ -1281,6 +1283,7 @@ document.addEventListener('visibilitychange',()=>{
   const appActive=document.getElementById('app-shell').classList.contains('active');
   function doLock(){
     document.getElementById('app-shell').classList.remove('active');
+    document.getElementById('auth-wrap').style.display='flex';
     document.getElementById('lock-screen').classList.add('active');
   }
   if(document.hidden){
@@ -1357,11 +1360,11 @@ function renderGlobal(){
   const totI=carteras.reduce((s,c)=>s+cI(c.id),0);
   const totG=totV-totI;
   const totP=totI>0?totG/totI*100:0;
-  document.getElementById('g-valor-total').textContent=fe(totV).replace('€','');
+  document.getElementById('g-valor-total').textContent=fe(totV);
   document.getElementById('g-rent-total').textContent=(totP>=0?'+':'')+totP.toFixed(1)+'%';
   document.getElementById('g-rent-total').className='msub '+(totP>=0?'pos':'neg');
   document.getElementById('g-n-carteras').textContent=carteras.length;
-  document.getElementById('g-invertido').textContent=fe(totI).replace('€','');
+  document.getElementById('g-invertido').textContent=fe(totI);
   document.getElementById('g-ganancia').innerHTML=`<span class="amt ${totG>=0?'pos':'neg'}">${(totG>=0?'+':'')+fe(Math.abs(totG))}</span>`;
   document.getElementById('lista-carteras').innerHTML=carteras.map(c=>{const v=cV(c.id),i=cI(c.id),p=i>0?(v-i)/i*100:0;return`<div class="port-card" onclick="selectCartera('${c.id}')"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="font-weight:700;font-size:13px;flex:1;color:var(--t0)">${c.nombre}</span><span style="font-size:13px;font-weight:700;color:var(--t0)" class="amt">${fe(v)}</span></div><div style="font-size:11px;color:var(--t1);margin-bottom:6px">${c.desc}</div><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:var(--t1)">Invertido: <span class="amt">${fe(i)}</span></span><span style="font-size:12px" class="${p>=0?'pos':'neg'}">${fp(p)}</span></div></div>`;}).join('');
   const C=CC(),gV={};activos.forEach(a=>{gV[a.grupo]=(gV[a.grupo]||0)+a.qty*a.cot;});const ls=Object.keys(gV),dt=Object.values(gV),tot=dt.reduce((s,v)=>s+v,0);
@@ -2075,7 +2078,11 @@ const GLOSARIO=[
   {t:'Rebalanceo',d:'Ajuste periódico de la cartera para recuperar los pesos objetivo de cada activo, vendiendo lo que ha crecido más y comprando lo que menos.',c:'Macro y mercado'},
   {t:'Benchmark',d:'Índice de referencia con el que se compara el rendimiento de una cartera. El S&P 500 es el benchmark más usado en renta variable.',c:'Macro y mercado'},
   {t:'Inflación',d:'Aumento generalizado del nivel de precios que reduce el poder adquisitivo del dinero. Afecta directamente a la rentabilidad real de las inversiones.',c:'Macro y mercado'},
-  {t:'Tipo de cambio',d:'Precio de una divisa expresado en otra. Las variaciones de tipo de cambio afectan a la rentabilidad de activos en moneda extranjera.',c:'Macro y mercado'}
+  {t:'Tipo de cambio',d:'Precio de una divisa expresado en otra. Las variaciones de tipo de cambio afectan a la rentabilidad de activos en moneda extranjada.',c:'Macro y mercado'},
+  {t:'Bid (precio comprador)',d:'Precio más alto que un comprador está dispuesto a pagar por un activo en un momento dado. Al vender un activo, la operación se ejecuta al precio bid.',c:'General'},
+  {t:'Ask (precio vendedor)',d:'Precio más bajo al que un vendedor está dispuesto a vender un activo en un momento dado. Al comprar, la operación se ejecuta al precio ask.',c:'General'},
+  {t:'Spread (diferencial)',d:'Diferencia entre el precio ask y el bid. Es un coste implícito de toda operación: cuanto mayor el spread, más caro resulta comprar y vender.',c:'General'},
+  {t:'Slippage',d:'Diferencia entre el precio esperado de una operación y el precio al que se ejecuta realmente. Ocurre por falta de liquidez o movimientos bruscos del mercado justo en el momento de la orden.',c:'General'}
 ];
 function setAprendeTab(tab){aprendeTab=tab;document.getElementById('tab-canales').className='tag'+(tab==='canales'?' selected':'');document.getElementById('tab-glosario').className='tag'+(tab==='glosario'?' selected':'');document.getElementById('aprende-canales').style.display=tab==='canales'?'':'none';document.getElementById('aprende-glosario').style.display=tab==='glosario'?'':'none';if(tab==='glosario')renderGlosario();}
 function renderGlosario(){const cats=['Todos',...[...new Set(GLOSARIO.map(g=>g.c))]];document.getElementById('glosario-filtros').innerHTML=cats.map(c=>`<span class="tag${c===glosarioFiltro?' selected':''}" onclick="filterGlosario('${c}',this)">${c}</span>`).join('');const lista=glosarioFiltro==='Todos'?GLOSARIO:GLOSARIO.filter(g=>g.c===glosarioFiltro);document.getElementById('lista-glosario').innerHTML=lista.map(g=>`<details style="margin-bottom:6px"><summary style="padding:10px 12px;background:var(--bg1);border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--t0);list-style:none;display:flex;align-items:center;justify-content:space-between">${g.t}<span class="badge ${GLOSARIO_CAT_COLOR[g.c]||'b-gray'}" style="font-size:9px;flex-shrink:0">${g.c}</span></summary><div style="padding:10px 12px 10px 14px;font-size:12px;color:var(--t1);line-height:1.5;border-left:2px solid var(--ac);margin-left:10px;margin-top:3px">${g.d}</div></details>`).join('');}
