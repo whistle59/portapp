@@ -7,6 +7,8 @@ on:
       - 'prototype/index.html'
       - 'scripts/build.js'
       - 'package.json'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
 
 jobs:
   deploy:
