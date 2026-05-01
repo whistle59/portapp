@@ -16,11 +16,10 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '22'
 
       - name: Instalar dependencias
-        run: npm ci
+        run: npm install
 
       - name: Obfuscar y generar dist/
         run: npm run build
