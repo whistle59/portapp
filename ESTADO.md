@@ -217,6 +217,7 @@
 | B8 | Calculadora de rebalanceo — cuánto comprar/vender para volver a la asignación objetivo (depende de B4) | Media |
 | B9 | Watchlist / lista de seguimiento de activos no comprados | Baja |
 | B10 | Vista de comisiones pagadas — total de fees por broker y por período | Baja |
+| B11 | Layout tablet para producción — la versión web responsive de producción debe tener un layout adaptado a tablet (≥768px): sidebar fijo, dos columnas o navegación lateral. El parche actual (max-width:520px en el prototipo) es temporal; en producción el diseño tablet debe ser nativo, no un teléfono ampliado. Ver sección 38 de ESTADO.md (diseño responsive) y M5 del roadmap. | Media |
 
 ---
 

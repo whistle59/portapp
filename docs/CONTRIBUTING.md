@@ -2,6 +2,13 @@
 
 ---
 
+> **STOP — antes de abrir cualquier PR:**
+> `gh pr create` SIEMPRE con `--base dev`. Nunca `--base main`.
+> Si el PR ya existe contra `main`, cerrarlo y recrearlo contra `dev`.
+> Esta regla se ha violado en los PRs #149 y #267 — ambas veces con impacto en el historial de ramas.
+
+---
+
 ## Ramas y flujo de trabajo
 
 ```
