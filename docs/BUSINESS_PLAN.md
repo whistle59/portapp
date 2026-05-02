@@ -1,18 +1,18 @@
-# portapp — Documento de negocio para inversores
+# Portgrow — Documento de negocio para inversores
 
-> Versión 1.4 · Abril 2026 · Confidencial
+> Versión 1.5 · Mayo 2026 · Confidencial
 
 ---
 
 ## Resumen ejecutivo
 
-**portapp** es una aplicación móvil y web de gestión de carteras de inversión personal, diseñada para el inversor minorista hispanohablante que gestiona su patrimonio de forma autónoma. El mercado objetivo es España y Latinoamérica — un universo de más de **500 millones de hispanohablantes** donde la oferta de herramientas de inversión en español es prácticamente inexistente y la comunidad DIY (Do It Yourself) crece de forma acelerada.
+**Portgrow** es una aplicación móvil y web de gestión de carteras de inversión personal, diseñada para el inversor minorista hispanohablante que gestiona su patrimonio de forma autónoma. El mercado objetivo es España y Latinoamérica — un universo de más de **500 millones de hispanohablantes** donde la oferta de herramientas de inversión en español es prácticamente inexistente y la comunidad DIY (Do It Yourself) crece de forma acelerada.
 
-A diferencia de los competidores existentes, portapp adopta una arquitectura **local-first** que garantiza que los datos financieros del usuario nunca abandonan su dispositivo sin su consentimiento explícito — el único producto del mercado hispanohablante que combina privacidad real, funcionamiento offline completo y sincronización multi-dispositivo opcional.
+A diferencia de los competidores existentes, Portgrow adopta una arquitectura **local-first** que garantiza que los datos financieros del usuario nunca abandonan su dispositivo sin su consentimiento explícito — el único producto del mercado hispanohablante que combina privacidad real, funcionamiento offline completo y sincronización multi-dispositivo opcional.
 
 El mercado latinoamericano de fintech alcanzó **71.360 millones de dólares en 2024**, con más de 415 millones de usuarios de servicios financieros digitales y un crecimiento del 27% anual en financiación. En España, el número de carteras de inversores minoristas alcanzó las **551.000 en 2024**, con una rentabilidad media del 16,3% ese año, reflejo de una comunidad inversora madura y activa.
 
-portapp opera un modelo de monetización híbrido — pago único por la app base + suscripción anual por servicios con coste recurrente real + licencias B2B para asesores financieros — que combina bajas barreras de adquisición con ingresos recurrentes predecibles.
+Portgrow opera un modelo de monetización híbrido — pago único por la app base + suscripción anual por servicios con coste recurrente real + licencias B2B para asesores financieros — que combina bajas barreras de adquisición con ingresos recurrentes predecibles.
 
 El equipo busca una inversión inicial para completar el desarrollo del producto y ejecutar el lanzamiento en España, con expansión natural al mercado hispanohablante latinoamericano.
 
@@ -35,7 +35,7 @@ Los líderes del mercado (Sharesight, Snowball Analytics, Portfolio Performance)
 
 ## 2. La solución
 
-portapp es una aplicación iOS, Android y web que permite al inversor minorista:
+Portgrow es una aplicación iOS, Android y web que permite al inversor minorista:
 
 - **Consolidar** todas sus carteras en una sola vista — acciones, ETFs, criptomonedas, efectivo
 - **Analizar** su rentabilidad real con el método TWR (Time-Weighted Return), el estándar profesional
@@ -45,7 +45,7 @@ portapp es una aplicación iOS, Android y web que permite al inversor minorista:
 
 **Acceso a todos los mercados mundiales**
 
-Aunque el producto está diseñado para el inversor hispanohablante, soporta todos los mercados financieros globales — NASDAQ, NYSE, XETRA, Londres, Tokio, mercados emergentes y criptomonedas. El inversor hispanohablante opera en los mismos mercados internacionales que cualquier otro inversor: portapp no limita su acceso a ninguno de ellos.
+Aunque el producto está diseñado para el inversor hispanohablante, soporta todos los mercados financieros globales — NASDAQ, NYSE, XETRA, Londres, Tokio, mercados emergentes y criptomonedas. El inversor hispanohablante opera en los mismos mercados internacionales que cualquier otro inversor: Portgrow no limita su acceso a ninguno de ellos.
 
 **El diferenciador clave: privacidad por diseño**
 
@@ -57,7 +57,7 @@ La app está diseñada y desarrollada en español. No es una traducción — es 
 
 **Ecosistema educativo integrado**
 
-portapp no es solo una herramienta de seguimiento — es una plataforma de educación financiera. La app incluye acceso a canales de YouTube curados sobre inversión, y la estrategia de contenido se extiende fuera de la app con un **blog especializado** y **webinars periódicos** sobre estrategias de inversión, fiscalidad y gestión patrimonial. Este ecosistema educativo cumple tres funciones simultáneas: genera tráfico orgánico (SEO), crea comunidad y aumenta la retención — el usuario que aprende con portapp no tiene razón para irse a la competencia.
+Portgrow no es solo una herramienta de seguimiento — es una plataforma de educación financiera. La app incluye acceso a canales de YouTube curados sobre inversión, y la estrategia de contenido se extiende fuera de la app con un **blog especializado** y **webinars periódicos** sobre estrategias de inversión, fiscalidad y gestión patrimonial. Este ecosistema educativo cumple tres funciones simultáneas: genera tráfico orgánico (SEO), crea comunidad y aumenta la retención — el usuario que aprende con Portgrow no tiene razón para irse a la competencia.
 
 ---
 
@@ -89,7 +89,7 @@ México, Argentina y Colombia son los mercados más maduros de la región. El in
 
 ### Oportunidad específica
 
-La comunidad hispanohablante ha sido históricamente desatendida en el espacio de inversión. No existe ninguna aplicación de gestión de carteras en español con las capacidades de portapp. El mercado potencial total (TAM) en el segmento hispanohablante supera los 500 millones de personas, con un núcleo de inversores activos estimado en varios millones creciendo año a año.
+La comunidad hispanohablante ha sido históricamente desatendida en el espacio de inversión. No existe ninguna aplicación de gestión de carteras en español con las capacidades de Portgrow. El mercado potencial total (TAM) en el segmento hispanohablante supera los 500 millones de personas, con un núcleo de inversores activos estimado en varios millones creciendo año a año.
 
 ---
 
@@ -97,7 +97,7 @@ La comunidad hispanohablante ha sido históricamente desatendida en el espacio d
 
 ### Análisis competitivo
 
-| Competidor | Fortalezas | Debilidades vs. portapp |
+| Competidor | Fortalezas | Debilidades vs. Portgrow |
 |---|---|---|
 | **Sharesight** | 500.000+ usuarios globales, informes fiscales, marca consolidada | Solo en inglés, datos en servidores cloud, sin offline, $7-23/mes, sin soporte mercado español |
 | **Snowball Analytics** | Perspectiva europea, herramientas de optimización | Solo en inglés, datos en servidor, $12-15/mes |
@@ -108,7 +108,7 @@ La comunidad hispanohablante ha sido históricamente desatendida en el espacio d
 
 ### Ventaja competitiva sostenible
 
-portapp ocupa un espacio no disputado: **privacidad real + experiencia móvil fluida + español nativo**. Portfolio Performance es la única solución verdaderamente privada comparable, pero es exclusivamente desktop, no tiene versión móvil y requiere conocimientos técnicos avanzados. Ningún competidor actual combina los tres atributos simultáneamente para el mercado hispanohablante.
+Portgrow ocupa un espacio no disputado: **privacidad real + experiencia móvil fluida + español nativo**. Portfolio Performance es la única solución verdaderamente privada comparable, pero es exclusivamente desktop, no tiene versión móvil y requiere conocimientos técnicos avanzados. Ningún competidor actual combina los tres atributos simultáneamente para el mercado hispanohablante.
 
 ---
 
@@ -148,7 +148,7 @@ Asesores financieros independientes, family offices. Acceso de lectura a cartera
 
 ### Estado actual
 
-El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un prototipo HTML autocontenido que valida flujos y experiencia de usuario, sin backend. Incluye 17 pantallas funcionales con modo básico/avanzado, proyecciones DCA guardadas, cancelación de operaciones y FAQ integrada.
+El **Prototipo v6** está completo — dos rondas de testers completadas. Es un prototipo HTML autocontenido que valida flujos y experiencia de usuario, sin backend. Incluye 18 pantallas funcionales con modo básico/avanzado, proyecciones DCA guardadas, cancelación de operaciones y FAQ integrada.
 
 ### Roadmap
 
@@ -163,7 +163,7 @@ El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un proto
 ### Stack tecnológico
 
 - **Frontend:** React Native + Expo (iOS, Android y Web desde una base de código)
-- **Base de datos local:** Expo SQLite
+- **Base de datos local:** WatermelonDB (SQLite)
 - **Sincronización:** PowerSync / Electric SQL
 - **Backend:** Supabase (PostgreSQL, Auth, Storage, Edge Functions, RLS)
 - **Pagos:** Paddle (Merchant of Record — gestiona IVA y facturación)
@@ -176,7 +176,7 @@ El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un proto
 
 ### Fortalezas
 
-- **Único producto profesional en español** — no existe ningún competidor con las capacidades de portapp en español. Es el primer entrante en un mercado desatendido.
+- **Único producto profesional en español** — no existe ningún competidor con las capacidades de Portgrow en español. Es el primer entrante en un mercado desatendido.
 - **Privacidad como diferenciador estructural** — arquitectura local-first que ningún competidor principal ofrece. No es marketing: los datos no pueden ser vendidos, hackeados del servidor ni cedidos a terceros.
 - **Funcionamiento offline completo** — el usuario consulta y registra operaciones sin conexión. Relevante en mercados latinoamericanos con conectividad variable.
 - **Comunidad hispanohablante ya educada** — existe un ecosistema maduro de blogs, podcasts y canales de YouTube sobre inversión en español (El Inversor Inteligente, Indexa Capital, Finect…) que genera demanda orgánica y facilita la distribución.
@@ -217,24 +217,24 @@ El **Prototipo v6** está completo y en pruebas con usuarios reales. Es un proto
 
 ## 8. Economic Moat — Barreras de entrada sostenibles
 
-Un moat económico es la ventaja competitiva duradera que protege a una empresa de la competencia a largo plazo. portapp tiene la capacidad de construir un moat sólido basado en cuatro fuentes combinadas:
+Un moat económico es la ventaja competitiva duradera que protege a una empresa de la competencia a largo plazo. Portgrow tiene la capacidad de construir un moat sólido basado en cuatro fuentes combinadas:
 
 **8.1 Switching costs — el moat más fuerte**
-Cuando un usuario lleva 12-24 meses registrando operaciones en portapp, ha acumulado un historial financiero completo e irreemplazable: compras, ventas, dividendos, rentabilidades, anotaciones. Migrar ese historial a otra app es costoso en tiempo y propenso a errores. Cuanto más tiempo usa el producto, más difícil es abandonarlo — exactamente lo contrario a la mayoría de apps de consumo.
+Cuando un usuario lleva 12-24 meses registrando operaciones en Portgrow, ha acumulado un historial financiero completo e irreemplazable: compras, ventas, dividendos, rentabilidades, anotaciones. Migrar ese historial a otra app es costoso en tiempo y propenso a errores. Cuanto más tiempo usa el producto, más difícil es abandonarlo — exactamente lo contrario a la mayoría de apps de consumo.
 
 **8.2 Content moat — comunidad como barrera**
-El blog, los webinars y los canales curados crean un ecosistema de contenido propio que los competidores no pueden replicar con dinero a corto plazo. Una comunidad activa de inversores hispanohablantes que asocia su formación financiera con portapp genera referidos orgánicos, reduce el coste de adquisición y aumenta la retención. Este moat crece con el tiempo y es muy difícil de copiar.
+El blog, los webinars y los canales curados crean un ecosistema de contenido propio que los competidores no pueden replicar con dinero a corto plazo. Una comunidad activa de inversores hispanohablantes que asocia su formación financiera con Portgrow genera referidos orgánicos, reduce el coste de adquisición y aumenta la retención. Este moat crece con el tiempo y es muy difícil de copiar.
 
 **8.3 Moat arquitectónico — privacidad irrepetible**
-La arquitectura local-first no es una característica que se añade a un producto existente — requiere rediseñar el producto desde cero. Los competidores establecidos (Sharesight, Snowball) tienen millones de usuarios en arquitecturas cloud y no pueden migrar sin romper su negocio actual. Este moat es especialmente defensivo porque convierte la fortaleza de portapp en la debilidad estructural de sus competidores.
+La arquitectura local-first no es una característica que se añade a un producto existente — requiere rediseñar el producto desde cero. Los competidores establecidos (Sharesight, Snowball) tienen millones de usuarios en arquitecturas cloud y no pueden migrar sin romper su negocio actual. Este moat es especialmente defensivo porque convierte la fortaleza de Portgrow en la debilidad estructural de sus competidores.
 
 **8.4 Network effects parciales**
 Las carteras compartidas, las comparativas anónimas entre usuarios y el contenido comunitario crean efectos de red moderados: cuantos más usuarios, más valor genera la plataforma para cada usuario individual. No es el network effect de una red social, pero sí un efecto de comunidad que se refuerza con el crecimiento.
 
 **8.5 Data moat — inteligencia acumulada**
-portapp captura desde el primer día métricas detalladas de comportamiento: qué pantallas usa cada tipo de usuario, qué activos registra, cómo navega, dónde abandona. Esta capa de analytics — inspirada en el modelo de instrumentación de los juegos móviles — genera una ventaja competitiva creciente: cada mes de operación añade señales que permiten optimizar el producto, personalizar la experiencia y afinar el marketing con una precisión que un competidor nuevo no puede replicar. Los datos acumulados son, en sí mismos, un activo que crece con el tiempo.
+Portgrow captura desde el primer día métricas detalladas de comportamiento: qué pantallas usa cada tipo de usuario, qué activos registra, cómo navega, dónde abandona. Esta capa de analytics — inspirada en el modelo de instrumentación de los juegos móviles — genera una ventaja competitiva creciente: cada mes de operación añade señales que permiten optimizar el producto, personalizar la experiencia y afinar el marketing con una precisión que un competidor nuevo no puede replicar. Los datos acumulados son, en sí mismos, un activo que crece con el tiempo.
 
-**Conclusión:** portapp no tiene un moat único y dominante como Google o Visa, pero sí una combinación de switching costs + content + arquitectura + datos que lo hace estructuralmente defensible. En el mercado hispanohablante, donde no existe ningún competidor establecido, construir ese moat antes que nadie es el objetivo central de los primeros 24 meses.
+**Conclusión:** Portgrow no tiene un moat único y dominante como Google o Visa, pero sí una combinación de switching costs + content + arquitectura + datos que lo hace estructuralmente defensible. En el mercado hispanohablante, donde no existe ningún competidor establecido, construir ese moat antes que nadie es el objetivo central de los primeros 24 meses.
 
 ---
 
@@ -296,11 +296,11 @@ El programa de financiación más potente de Europa para startups innovadoras. C
 - Presupuesto 2026: **414 millones de euros**
 - Convocatorias bimestrales (6 al año)
 
-Es altamente competitivo (~5% de éxito) y adecuado para cuando portapp tenga tracción demostrada — horizonte realista: **12–18 meses desde el lanzamiento**.
+Es altamente competitivo (~5% de éxito) y adecuado para cuando Portgrow tenga tracción demostrada — horizonte realista: **12–18 meses desde el lanzamiento**.
 
 ### Estrategia de financiación combinada
 
-La combinación óptima para portapp en su fase actual:
+La combinación óptima para Portgrow en su fase actual:
 
 ```
 Fase 1 (ahora):        ACCIÓ Startup Capital (75.000€ fondo perdido)
@@ -323,7 +323,7 @@ Tres tendencias convergen en este momento:
 La comunidad de inversión en español lleva años creciendo — canales de YouTube con 500.000+ seguidores, podcasts con decenas de miles de oyentes, foros activos. Todos ellos usan hojas de Excel o apps en inglés. La demanda está creada; el producto no existe.
 
 **2. Madurez tecnológica del local-first**
-Hace tres años, construir una app local-first con sync transparente requería implementar CRDTs desde cero. Hoy, PowerSync y Electric SQL abstraen esa complejidad. El momento técnico para construir portapp es ahora, con un coste de desarrollo significativamente menor que hace dos años.
+Hace tres años, construir una app local-first con sync transparente requería implementar CRDTs desde cero. Hoy, PowerSync y Electric SQL abstraen esa complejidad. El momento técnico para construir Portgrow es ahora, con un coste de desarrollo significativamente menor que hace dos años.
 
 **3. LatAm fintech en el mejor momento inversor de su historia**
 $4.100M invertidos en 2025, un 13,8% más que en 2024. El ecosistema latinoamericano de fintech está maduro, los inversores están activos y el mercado de usuarios fintech supera los 415 millones. Entrar ahora en España con visión de expansión latinoamericana es posicionarse en el momento de máximo crecimiento.
