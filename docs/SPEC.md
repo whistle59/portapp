@@ -1,4 +1,4 @@
-# portapp — Especificación de requisitos
+# Portgrow — Especificación de requisitos
 
 ## Visión general
 Gestor personal multicartera de activos financieros. Orientado a inversores particulares
@@ -26,7 +26,7 @@ movimientos de efectivo, proyecciones y rendimiento real.
 Campos por activo:
 - Ticker, ISIN, nombre completo del producto
 - Tipo: Acción | ETF | Cripto | Bono | Fondo | Otro
-- Índice que sigue (si aplica) — introducido automáticamente por la app a partir del ticker/ISIN
+- Índice que sigue (si aplica) — introducido manualmente en v1; automático a partir de ticker/ISIN en v2
 - Divisa de negociación
 - Mercado donde se negocia
 - Exposición porcentual por divisa y por región/país
@@ -52,8 +52,8 @@ Campos por operación:
 ### 5. Efectivo
 - Registro de ingresos: transferencia, Bizum, dividendo, staking, interés, saveback
 - Registro de egresos: compra activo, comisión, transferencia salida, otro
-- Saldo por broker con soporte multi-divisa
-- Conversión automática a divisa base
+- Saldo por broker *(multi-divisa en v2; v1 solo EUR)*
+- Conversión automática a divisa base *(v2)*
 
 ### 6. Proyección DCA
 - Aportación periódica configurable: semanal / quincenal / mensual
@@ -84,6 +84,27 @@ Agrupaciones predefinidas y personalizables:
 - Notas por activo individual (accesibles desde el detalle del activo)
 - No interfieren con el flujo ni la navegación
 
+### 11. Detalle de activo
+Pantalla individual por activo con:
+- Broker, fecha de compra, ticker, divisa
+- Cantidad comprada/vendida, comisión, coste total
+- Precio medio ponderado
+- Cotización actual *(v2; en v1 se introduce manualmente)*
+- Historial completo de operaciones
+- Anotaciones propias
+- Ajustes de reconciliación: corrección de precio medio, cantidad o saldo cuando difiere del broker
+- Conexión con todos los totales de la app
+
+### 12. Ajustes
+- Divisa base EUR *(multi-divisa en v2)*
+- Conexión con brokers y plataformas externas
+- Grupos de activos: crear, editar, eliminar
+- Preferencias de interfaz: modo oscuro, decimales, formato de fecha
+- Exportación: Excel, CSV
+- Importación de datos
+- Backup y restauración
+- Gestión de conexiones API *(v2)*
+
 ### 13. Rentabilidad efectivo (`s-rent-efectivo`)
 - Rentabilidad calculada sobre los movimientos de efectivo
 
@@ -94,27 +115,7 @@ Agrupaciones predefinidas y personalizables:
 - Canales de contenido curados para formación inversora
 
 ### 16. Ayuda / FAQ (`s-ayuda`)
-- Preguntas frecuentes, guía de uso, información sobre el cálculo de precio medio
-
-### 11. Detalle de activo
-Pantalla individual por activo con:
-- Broker, fecha de compra, ticker, divisa
-- Cantidad comprada/vendida, comisión, coste total
-- Precio medio ponderado
-- Cotización actual (API)
-- Historial completo de operaciones
-- Anotaciones propias
-- Conexión con todos los totales de la app
-
-### 12. Ajustes
-- Divisas activas y divisa base de conversión
-- Conexión con brokers y plataformas externas
-- Grupos de activos: crear, editar, eliminar
-- Preferencias de interfaz: modo oscuro, decimales, formato de fecha
-- Exportación: Excel, CSV
-- Importación de datos
-- Backup y restauración
-- Gestión de conexiones API
+- Preguntas frecuentes, guía de uso, información sobre el cálculo de precio medio y ajustes de reconciliación
 
 ---
 
@@ -156,7 +157,7 @@ Pantalla individual por activo con:
 
 | Versión | Contenido |
 |---------|-----------|
-| v6 (HTML) | Prototipo UI completo — 17 pantallas, modo básico/avanzado, proyecciones DCA (actual) |
+| v6 (HTML) | Prototipo UI completo — 18 pantallas, modo básico/avanzado, proyecciones DCA (actual) |
 | Prototipo 2 | Validación arquitectura local-first: React Native + WatermelonDB + Supabase |
 | v1.0 | App funcional con datos reales, sin APIs externas |
 | v1.5 | Integración cotizaciones en tiempo real |

@@ -1,4 +1,4 @@
-# portapp — Guión de pruebas con usuarios
+# Portgrow — Guión de pruebas con usuarios
 
 > Credenciales demo: `usuario@portapp.com` / `demo1234` / OTP: `123456` *(simulado — no valida contra backend real)*
 > URL del prototipo: compartir via Netlify Drop
@@ -91,7 +91,7 @@ Entrega las tareas de una en una. No pases a la siguiente hasta que termine o se
 
 **Objetivo de la sesión:** Detectar funcionalidades que faltan, flujos que no son suficientemente potentes y comparaciones con herramientas que ya usan.
 
-**Duración estimada:** 40–50 minutos
+**Duración estimada:** 45–60 minutos
 
 ---
 
@@ -144,11 +144,17 @@ Entrega las tareas de una en una. No pases a la siguiente hasta que termine o se
 - Objetivo: probar los ajustes.
 - Señal de problema: no encuentra Ajustes o la configuración de seguridad.
 
+**Tarea 7 — Ajuste de reconciliación**
+> "El precio medio de VWCE en la app es 107,80€ pero tu broker muestra 108,20€ porque hay una comisión de custodia que no registraste. ¿Cómo lo corriges sin borrar el historial de operaciones?"
+
+- Objetivo: probar el flujo completo de ajuste de reconciliación (requiere modo avanzado).
+- Señal de problema: no encuentra el botón "+ Registrar ajuste" en el detalle del activo, confunde el ajuste con crear una nueva operación, no entiende por qué no se modifica el historial.
+
 ---
 
 ### Fase 3 — Preguntas al finalizar (10–15 min)
 
-1. ¿Qué herramienta usas ahora para seguir tus inversiones? ¿Qué tiene que portapp no tiene? ¿Y al revés?
+1. ¿Qué herramienta usas ahora para seguir tus inversiones? ¿Qué tiene que Portgrow no tiene? ¿Y al revés?
 2. ¿Hay algún cálculo o dato que esperabas ver y no estaba?
 3. ¿El cálculo de rentabilidad TWR te parece correcto o hay algo que no cuadra?
 4. ¿Pagarías por esta app? ¿Cuánto? ¿Pago único o suscripción?
@@ -173,6 +179,7 @@ Tarea 3: [completó / no completó] — Tiempo: __ min — Notas:
 Tarea 4: [completó / no completó] — Tiempo: __ min — Notas:
 Tarea 5: [completó / no completó] — Tiempo: __ min — Notas:
 Tarea 6 (solo B): [completó / no completó] — Tiempo: __ min — Notas:
+Tarea 7 (solo B): [completó / no completó] — Tiempo: __ min — Notas:
 
 MOMENTOS DE CONFUSIÓN (anotar literalmente qué dijo el usuario)
 -
