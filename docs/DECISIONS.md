@@ -159,3 +159,52 @@ Registro de decisiones de arquitectura y producto. Cada entrada explica **qué**
 
 **Alternativas descartadas:**
 - Campos booleanos en la tabla `users` (`gdpr_accepted`, `backup_consent`…): no guarda historial ni versiones; incumple requisitos de trazabilidad GDPR
+
+---
+
+## ADR-011 · Operaciones con fecha retroactiva
+
+**Fecha:** 2026-05-03
+**Estado:** Vigente
+
+**Decisión:** La app permite registrar operaciones con fecha anterior a la última operación ya registrada. Al guardar una operación retroactiva, el sistema recalcula precio medio ponderado, TWR y métricas históricas desde esa fecha hacia adelante.
+
+**Por qué:** Necesario para dos casos reales: (1) importar historial completo de operaciones pasadas al empezar a usar la app, (2) corregir errores de fecha en operaciones ya registradas. Sin esto, el historial queda incompleto o incorrecto de forma permanente.
+
+**Alternativas descartadas:**
+- No permitirlo: bloquea la importación de historial y obliga a introducir operaciones en orden cronológico estricto — inaceptable
+- Permitirlo sin recálculo: los datos históricos quedarían inconsistentes (precio medio incorrecto, TWR erróneo a partir de esa fecha)
+
+**Implicación de implementación:** el motor de cálculo de métricas debe estar diseñado para recalcular desde un punto arbitrario en el tiempo, no solo incrementalmente hacia adelante.
+
+---
+
+## ADR-012 · Cuenta bancaria de origen/destino en transferencias de Efectivo
+
+**Fecha:** 2026-05-03
+**Estado:** Vigente
+
+**Decisión:** Los movimientos de Efectivo de tipo "Transferencia entrada" y "Transferencia salida" admiten un campo opcional `cuentaBancariaId` que referencia una cuenta de tipo `banco` definida en Ajustes. Esto permite registrar de dónde viene o adónde va el dinero en una transferencia entre cuenta bancaria y broker.
+
+**Alcance acotado:** esta decisión NO implica gestión de saldos bancarios, ni importación de extractos bancarios, ni seguimiento de gastos personales. El único propósito es completar el rastro de auditoría de movimientos de capital entre banco y broker.
+
+**Por qué:** El inversor transfiere dinero de su cuenta bancaria a su broker (o viceversa) regularmente. Registrar el origen/destino permite saber exactamente cuánto capital ha entrado en el sistema de inversión y desde qué cuenta, sin necesidad de una herramienta separada de finanzas personales.
+
+**Alternativas descartadas:**
+- Gestión completa de cuentas bancarias (saldos, extractos): scope demasiado amplio, convierte Portgrow en una app de finanzas personales, hay herramientas específicas para eso
+- No implementar: deja el rastro de capital incompleto (no se sabe de dónde vino el dinero que entró al broker)
+
+---
+
+## ADR-013 · No limpiar caché al cerrar la app
+
+**Fecha:** 2026-05-03
+**Estado:** Vigente
+
+**Decisión:** La app no borra datos locales ni sesión cuando el usuario cierra voluntariamente la aplicación.
+
+**Por qué:** La pantalla de bloqueo con PIN/biometría ya cubre el caso de seguridad que motivaría el borrado (alguien coge el teléfono desbloqueado). Borrar la caché al salir destruye la experiencia local-first: el usuario tendría que re-sincronizar datos en cada apertura, convirtiendo la app en un producto efectivamente dependiente de conexión.
+
+**Alternativas descartadas:**
+- Borrar caché al salir voluntariamente: rompe la UX de forma severa sin aportar seguridad incremental real frente al lock screen ya implementado
+- Borrado opcional configurable por el usuario: añade complejidad sin caso de uso claro dado que el lock screen ya existe
