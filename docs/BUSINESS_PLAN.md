@@ -1,146 +1,136 @@
-# Portgrow — Documento de negocio para inversores
+# Portgrow — Análisis de negocio
 
-> Versión 1.5 · Mayo 2026 · Confidencial
+> Versión 2.0 · Mayo 2026 · Documento de trabajo interno
 
 ---
 
 ## Resumen ejecutivo
 
-**Portgrow** es una aplicación móvil y web de gestión de carteras de inversión personal, diseñada para el inversor minorista hispanohablante que gestiona su patrimonio de forma autónoma. El mercado objetivo es España y Latinoamérica — un universo de más de **500 millones de hispanohablantes** donde la oferta de herramientas de inversión en español es prácticamente inexistente y la comunidad DIY (Do It Yourself) crece de forma acelerada.
+**Portgrow** es una aplicación móvil de gestión de carteras de inversión personal para el inversor minorista español que opera con múltiples brokers. El mercado objetivo es España — sin expansión geográfica planificada a corto o medio plazo.
 
-A diferencia de los competidores existentes, Portgrow adopta una arquitectura **local-first** que garantiza que los datos financieros del usuario nunca abandonan su dispositivo sin su consentimiento explícito — el único producto del mercado hispanohablante que combina privacidad real, funcionamiento offline completo y sincronización multi-dispositivo opcional.
+El diferenciador principal es la arquitectura **local-first**: los datos financieros del usuario se almacenan en su dispositivo y la sincronización con la nube es opcional y reversible. Este posicionamiento es técnicamente verificable y difícil de replicar por competidores con arquitecturas cloud ya establecidas.
 
-El mercado latinoamericano de fintech alcanzó **71.360 millones de dólares en 2024**, con más de 415 millones de usuarios de servicios financieros digitales y un crecimiento del 27% anual en financiación. En España, el número de carteras de inversores minoristas alcanzó las **551.000 en 2024**, con una rentabilidad media del 16,3% ese año, reflejo de una comunidad inversora madura y activa.
+La competencia en español existe y ha crecido: Capitally, OnePortfolio y AllInvestView operan en español con funcionalidades similares. El espacio no está vacío. La ventaja competitiva real de Portgrow no es la ausencia de competidores sino una combinación concreta de atributos que ningún competidor actual ofrece simultáneamente: **privacidad estructural + experiencia móvil completa + idioma español + sin dependencia de nube**. Hasta qué punto ese diferenciador es suficiente para captar usuarios de pago en un mercado español con baja disposición a pagar por software es la pregunta central sin respuesta definitiva todavía.
 
-Portgrow opera un modelo de monetización híbrido — pago único por la app base + suscripción anual por servicios con coste recurrente real + licencias B2B para asesores financieros — que combina bajas barreras de adquisición con ingresos recurrentes predecibles.
-
-El equipo busca una inversión inicial para completar el desarrollo del producto y ejecutar el lanzamiento en España, con expansión natural al mercado hispanohablante latinoamericano.
+El modelo de negocio planteado es una suscripción anual con un nivel gratuito de captación, operado por un único desarrollador sin equipo ni financiación externa.
 
 ---
 
 ## 1. El problema
 
-El inversor minorista hispanohablante que gestiona su propio patrimonio se enfrenta a tres problemas no resueltos:
+El inversor minorista español que gestiona su propio patrimonio en múltiples brokers enfrenta tres problemas reales:
 
 **1.1 Fragmentación de carteras**
-El inversor medio opera en 2-3 brokers distintos (DEGIRO, Interactive Brokers, Coinbase, banca tradicional) sin ninguna herramienta que consolide su visión patrimonial en un único lugar. Las hojas de Excel siguen siendo la solución más utilizada — con todos sus problemas de mantenimiento, error humano y falta de análisis.
+El inversor medio en España opera en 2-3 brokers (DEGIRO, Interactive Brokers, Trade Republic, su banco tradicional) sin ninguna herramienta que consolide toda su exposición en un punto. Las hojas de Excel siguen siendo la solución más usada, con todos sus problemas de mantenimiento y error manual.
 
-**1.2 Privacidad comprometida**
-Las aplicaciones existentes almacenan datos financieros detallados en servidores de terceros — carteras completas, operaciones históricas, dividendos cobrados, IBANs. Ceder información tan sensible sin control real sobre dónde viven los datos es una barrera de adopción creciente, especialmente en un contexto post-RGPD en España y con el auge de la conciencia sobre privacidad digital en Latinoamérica.
+**1.2 Privacidad de datos financieros**
+Las aplicaciones disponibles almacenan carteras completas — operaciones históricas, dividendos, posiciones detalladas — en servidores de terceros. Para un número creciente de inversores, ceder información financiera sensible a una plataforma cloud sin control real sobre dónde viven esos datos es un problema genuino.
 
-**1.3 Ninguna solución en español de calidad**
-Los líderes del mercado (Sharesight, Snowball Analytics, Portfolio Performance) están diseñados para mercados anglosajones y disponibles solo en inglés. Las pocas alternativas en español son superficiales, sin análisis real de rentabilidad, sin soporte para múltiples carteras ni múltiples brokers. La comunidad hispanohablante de inversores DIY — enorme y en rápido crecimiento — carece de una herramienta profesional en su idioma.
+**1.3 Métricas de rentabilidad fiables**
+Los brokers ofrecen rentabilidades calculadas solo sobre los activos que custodian, no sobre el conjunto del patrimonio. Calcular TWR real sobre carteras multi-broker es actualmente imposible sin una herramienta externa o trabajo manual en Excel.
 
 ---
 
 ## 2. La solución
 
-Portgrow es una aplicación iOS, Android y web que permite al inversor minorista:
+Portgrow es una aplicación iOS, Android y web que permite al inversor:
 
-- **Consolidar** todas sus carteras en una sola vista — acciones, ETFs, criptomonedas, efectivo
-- **Analizar** su rentabilidad real con el método TWR (Time-Weighted Return), el estándar profesional
-- **Planificar** su estrategia de aportaciones con el simulador DCA integrado
-- **Controlar** su liquidez con el módulo de gestión de efectivo por broker y cuenta bancaria
-- **Compartir** carteras de forma segura con asesores o familiares con permisos granulares
+- **Consolidar** todas sus posiciones y carteras en una vista única
+- **Calcular** rentabilidad real con el método TWR (Time-Weighted Return)
+- **Planificar** aportaciones con el simulador DCA integrado
+- **Controlar** liquidez por broker y cuenta bancaria
+- **Operar offline**: la app funciona sin conexión; la sincronización es opcional
 
-**Acceso a todos los mercados mundiales**
+**El diferenciador estructural: privacidad por arquitectura**
 
-Aunque el producto está diseñado para el inversor hispanohablante, soporta todos los mercados financieros globales — NASDAQ, NYSE, XETRA, Londres, Tokio, mercados emergentes y criptomonedas. El inversor hispanohablante opera en los mismos mercados internacionales que cualquier otro inversor: Portgrow no limita su acceso a ninguno de ellos.
+Los datos viven en el dispositivo del usuario. La sincronización con la nube requiere activación explícita y es reversible. Esto no es una promesa de política de privacidad — es una propiedad del diseño técnico que los competidores cloud no pueden adoptar sin rediseñar su producto desde cero.
 
-**El diferenciador clave: privacidad por diseño**
-
-Los datos financieros del usuario viven en su dispositivo. La sincronización con la nube es opcional y reversible. El argumento de venta — *"tus datos de inversión nunca salen de tu dispositivo"* — es único en el mercado hispanohablante y directamente relevante en el contexto regulatorio y cultural actual.
-
-**En español, desde el primer día**
-
-La app está diseñada y desarrollada en español. No es una traducción — es un producto pensado para el inversor hispanohablante, con la terminología financiera correcta en español y adaptado a la fiscalidad y los instrumentos de inversión más comunes en España y Latinoamérica.
-
-**Ecosistema educativo integrado**
-
-Portgrow no es solo una herramienta de seguimiento — es una plataforma de educación financiera. La app incluye acceso a canales de YouTube curados sobre inversión, y la estrategia de contenido se extiende fuera de la app con un **blog especializado** y **webinars periódicos** sobre estrategias de inversión, fiscalidad y gestión patrimonial. Este ecosistema educativo cumple tres funciones simultáneas: genera tráfico orgánico (SEO), crea comunidad y aumenta la retención — el usuario que aprende con Portgrow no tiene razón para irse a la competencia.
+**Limitación importante:** los datos de telemetría de uso del producto (pantallas visitadas, flujos completados) solo se capturarán de forma agregada y con consentimiento explícito del usuario, o no se capturarán. Es incompatible con el posicionamiento de privacidad recoger datos de comportamiento detallados por usuario. La estrategia de producto se apoya en feedback directo y NPS, no en telemetría masiva.
 
 ---
 
 ## 3. Mercado
 
-### Mercado principal: España
+### Mercado objetivo: España
 
-| Dato | Valor |
-|---|---|
-| Carteras de inversores minoristas (2024) | 551.000 |
-| Rentabilidad media del inversor minorista (2024) | +16,3% |
-| Crecimiento inversión pasiva / ETFs | Tendencia estructural al alza |
-| Ecosistema fintech España | Regulación favorable (Ley Startup 2022, sandbox regulatorio) |
+| Dato | Valor | Fuente |
+|---|---|---|
+| Carteras de inversores minoristas activas en RV española (2024) | 551.084 | CNMV 2024 |
+| % con un solo valor en cartera | 60,4% | CNMV 2024 |
+| Valor mediano de cartera | 5.629 € | CNMV 2024 |
+| Valor medio de cartera | 5.112 € | CNMV 2024 |
+| Usuarios plataforma Finect (inversor DIY activo) | >1.000.000 | Finect 2025 |
+| Inversión en fondos de inversión en España (2025) | 49.732 M€ | Récord histórico |
 
-España es un punto de entrada estratégico: mercado maduro, regulación favorable, comunidad inversora DIY consolidada (blogs, podcasts, canales de YouTube en español con cientos de miles de seguidores) y cultura financiera creciente impulsada por el movimiento FIRE y la inversión en índices.
+**Interpretación honesta del mercado:**
 
-### Mercado de expansión: Latinoamérica
+La cifra de 551.084 carteras es el universo total de inversores minoristas con actividad en renta variable española según la CNMV. No es el mercado objetivo de Portgrow. El 60,4% tiene un único valor en cartera y una mediana de ~5.600€ — eso describe un inversor ocasional, no un usuario que necesita consolidación multi-broker ni cálculo de TWR.
 
-| Dato | Valor |
-|---|---|
-| Mercado fintech LatAm (2024) | $71.360M |
-| Proyección mercado fintech LatAm (2033) | $125.880M (CAGR ~6,5%) |
-| Usuarios fintech en la región (2022) | +415 millones |
-| Startups fintech activas | +3.000 en 26 países |
-| Financiación fintech LatAm (2025) | $4.100M (+13,8% vs 2024) |
-| Fintech como % del VC en México (2024) | 74% |
+El segmento real al que Portgrow se dirige es más estrecho: inversor con al menos dos brokers, cartera superior a 20.000€, que realiza aportaciones periódicas y hace seguimiento activo de su rentabilidad. No existe un dato público que cuantifique exactamente ese segmento. La estimación de trabajo, basada en los datos de la CNMV y el tamaño de la comunidad Finect, sitúa ese universo entre **30.000 y 100.000 personas en España**. Es un mercado de nicho.
 
-México, Argentina y Colombia son los mercados más maduros de la región. El inversor DIY hispanohablante en Latinoamérica crece aceleradamente, impulsado por el acceso a brokers internacionales (Interactive Brokers, eToro) y una oferta de contenido educativo en español cada vez mayor — sin herramientas profesionales de seguimiento acordes.
-
-### Oportunidad específica
-
-La comunidad hispanohablante ha sido históricamente desatendida en el espacio de inversión. No existe ninguna aplicación de gestión de carteras en español con las capacidades de Portgrow. El mercado potencial total (TAM) en el segmento hispanohablante supera los 500 millones de personas, con un núcleo de inversores activos estimado en varios millones creciendo año a año.
+**Implicación directa para el modelo de negocio:** incluso capturando el 5% del segmento objetivo (1.500–5.000 usuarios de pago), los ingresos son modestos. Portgrow no es un negocio de venture capital. Es un negocio de nicho que puede funcionar de forma sostenible como proyecto indie.
 
 ---
 
 ## 4. Competencia
 
-### Análisis competitivo
+### Análisis actualizado (mayo 2026)
 
-| Competidor | Fortalezas | Debilidades vs. Portgrow |
-|---|---|---|
-| **Sharesight** | 500.000+ usuarios globales, informes fiscales, marca consolidada | Solo en inglés, datos en servidores cloud, sin offline, $7-23/mes, sin soporte mercado español |
-| **Snowball Analytics** | Perspectiva europea, herramientas de optimización | Solo en inglés, datos en servidor, $12-15/mes |
-| **Portfolio Performance** | Gratuito, potente, privado (local) | Solo desktop, sin móvil, sin sync, curva de aprendizaje alta, sin español |
-| **Portseido** | Soporte para inversores españoles | Sin offline, datos en servidor, funcionalidades limitadas |
-| **Hoja de Excel** | Flexible, privada | Sin automatización, sin cotizaciones, mantenimiento manual |
-| **Apps de broker** | Integración directa | Solo muestra activos de ese broker, sin visión consolidada |
+| Competidor | Español | Móvil | Privacidad | Spain tax | Precio | Debilidad vs. Portgrow |
+|---|---|---|---|---|---|---|
+| **AllInvestView** | Sí (UI completa) | No (web responsive) | Cloud | Sí — Modelo 720, AEAT, tramos IRPF | ~6-17€/mes | Sin app móvil nativa; cloud-only; sin offline |
+| **Capitally** | Sí | Sí (nativo) | E2E encrypt + offline | No | ~7-11€/mes (estimado) | Offline parcial (no confirmado SQLite real); sin Spain tax features |
+| **OnePortfolio** | Sí (parcial) | No (web) | Cloud | No | 8-11 $/mes | Sin app móvil; lanzado 2025, aún inmaduro; cloud-only |
+| **Portseido** | No (solo inglés) | Sí (iOS/Android) | Cloud | No | 8-12 $/mes | Sin español; cloud-only; sin Spain tax features |
+| **Portfolio Performance** | No | Solo lectura | Local (desktop) | No | Gratis | Sin español; entrada de datos solo en desktop; sin móvil funcional |
+| **Sharesight** | No | Sí | Cloud | No | 7-23 $/mes | Sin español; sin Spain tax features; cloud-only |
+| **Wealthfolio** | No | Parcial | Local (desktop+) | No | Freemium | Sin español; orientado a desktop; sin Spain tax features |
 
-### Ventaja competitiva sostenible
+### Observaciones relevantes
 
-Portgrow ocupa un espacio no disputado: **privacidad real + experiencia móvil fluida + español nativo**. Portfolio Performance es la única solución verdaderamente privada comparable, pero es exclusivamente desktop, no tiene versión móvil y requiere conocimientos técnicos avanzados. Ningún competidor actual combina los tres atributos simultáneamente para el mercado hispanohablante.
+**AllInvestView es el competidor que más se pasa por alto y que más daño puede hacer.** Es el único tracker con soporte completo del Modelo 720, integración con AEAT y tramos del IRPF español. Tiene versión en español, cubre el BME y soporta sincronización con DEGIRO e Interactive Brokers. Si el usuario español necesita gestionar su declaración fiscal, AllInvestView resuelve algo que Portgrow no resuelve en v1. La ausencia de app móvil nativa es su principal debilidad.
+
+**Capitally es el competidor arquitectónicamente más parecido a Portgrow.** Tiene cifrado extremo a extremo, afirma soporte offline, app móvil nativa y versión en español. Si su "offline" es SQLite real y no un PWA installable, su propuesta de privacidad es comparable. Diferencia actual: no tiene features de fiscalidad española y su pricing no es público (señal de que no tiene una propuesta clara todavía).
+
+**Portfolio Performance** tiene app móvil desde 2025, pero es solo de lectura. Para introducir operaciones, el usuario necesita el software de escritorio. Es una limitación estructural para usuarios que quieren registrar operaciones desde el móvil en el momento de la compra.
+
+**Portseido no tiene interfaz en español.** A diferencia de lo que se asumía antes, esto lo excluye automáticamente del segmento de usuarios no angloparlantes.
+
+### Ventaja competitiva real de Portgrow
+
+La combinación **privacidad estructural (local-first) + app móvil completa + español nativo** no la ofrece actualmente ningún competidor. Capitally se acerca más, pero sin confirmación de su arquitectura real y sin features de fiscalidad española.
+
+**Riesgo competitivo principal:** Capitally o OnePortfolio pueden añadir la capa de fiscalidad española en cualquier momento. El moat es estrecho y requiere ejecución rápida.
 
 ---
 
 ## 5. Modelo de negocio
 
-### Estructura de ingresos
+### Propuesta de valor por segmento
 
-**Tier 1 — Plan gratuito** *(adquisición)*
-1 cartera, hasta 20 operaciones, funcionalidades básicas. Sin límite de tiempo. Objetivo: eliminar fricción de entrada y demostrar valor.
+**Plan gratuito** *(adquisición)*
+1 cartera, hasta 30 operaciones, funcionalidades básicas. Sin límite de tiempo. Objetivo: demostrar valor antes de pedir dinero.
 
-**Tier 2 — Plan Personal: pago único 29-49€**
-Carteras ilimitadas, operaciones ilimitadas, exportación CSV/Excel, importación PDF de broker, alertas configurables, compartir cartera. Actualizaciones durante 1 año.
+**Plan Personal — suscripción anual: 24-36€/año**
+Carteras ilimitadas, operaciones ilimitadas, exportación CSV/Excel, sincronización multi-dispositivo opcional, backup automático, actualizaciones continuas.
 
-**Tier 2+ — Suscripción anual de servicios: 12-24€/año**
-Solo para funciones con coste de infraestructura real y valor tangible:
-- Cotizaciones en tiempo real (API de mercados)
-- Sincronización multi-dispositivo en la nube
-- Backup automático
-- Actualizaciones pasado el primer año
+La sincronización y el backup son los únicos componentes con coste de infraestructura real para el desarrollador. Son también las únicas funcionalidades que justifican una suscripción recurrente. El modelo de pago único (que aparecía en versiones anteriores de este documento) se descarta: complica la comunicación de valor, mezcla ingresos recurrentes y no recurrentes, y no encaja con un producto que se mejora continuamente.
 
-**Tier 3 — Plan Profesional B2B: 50-150€/mes por usuario**
-Asesores financieros independientes, family offices. Acceso de lectura a carteras de clientes, informes PDF exportables, panel de gestión multi-cliente.
+### Proyección de ingresos (España, escenario conservador-realista)
 
-### Proyección de ingresos (escenario conservador)
+| Año | Usuarios gratuitos | Conversión | Usuarios de pago | Ingresos anuales |
+|---|---|---|---|---|
+| Año 1 (post-lanzamiento) | 500 | 12% | 60 | ~1.800 € |
+| Año 2 | 2.000 | 15% | 300 | ~9.000 € |
+| Año 3 | 6.000 | 18% | 1.080 | ~32.400 € |
 
-| Año | Usuarios gratuitos | Conversión Plan Personal | ARR estimado |
-|---|---|---|---|
-| Año 1 | 2.000 | 8% (160 usuarios) | ~7.000€ |
-| Año 2 | 12.000 | 10% (1.200 usuarios) | ~75.000€ |
-| Año 3 | 40.000 | 12% (4.800 usuarios) | ~320.000€ |
+*Precio medio asumido: 30€/año. Sin ingresos B2B incluidos.*
 
-*Proyección basada en métricas de conversión de apps fintech similares. No incluye ingresos B2B ni suscripciones de servicios, que pueden representar un multiplicador significativo.*
+**Nota sobre estas cifras:** son modestas porque el mercado objetivo es pequeño y la distribución sin presupuesto de marketing es lenta. No son ingresos que reemplacen un sueldo. Son ingresos consistentes con un proyecto personal bien ejecutado en un nicho real. Si en el año 3 el producto tiene 1.000 suscriptores activos, eso es validación suficiente para considerar si escalar o mantener.
+
+**Lo que no está incluido y podría cambiar el escenario:**
+- Plan para asesores financieros (EAFIs) si se añade Modelo 720 y AEAT — segmento pequeño pero con alto LTV
+- Si algún competidor abandona el mercado o sube precios significativamente
 
 ---
 
@@ -148,27 +138,40 @@ Asesores financieros independientes, family offices. Acceso de lectura a cartera
 
 ### Estado actual
 
-El **Prototipo v6** está completo — dos rondas de testers completadas. Es un prototipo HTML autocontenido que valida flujos y experiencia de usuario, sin backend. Incluye 18 pantallas funcionales con modo básico/avanzado, proyecciones DCA guardadas, cancelación de operaciones y FAQ integrada.
+El **Prototipo v6** está completo — dos rondas de testers cerradas, feedback recogido e implementado. Es un prototipo HTML autocontenido (sin backend) que valida flujos de usuario. Incluye 18 pantallas funcionales con modo básico/avanzado.
 
 ### Roadmap
 
-| Fase | Entregable | Plazo estimado |
+| Fase | Entregable | Estimación |
 |---|---|---|
-| **Prototipo 2** | Validación arquitectura local-first: React Native + WatermelonDB + Supabase (sin dependencia de terceros en capa sync) | 3-4 meses |
-| **Beta cerrada** | App iOS + Android con funcionalidades core, 100 usuarios beta | 6-8 meses |
-| **Lanzamiento v1** | App Store + Google Play + Web, Plan Personal disponible | 10-12 meses |
-| **v1.1** | Plan Profesional B2B, importación PDF de broker con IA | 14-16 meses |
-| **v2** | Expansión Latinoamérica, fiscalidad local por país | 18-24 meses |
+| **Prototipo 2** | React Native + WatermelonDB + Supabase: validación de la arquitectura local-first con datos reales y sync | 4-6 meses |
+| **Beta cerrada** | App iOS + Android funcional con 50-100 usuarios beta reales | 8-12 meses |
+| **v1.0** | App Store + Google Play, Plan Personal disponible, sin cotizaciones automáticas | 12-18 meses |
+| **v1.5** | Cotizaciones en tiempo real, Modelo 720 / AEAT (si se confirma demanda) | 18-24 meses |
+| **v2.0** | Comparativo de escenarios DCA, proyección sobre cartera real | 24-30 meses |
 
 ### Stack tecnológico
 
-- **Frontend:** React Native + Expo (iOS, Android y Web desde una base de código)
+- **Frontend:** React Native + Expo (iOS, Android, Web)
 - **Base de datos local:** WatermelonDB (SQLite)
-- **Sincronización:** PowerSync / Electric SQL
+- **Sincronización:** PowerSync (sobre Supabase) — dependencia de tercero, coste recurrente (~49 $/mes en producción en plan base). Alternativa: Electric SQL. Decisión pendiente de comparativa técnica.
 - **Backend:** Supabase (PostgreSQL, Auth, Storage, Edge Functions, RLS)
-- **Pagos:** Paddle (Merchant of Record — gestiona IVA y facturación)
-- **Cotizaciones:** Yahoo Finance API / Alpha Vantage
-- **Analytics:** BigQuery (DWH) + dbt Core (transformaciones) + Looker Studio (dashboards) — integración nativa BigQuery ↔ Looker gracias a la adquisición de Looker por Google. Stack separado del operacional para no afectar rendimiento de la app.
+- **Pagos:** Paddle (Merchant of Record)
+- **Analytics operacional:** BigQuery + dbt Core + Looker Studio (separado del stack de app para no afectar rendimiento)
+
+### Estrategia de datos de mercado (cotizaciones)
+
+**yfinance no es una opción para producción.** La librería usa endpoints no oficiales de Yahoo Finance, viola explícitamente los Términos de Servicio de Yahoo para uso comercial y no ofrece ningún SLA. Yahoo puede cortar el acceso en cualquier momento. Usarla en un producto de pago es un riesgo legal y operacional.
+
+Opciones reales para cotizaciones en producción, con cobertura del BME (Bolsa de Madrid):
+
+| Proveedor | Cobertura BME | Precio orientativo | Notas |
+|---|---|---|---|
+| **EODHD** | Sí (código MC) | ~20-100€/mes (personal); commercial requiere contacto | Opción más económica para datos EOD europeos |
+| **Twelve Data** | Sí (XMAD) | Business tier, precio por contacto | Requiere plan Pro ($229/mes) o Business para XMAD |
+| **Alpha Vantage** | A confirmar | Commercial license, precio por contacto | NASDAQ-licenciado; bajo riesgo legal |
+
+**Conclusión:** el coste de datos de mercado en producción es entre 20 y 200€/mes dependiendo del proveedor y el volumen. No es trivial y no está amortizado hasta tener cientos de usuarios de pago. En v1.0 (sin cotizaciones automáticas), este coste no existe.
 
 ---
 
@@ -176,170 +179,102 @@ El **Prototipo v6** está completo — dos rondas de testers completadas. Es un 
 
 ### Fortalezas
 
-- **Único producto profesional en español** — no existe ningún competidor con las capacidades de Portgrow en español. Es el primer entrante en un mercado desatendido.
-- **Privacidad como diferenciador estructural** — arquitectura local-first que ningún competidor principal ofrece. No es marketing: los datos no pueden ser vendidos, hackeados del servidor ni cedidos a terceros.
-- **Funcionamiento offline completo** — el usuario consulta y registra operaciones sin conexión. Relevante en mercados latinoamericanos con conectividad variable.
-- **Comunidad hispanohablante ya educada** — existe un ecosistema maduro de blogs, podcasts y canales de YouTube sobre inversión en español (El Inversor Inteligente, Indexa Capital, Finect…) que genera demanda orgánica y facilita la distribución.
-- **Coste de infraestructura mínimo** — la arquitectura local-first desplaza el coste computacional al dispositivo. El backend gestiona solo sync, auth y licencias.
-- **Prototipo validado con usuarios reales** — 17 pantallas funcionales en pruebas con inversores reales.
-- **Modelo de monetización sin publicidad** — los datos financieros del usuario nunca se monetizan, lo que refuerza el argumento de privacidad.
-- **Escalabilidad geográfica natural** — España como mercado de validación, con expansión natural a México, Argentina, Colombia y Chile sin cambio de idioma ni de producto.
+- **Privacidad estructural (local-first):** el único tracker en español con datos que viven en el dispositivo del usuario. No es una promesa de política — es una propiedad arquitectónica que los competidores cloud no pueden copiar sin rediseñar su producto.
+- **App móvil completa:** a diferencia de Portfolio Performance (solo lectura en móvil) o OnePortfolio (web responsive), Portgrow permitirá registrar operaciones desde el móvil.
+- **Español nativo:** diseñado y desarrollado en español desde el inicio, no traducido.
+- **Sin anuncios ni monetización de datos:** refuerza el argumento de privacidad con hechos, no solo con promesas.
+- **Prototipo con dos rondas de feedback:** validación real de flujos y UX antes de construir la app nativa.
+- **Coste de infraestructura bajo en v1.0:** sin cotizaciones automáticas, el coste de servidor es mínimo (Supabase free tier hasta cierta escala).
 
 ### Debilidades
 
-- **Equipo pequeño en fase inicial** — el desarrollo requiere incorporar desarrolladores React Native y expertise en sync de datos distribuidos.
-- **Sin cotizaciones automáticas aún** — la integración con APIs de datos de mercado está pendiente. Sin cotizaciones en tiempo real el cálculo de rentabilidad depende de actualizaciones manuales.
-- **Reconocimiento de marca cero** — la adquisición de los primeros usuarios requerirá inversión en contenido, comunidad y marketing.
-- **Complejidad técnica del sync** — sincronizar SQLite local con PostgreSQL de forma transparente es un problema técnico no trivial. PowerSync y Electric SQL mitigan este riesgo pero añaden dependencia de terceros.
-- **Mercado sensible a la confianza** — los usuarios son reacios a probar apps nuevas con sus datos financieros. La curva de adopción puede ser más lenta que en otras categorías.
-- **Fragmentación fiscal en Latinoamérica** — cada país tiene su propia fiscalidad de inversiones. El soporte fiscal localizado por país es un desarrollo considerable para la v2.
+- **Sin fiscalidad española en v1:** AllInvestView ya resuelve Modelo 720 y AEAT. Para el inversor que necesita esas funcionalidades, Portgrow no es suficiente hasta v1.5 como mínimo.
+- **Un solo desarrollador:** toda la velocidad de desarrollo y mantenimiento depende de una única persona. Cualquier interrupción (salud, motivación, prioridades) detiene el proyecto.
+- **Sin presupuesto de marketing:** la adquisición depende exclusivamente de contenido orgánico, comunidades de inversión y boca a boca. Es lenta.
+- **Stack complejo:** React Native + WatermelonDB + sync es una arquitectura no trivial. El riesgo de que la capa de sync (PowerSync/Electric SQL) introduzca problemas difíciles de depurar es real.
+- **Sin cotizaciones en v1.0:** el usuario tiene que introducir cotizaciones manualmente. Para algunos usuarios esto es un bloqueante; para otros (que confían más en sus propios datos) es aceptable.
 
 ### Oportunidades
 
-- **Mercado hispanohablante sin competidor directo** — el espacio está prácticamente vacío. El primer producto de calidad en capturarlo tiene ventaja de pionero significativa.
-- **Crecimiento estructural de la inversión DIY en España** — el número de carteras minoristas crece año a año, impulsado por la cultura de inversión pasiva y los ETFs de bajo coste.
-- **Explosión fintech en Latinoamérica** — $4.100M de inversión en 2025 (+13,8%), con México, Colombia y Argentina como mercados principales. El inversor DIY latinoamericano crece en paralelo al acceso a brokers internacionales.
-- **Comunidad de contenido en español como canal de distribución** — youtubers, podcasters y bloggers de inversión en español tienen audiencias de cientos de miles de seguidores. Son canales de distribución naturales y alineados con el producto.
-- **Privacidad como argumento regulatorio en España/UE** — el RGPD ha educado al usuario español sobre sus derechos. Una app que garantiza estructuralmente la privacidad tiene un argumento diferencial que resuena de forma natural.
-- **Segmento B2B asesor financiero** — los asesores financieros independientes en España (EAFIs) y Latinoamérica carecen de herramientas asequibles de seguimiento multi-cliente. El Plan Profesional puede generar ingresos recurrentes significativos.
-- **Movimiento FIRE en español** — la comunidad de independencia financiera en español crece aceleradamente, con perfiles de alta intención de uso de herramientas de gestión patrimonial.
+- **Segmento DIY español en crecimiento:** la comunidad inversora en español (blogs, podcasts, canales de YouTube) tiene audiencias de cientos de miles de seguidores. Son canales de distribución naturales si el producto tiene calidad suficiente para generar recomendaciones orgánicas.
+- **Modelo 720 y fiscalidad española como expansión:** si se añaden estas funcionalidades, Portgrow se convierte en el único tracker que combina privacidad real con cumplimiento fiscal español — diferenciador muy difícil de replicar rápido por la competencia.
+- **Asesores financieros independientes (EAFIs):** pequeño segmento pero con disposición a pagar más alta si el producto ofrece informes AEAT. Solo planteable después de que la versión de consumo funcione.
+- **Portfolio Performance como referencia de migración:** sus usuarios buscan activamente alternativas con móvil. Son usuarios técnicamente sofisticados y con alta disposición a pagar.
 
 ### Amenazas
 
-- **Entrada de brokers con funcionalidades consolidadas** — brokers como DEGIRO, Interactive Brokers o Revolut podrían desarrollar vistas consolidadas. Sin embargo, tienen conflicto de interés estructural (no quieren mostrar activos de la competencia) y sus arquitecturas cloud no pueden replicar el argumento de privacidad.
-- **Competidores anglosajones que añaden español** — Sharesight o Snowball Analytics podrían lanzar versión en español. Sería un competidor serio, aunque sin el diferencial de privacidad local-first.
-- **Resistencia al pago en mercados latinoamericanos** — en algunos mercados de Latinoamérica la predisposición al pago por software es menor. El modelo freemium y el precio de entrada bajo (29-49€ pago único) mitigan este riesgo.
-- **Dependencia de APIs de datos de mercado** — las APIs de cotizaciones pueden cambiar condiciones en cualquier momento. Requiere estrategia multi-fuente.
-- **Retención a largo plazo** — las apps de portfolio tracker tienen un problema conocido de retención. La estrategia de contenido educativo (canales curados, formación) y las notificaciones activas son mitigantes parciales.
-- **Volatilidad del contexto macroeconómico** — en entornos de mercados bajistas, la actividad inversora DIY cae. El producto debe aportar valor también en escenarios de pérdidas, no solo de ganancias.
+- **Capitally o AllInvestView añaden la pieza que les falta:** Capitally sin fiscalidad española y AllInvestView sin app móvil — si cualquiera de los dos cierra esa brecha, el espacio de Portgrow se comprime significativamente.
+- **Disposición a pagar en España:** el mercado español tiene históricamente baja disposición a pagar por software. El argumento de privacidad puede justificar el precio para un segmento, pero no para la mayoría.
+- **Abandono del proyecto:** el mayor riesgo operacional es que el desarrollador pierda el interés o el tiempo antes de llegar a v1.0. No hay colchón de equipo ni financiación que lo mitigue.
+- **Dependencia de terceros en el stack:** PowerSync/Electric SQL, Supabase, Paddle, EODHD/Twelve Data son todos proveedores externos que pueden cambiar condiciones o precios. La arquitectura local-first mitiga parcialmente este riesgo (si Supabase desaparece, los datos del usuario siguen en su dispositivo), pero la sync se pierde.
 
 ---
 
-## 8. Economic Moat — Barreras de entrada sostenibles
+## 8. Barreras de entrada (Moat)
 
-Un moat económico es la ventaja competitiva duradera que protege a una empresa de la competencia a largo plazo. Portgrow tiene la capacidad de construir un moat sólido basado en cuatro fuentes combinadas:
+Evaluación honesta de las barreras reales, no de las aspiracionales:
 
-**8.1 Switching costs — el moat más fuerte**
-Cuando un usuario lleva 12-24 meses registrando operaciones en Portgrow, ha acumulado un historial financiero completo e irreemplazable: compras, ventas, dividendos, rentabilidades, anotaciones. Migrar ese historial a otra app es costoso en tiempo y propenso a errores. Cuanto más tiempo usa el producto, más difícil es abandonarlo — exactamente lo contrario a la mayoría de apps de consumo.
+**Switching costs — el más sólido, condicionado a retención**
+Si un usuario registra 12-24 meses de operaciones en Portgrow, migrar ese historial es costoso. Esta barrera solo existe si el usuario usa el producto activamente. Sin retención real, no hay switching cost.
 
-**8.2 Content moat — comunidad como barrera**
-El blog, los webinars y los canales curados crean un ecosistema de contenido propio que los competidores no pueden replicar con dinero a corto plazo. Una comunidad activa de inversores hispanohablantes que asocia su formación financiera con Portgrow genera referidos orgánicos, reduce el coste de adquisición y aumenta la retención. Este moat crece con el tiempo y es muy difícil de copiar.
+**Moat arquitectónico — real pero estrecho**
+La arquitectura local-first es técnicamente difícil de copiar para competidores cloud establecidos. Es una barrera real. Capitally tiene una propuesta similar; si su implementación es equivalente, la ventaja se diluye.
 
-**8.3 Moat arquitectónico — privacidad irrepetible**
-La arquitectura local-first no es una característica que se añade a un producto existente — requiere rediseñar el producto desde cero. Los competidores establecidos (Sharesight, Snowball) tienen millones de usuarios en arquitecturas cloud y no pueden migrar sin romper su negocio actual. Este moat es especialmente defensivo porque convierte la fortaleza de Portgrow en la debilidad estructural de sus competidores.
+**Contenido y comunidad — débil a corto plazo**
+Un blog, webinars y YouTube son valiosos para adquisición, pero no son barreras duraderas. Cualquier competidor con más recursos los puede replicar. Su valor real está en la distribución, no en la defensibilidad.
 
-**8.4 Network effects parciales**
-Las carteras compartidas, las comparativas anónimas entre usuarios y el contenido comunitario crean efectos de red moderados: cuantos más usuarios, más valor genera la plataforma para cada usuario individual. No es el network effect de una red social, pero sí un efecto de comunidad que se refuerza con el crecimiento.
+**Network effects — prácticamente inexistentes**
+Un portfolio tracker es una utilidad individual. Compartir carteras con permisos granulares añade un elemento social marginal, pero no hay efectos de red significativos en este tipo de producto.
 
-**8.5 Data moat — inteligencia acumulada**
-Portgrow captura desde el primer día métricas detalladas de comportamiento: qué pantallas usa cada tipo de usuario, qué activos registra, cómo navega, dónde abandona. Esta capa de analytics — inspirada en el modelo de instrumentación de los juegos móviles — genera una ventaja competitiva creciente: cada mes de operación añade señales que permiten optimizar el producto, personalizar la experiencia y afinar el marketing con una precisión que un competidor nuevo no puede replicar. Los datos acumulados son, en sí mismos, un activo que crece con el tiempo.
+**Data moat — incompatible con el posicionamiento de privacidad**
+Capturar datos de comportamiento detallados por usuario (pantallas visitadas, activos registrados, flujos completados) contradice directamente el argumento de "tus datos nunca salen de tu dispositivo." No es posible tener los dos a la vez de forma creíble. La estrategia de producto se apoya en telemetría opt-in mínima (datos agregados sin identificación de usuario) o en feedback directo, no en un data moat.
 
-**Conclusión:** Portgrow no tiene un moat único y dominante como Google o Visa, pero sí una combinación de switching costs + content + arquitectura + datos que lo hace estructuralmente defensible. En el mercado hispanohablante, donde no existe ningún competidor establecido, construir ese moat antes que nadie es el objetivo central de los primeros 24 meses.
-
----
-
-## 9. Uso de los fondos
-
-*(Indicativo — a detallar con el inversor)*
-
-| Partida | % orientativo |
-|---|---|
-| Desarrollo Prototipo 2 y Beta (React Native + sync) | 50% |
-| Diseño UX/UI profesional | 10% |
-| Infraestructura y licencias (Supabase, APIs, Paddle) | 10% |
-| Marketing, comunidad y adquisición primeros usuarios | 20% |
-| Legal (constitución, propiedad intelectual, RGPD) | 10% |
+**Conclusión:** el moat real de Portgrow en el horizonte de 3-5 años es switching costs + arquitectura. Los demás son más débiles de lo que parecen sobre el papel.
 
 ---
 
-## 10. Financiación pública disponible
+## 9. Financiación pública disponible
 
-> La existencia de programas públicos de financiación no es un detalle administrativo — es un argumento de negocio. Para el inversor privado significa que una parte del capital necesario puede obtenerse sin dilución adicional, reduciendo el riesgo de la inversión y extendiendo la runway. Para el proyecto significa que existe un ecosistema institucional que valida y apoya exactamente este tipo de startup. Las ayudas descritas a continuación son compatibles entre sí y con la inversión privada, y varias de ellas tienen convocatorias abiertas o previstas para 2026.
+> Esta sección es orientativa. Ninguna de las ayudas mencionadas está confirmada como accesible para este proyecto. Cada convocatoria tiene requisitos propios que deben contrastarse en el momento de la solicitud.
 
-### Cataluña — ACCIÓ Startup Capital
+**ACCIÓ Startup Capital (Cataluña)**
+Subvención a fondo perdido de hasta 99.000€ al 75% del coste del proyecto (no al 100% como figuraba en versiones anteriores de este documento). La convocatoria puede estar cerrada en el momento de lectura de este documento — verificar en la web de ACCIÓ antes de planificar sobre esta base. Requiere startup tecnológica con innovación propia, lo que exige argumentar qué parte del stack es tecnología diferencial propia y no solo ensamblaje de herramientas de terceros.
 
-Subvención a **fondo perdido** de hasta **75.000€** gestionada por la Agencia para la Competitividad Empresarial de la Generalitat de Catalunya. En la convocatoria 2026 cubre el **100% del coste del proyecto** (mejora respecto al 80% de años anteriores). Dirigida específicamente a startups tecnológicas catalanas en fase inicial que necesitan validar su modelo de negocio.
+**NEOTEC (CDTI)**
+Subvención a fondo perdido de hasta 250.000€. Requiere que la ventaja competitiva esté basada en tecnología propia, no en servicios de terceros. Para Portgrow, el argumento debe centrarse en la capa de sync local-first y la arquitectura de privacidad, no en el uso de Supabase o React Native (que son herramientas estándar). Es la convocatoria más exigente y competitiva del ecosistema español de financiación pública para startups.
 
-- Presupuesto convocatoria 2026: **7 millones de euros**
-- Compatible con ayudas estatales y europeas
+**ENISA (préstamos participativos)**
+25.000€–75.000€ sin garantías personales, hasta 9 años de devolución. Más accesible que NEOTEC pero sigue requiriendo una empresa constituida con un mínimo de tracción.
 
-### España — NEOTEC (CDTI)
-
-Subvención a **fondo perdido** de hasta **250.000€** (o 325.000€ si se contrata personal investigador) del Centro para el Desarrollo Tecnológico y la Innovación. Es el programa estrella para startups de base tecnológica en España.
-
-- Requisitos clave: empresa < 3 años, modelo de negocio basado en tecnología propia
-- Presupuesto anual: **20 millones de euros** (5M reservados para empresas lideradas por mujeres)
-- Financia hasta el 70% del presupuesto presentado
-- **Compatible con ACCIÓ Startup Capital**
-
-### España — ENISA (préstamos participativos)
-
-Préstamos participativos de **25.000€ a 75.000€** sin garantías personales, con hasta 9 años de devolución y 2 años de carencia. El tipo de interés está ligado a los beneficios — si la empresa no genera beneficios, el coste financiero es mínimo.
-
-### España — Ley Startup (Ley 28/2022)
-
-No es una subvención sino un **marco fiscal muy favorable** que aplica automáticamente a startups certificadas:
-
-| Beneficio | Detalle |
-|---|---|
-| Impuesto de Sociedades reducido | 15% (vs 25% general) durante los primeros 4 años rentables |
-| Aplazamiento de impuestos | Sin intereses los dos primeros años con base imponible positiva |
-| Stock options | Exentas hasta **50.000€/año** por empleado — clave para atraer talento |
-| Régimen de impatriados | Tributación al 24% para talento extranjero contratado |
-
-### Europa — EIC Accelerator (Consejo Europeo de Innovación)
-
-El programa de financiación más potente de Europa para startups innovadoras. Combina subvención y equity:
-
-- **Subvención:** hasta **2,5 millones de euros** a fondo perdido
-- **Equity:** entre 0,5M€ y **10 millones de euros** del Fondo EIC
-- Presupuesto 2026: **414 millones de euros**
-- Convocatorias bimestrales (6 al año)
-
-Es altamente competitivo (~5% de éxito) y adecuado para cuando Portgrow tenga tracción demostrada — horizonte realista: **12–18 meses desde el lanzamiento**.
-
-### Estrategia de financiación combinada
-
-La combinación óptima para Portgrow en su fase actual:
-
-```
-Fase 1 (ahora):        ACCIÓ Startup Capital (75.000€ fondo perdido)
-                     + NEOTEC CDTI (hasta 250.000€ fondo perdido)
-                     + Ley Startup (ahorro fiscal automático)
-
-Fase 2 (post-lanzamiento): ENISA (préstamo sin garantías)
-                          + EIC Accelerator (si hay tracción)
-```
-
-Esta combinación puede aportar hasta **325.000€ en subvenciones no reembolsables** antes de tocar la inversión privada, reduciendo significativamente la dilución para todos los accionistas.
+**Ley Startup 2022**
+Marco fiscal favorable que aplica automáticamente a startups certificadas: IS al 15% durante los primeros 4 años rentables, aplazamiento de impuestos, stock options exentas hasta 50.000€/año. No es una subvención sino una reducción de carga fiscal futura.
 
 ---
 
-## 11. Por qué ahora
+## 10. Por qué ahora
 
-Tres tendencias convergen en este momento:
+**El problema existe y crece.** La comunidad inversora DIY en España lleva años creciendo — Finect tiene más de un millón de usuarios, los canales de YouTube sobre inversión en español tienen cientos de miles de seguidores. Todos ellos usan Excel o apps en inglés. La necesidad está creada; el producto que la resuelve bien aún no existe.
 
-**1. El inversor DIY hispanohablante existe y carece de herramientas**
-La comunidad de inversión en español lleva años creciendo — canales de YouTube con 500.000+ seguidores, podcasts con decenas de miles de oyentes, foros activos. Todos ellos usan hojas de Excel o apps en inglés. La demanda está creada; el producto no existe.
+**La tecnología local-first es ahora madura.** Hace tres años, construir sync offline-first requería implementar CRDTs desde cero. Hoy, WatermelonDB + PowerSync o Electric SQL lo abstraen con documentación pública y comunidades activas. El momento técnico es el correcto.
 
-**2. Madurez tecnológica del local-first**
-Hace tres años, construir una app local-first con sync transparente requería implementar CRDTs desde cero. Hoy, PowerSync y Electric SQL abstraen esa complejidad. El momento técnico para construir Portgrow es ahora, con un coste de desarrollo significativamente menor que hace dos años.
+**El perfil del desarrollador es el adecuado para este proyecto.** Un ingeniero con 30 años de experiencia, que es él mismo el cliente objetivo, que tiene tiempo sin presión financiera para construirlo bien y sin atajos. Eso no elimina los riesgos de un mercado pequeño, pero es la combinación más favorable para un producto de nicho.
 
-**3. LatAm fintech en el mejor momento inversor de su historia**
-$4.100M invertidos en 2025, un 13,8% más que en 2024. El ecosistema latinoamericano de fintech está maduro, los inversores están activos y el mercado de usuarios fintech supera los 415 millones. Entrar ahora en España con visión de expansión latinoamericana es posicionarse en el momento de máximo crecimiento.
+**Lo que no se sabe todavía:** si el segmento objetivo pagará. El prototipo valida flujos de usuario, no disposición a pagar. La primera validación real del negocio ocurrirá cuando la app nativa esté en producción y se pida dinero real a usuarios reales.
 
 ---
 
-*Documento preparado en abril de 2026. Información financiera proyectada con carácter orientativo.*
+*Documento preparado en mayo de 2026. Las proyecciones financieras son estimaciones de trabajo, no previsiones contables. Los datos de competencia corresponden a mayo de 2026 y pueden haber cambiado.*
 
 ---
 
-**Fuentes de referencia:**
-- [CNMV — Análisis del comportamiento de inversores minoristas](https://www.cnmv.es/DocPortal/Publicaciones/MONOGRAFIAS/DT_78_Comp_minoristas_COVID_ENen.pdf)
-- [Funds Society — Más inversores minoristas y crecimiento de ETFs](https://www.fundssociety.com/es/noticias/negocio/mas-inversores-minoristas-crecimiento-de-los-etfs-y-menores-margenes-asi-es-la-foto-del-negocio-europeo-de-fondos/)
-- [TechCrunch — Latin America fintech 2025](https://techcrunch.com/2024/11/24/latin-america-fintech-will-be-a-market-to-watch-in-2025/)
-- [Virtue Market Research — Latin America Fintech Market 2023-2030](https://virtuemarketresearch.com/report/latin-america-fintech-market)
-- [Crunchbase — LatAm Startup Funding 2025](https://news.crunchbase.com/venture/vcs-bullish-latam-startup-funding-rebounds-2025/)
-- [AllInvestView — Best Portfolio Trackers for Spanish Investors](https://www.allinvestview.com/best-portfolio-tracker-spain/)
-- [Capitally — Best Portfolio Tracker 2025](https://www.mycapitally.com/blog/best-portfolio-tracker-for-the-modern-diy-investor)
-- [Finance Magnates — GDPR as Competitive Advantage](https://www.financemagnates.com/fintech/how-fintech-companies-can-use-gdpr-as-a-competitive-advantage/)
+**Fuentes contrastadas:**
+- CNMV — Participación minorista en mercados de valores españoles 2024
+- Finect — Datos de comunidad 2025
+- Portseido — Pricing y features (portseido.com, mayo 2026)
+- OnePortfolio — Pricing y features (oneportfolio.io, mayo 2026)
+- Portfolio Performance — App móvil (portfolio-performance.app, mayo 2026)
+- AllInvestView — Features y pricing (allinvestview.com, mayo 2026)
+- Capitally — Features (mycapitally.com, mayo 2026)
+- yfinance — GitHub README y Yahoo ToS
+- EODHD — Pricing y cobertura de exchanges (eodhd.com, mayo 2026)
+- Twelve Data — Pricing y exchanges (twelvedata.com, mayo 2026)
