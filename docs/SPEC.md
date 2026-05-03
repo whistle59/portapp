@@ -153,6 +153,48 @@ Pantalla individual por activo con:
 
 ---
 
+## Evoluciones futuras del producto
+
+Funcionalidades identificadas para versiones posteriores a v1.0. No forman parte del alcance actual.
+
+---
+
+### EF-1 — Comparativo de escenarios DCA
+
+**Problema que resuelve:** la pantalla de proyección actual solo permite calcular un escenario a la vez. El usuario no puede comparar visualmente el impacto de cambiar el importe o la frecuencia sin recalcular manualmente.
+
+**Descripción funcional:**
+- Definir hasta 3 escenarios DCA simultáneamente, cada uno con sus propios parámetros: importe, frecuencia, rentabilidad esperada y horizonte temporal
+- Visualización superpuesta: un único gráfico de líneas con una línea por escenario, con colores diferenciados y leyenda
+- Tabla de comparativa anual: columnas por escenario, filas por año, mostrando capital acumulado, total invertido y ganancia en cada punto
+- Métricas de resumen por escenario: valor final, total aportado, ganancia total, rentabilidad anualizada (CAGR)
+- Los escenarios se pueden nombrar libremente (ej. "Conservador", "Base", "Agresivo")
+
+**Ejemplo de uso:** el usuario compara aportar 200€/mes al 6% vs 400€/mes al 7% a 20 años — ve en un solo gráfico la diferencia de resultado y decide cuál se ajusta a su situación.
+
+**Versión objetivo:** v1.5
+
+---
+
+### EF-2 — Proyección DCA sobre cartera real
+
+**Problema que resuelve:** la proyección DCA actual usa una rentabilidad esperada genérica introducida manualmente. No tiene en cuenta la composición real de la cartera del usuario ni su comportamiento histórico.
+
+**Descripción funcional:**
+- El usuario selecciona una cartera existente como base de la proyección
+- La app calcula automáticamente la **rentabilidad anualizada ponderada** de esa cartera usando el rendimiento real de cada activo en los últimos 12 meses, ponderado por su peso actual en la cartera
+- Esa rentabilidad calculada se usa como tasa base para la proyección — el usuario puede ajustarla manualmente si lo considera más conservador o agresivo
+- El usuario introduce el importe y la frecuencia de las aportaciones DCA previstas
+- La proyección asume que las nuevas aportaciones mantienen la misma distribución por activos que la cartera actual
+- El resultado incluye: gráfico de evolución, tabla anual y comparativa entre "sin nuevas aportaciones" vs "con DCA"
+- Nota informativa visible: *"La rentabilidad pasada no garantiza rentabilidad futura. Este cálculo es orientativo."*
+
+**Dependencias:** requiere cotizaciones históricas (v1.5) para calcular el rendimiento real de cada activo. No es implementable en v1.0.
+
+**Versión objetivo:** v2.0
+
+---
+
 ## Versiones planificadas
 
 | Versión | Contenido |
